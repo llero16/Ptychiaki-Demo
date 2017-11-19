@@ -23,7 +23,7 @@ public class DataIndexer
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get("indexed\\uDataIndex"));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		FSDirectory index = FSDirectory.open(Paths.get("indexed\\testing1310"));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
@@ -52,15 +52,15 @@ public class DataIndexer
 			
 			
 			//Εκτύπωση ευρετηριοποιημένω στοιχείων
-			System.out.println("user: " + dataUserID);
+			/*System.out.println("user: " + dataUserID);
 			System.out.println("item: " + dataItemID);
 			System.out.println("rating: " + dataRating);
 			System.out.println("timestamp: " + dataTimestamp);
-			System.out.println();
+			System.out.println();*/
 			
 			//Προσθήκη στο ευρετήριο
 			addDoc(writer,dataUserID, dataItemID, dataRating, dataTimestamp);
-			System.out.println("Ευρετηριοποιείται το αρχείο: " + dataUserID);
+			//System.out.println("Ευρετηριοποιείται το αρχείο: " + dataUserID);
 			}
 			
 			//Μεταβλητή για τον υπολογισμό χρόνου(τέλος ευρετηριοποίησης)

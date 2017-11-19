@@ -17,7 +17,7 @@ public class NewUser extends User
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		this.id = String.format("%04d", id);
 	}
 
 	public String getAge() {

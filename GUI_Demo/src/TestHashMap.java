@@ -14,7 +14,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-public class DataSearcher 
+public class TestHashMap 
 {
 
 	private static String indexDataDirectory = "indexed\\uDataIndex";
@@ -70,7 +70,7 @@ public class DataSearcher
 		   
 			String itemQueryString = document.get("dataItemID");
 			File itemFile = new File(indexItemDirectory);
-			titleSearch(itemQueryString,itemFile);
+			//titleSearch(itemQueryString,itemFile);
 		      
 			System.out.print(document.get("dataRating") + " ");
 			System.out.print(document.get("dataTimestamp") + " ");
