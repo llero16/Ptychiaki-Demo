@@ -35,7 +35,7 @@ public class CosineSimilarity {
 
 	public static void main(String[] args) throws IOException, ParseException
 	{
-		int currentUserID = 1;
+		int currentUserID = 2;
 		int userRating = 5;
 		int similarUsersNo = 5;
 		
@@ -69,26 +69,26 @@ public class CosineSimilarity {
 		//System.out.println();
 		
 		//Jaccard Similarity Test
-		/*
+		
 		double [] jsm = jaccardSimilarityMatrix(1,um,cum);
 		ArrayList<Integer> jsu = similarUsers(currentUserID,similarUsersNo,jsm);
 		ArrayList<String> jrm = recommendedMovies(jsu, cum, userRating, um);
 		
 		System.out.println("---Jaccard Similarity---");
 		printRecommendedMovies(currentUserID,similarUsersNo,userRating,jrm);
-		*/
+		
 		
 		//System.out.println();
 		
 		//Jaccard Rounded Similarity Test
-		
+		/*
 		double [] jrsm = jaccardSimilarityMatrix(currentUserID,rum,cum);
 		ArrayList<Integer> jrsu = similarUsers(currentUserID,similarUsersNo,jrsm);
 		ArrayList<String> jrrm = recommendedMovies(jrsu, cum, userRating, um);
 		
 		System.out.println("---Jaccard Rounded Similarity---");
 		printRecommendedMovies(currentUserID,similarUsersNo,userRating,jrrm);
-		
+		*/
 		
 		//System.out.println();
 		

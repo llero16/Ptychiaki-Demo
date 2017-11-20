@@ -1,10 +1,12 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -62,17 +64,18 @@ import org.apache.lucene.store.FSDirectory;
 public class MainFrame extends JFrame implements ActionListener
 {	
 	//Labels
-	//Sign In/Up Labels
-	private JLabel usernameSILabel;
-	private JLabel usernameSULabel;
-	private JLabel ageLabel;
-	private JLabel genderLabel;
-	private JLabel occupationLabel;
-	private JLabel zipCodeLabel;
 	private JLabel imageLabel;
+	//Home/Sign In Labels
+	private JLabel usernameSILabel;
+	//Sign Up Labels
+	private JLabel usernameSULabel;
+	private JLabel ageSULabel;
+	private JLabel genderSULabel;
+	private JLabel occupationSULabel;
+	private JLabel zipCodeSULabel;
 	//Movie Search Labels
 	private JLabel usernameMSLabel;
-	private JLabel idLabel;	
+	private JLabel idMSLabel;	
 	private JLabel titleMSLabel;
 	private JLabel releaseMSLabel;
 	private JLabel genreMSLabel;
@@ -91,31 +94,35 @@ public class MainFrame extends JFrame implements ActionListener
 	private JLabel ratedMRLabel;
 	
 	//TextFields
-	//Sign In/Up TextFields
+	//Home/Sign In TextFields
 	private JTextField usernameSITF;
+	//Sign Up TextFields
 	private JTextField usernameSUTF;
 	private JTextField ageSUTF;
 	private JTextField genderSUTF;
 	private JTextField occupationSUTF;
 	private JTextField zipCodeSUTF;
 	//Movie Search TextFields
-	private JTextField idTF;
-	private JTextField titleTF;
-	private JTextField releaseTF;
-	private JTextField genreTF;
-	
+	private JTextField idMSTF;
+	private JTextField titleMSTF;
+	private JTextField releaseMSTF;
+	private JTextField genreMSTF;
 	
 	//Buttons
-	//Sign In/Up Buttons
-	private JButton signInButton;
-	private JButton signUpButton;
+	//Home/Sign In Buttons
+	private JButton signInSInButton;
+	private JButton signUpSInButton;
+	//Sign Up Buttons
+	private JButton signUpSUpButton;
+	private JButton signInSUpButton;
 	//Movie Search Buttons
-	private JButton searchButton;
-	private JButton signOutButton;
-	private JButton recommendButton;
+	private JButton searchMSButton;
+	private JButton signOutMSButton;
+	private JButton recsMSButton;
 	//Movie Rate Buttons
-	private JButton rateButton;
+	private JButton rateMRButton;
 	private JButton searchMRButton;
+	private JButton recsMRButton;
 	private JButton signOutMRButton;
 	//Recommendations Buttons
 	private JButton jaccardButton;
@@ -124,14 +131,18 @@ public class MainFrame extends JFrame implements ActionListener
 	private JButton cosineButton;
 	private JButton euclideanButton;
 	private JButton chebyshevButton;
-	private JButton signOutRecButton;
 	private JButton searchRecButton;
+	private JButton signOutRecButton;
+	
 	
 	//Panels
-	//Sign In/Up Panels
 	private JPanel mainPanel;
+	//Home/Sign In Panel
 	private JPanel signInPanel;
+	//Sign Up Panels
 	private JPanel signUpPanel;
+	private JPanel infoSignUpPanel;
+	private JPanel buttonSignUpPanel;
 	//Movie Search Panels
 	private JPanel movieSearchPanel;
 	private JPanel infoSearchPanel;
@@ -142,8 +153,14 @@ public class MainFrame extends JFrame implements ActionListener
 	private JPanel buttonRatePanel;
 	//Recommendations Panel
 	private JPanel recommendationsPanel;
-	private JPanel buttonRecommendationsPanel;
-	private JPanel searchRecommendationsPanel;
+	private JPanel searchRecsPanel;
+	private JPanel buttonRecsPanel;
+	
+	//JScroll Panes
+	//MovieSearch JScroll Pane
+	private JScrollPane movieListScrollPane;
+	//Recommendations List JScroll Pane
+	private JScrollPane recsListScrollPane;
 	
 	//Menu, MenuBar & MenuItems
 	private JMenu mainMenu;
@@ -179,10 +196,7 @@ public class MainFrame extends JFrame implements ActionListener
 	//Recommendation List ListModel
 	private DefaultListModel<String> recommendationListModel;
 	
-	//MovieSearch JScroll Pane
-	private JScrollPane movieListScrollPane;
-	//Recommendations List JScroll Pane
-	private JScrollPane recommendationListScrollPane;
+	
 	
 	//ImageIcon
 	private ImageIcon scotlandImage;
@@ -245,13 +259,13 @@ public class MainFrame extends JFrame implements ActionListener
 		usernameSILabel = new JLabel("Username");
 		//Sign Up Panel Labels
 		usernameSULabel = new JLabel("Username/User ID");
-		ageLabel = new JLabel("Age");
-		genderLabel = new JLabel("Gender");
-		occupationLabel = new JLabel("Occupation");
-		zipCodeLabel = new JLabel("Zip Code");
+		ageSULabel = new JLabel("Age");
+		genderSULabel = new JLabel("Gender");
+		occupationSULabel = new JLabel("Occupation");
+		zipCodeSULabel = new JLabel("Zip Code");
 		//Movie Search Labels
 		usernameMSLabel = new JLabel("Username");
-		idLabel = new JLabel("Movie ID");
+		idMSLabel = new JLabel("Movie ID");
 		titleMSLabel = new JLabel("Title");
 		releaseMSLabel = new JLabel("Release");
 		genreMSLabel = new JLabel("Genre");
@@ -279,25 +293,29 @@ public class MainFrame extends JFrame implements ActionListener
 		occupationSUTF = new JTextField();
 		zipCodeSUTF = new JTextField();
 		//Movie Search TextField
-		idTF = new JTextField();
-		titleTF = new JTextField();
-		releaseTF = new JTextField();
-		genreTF = new JTextField();
+		idMSTF = new JTextField();
+		titleMSTF = new JTextField();
+		releaseMSTF = new JTextField();
+		genreMSTF = new JTextField();
 			
 	
 		//Buttons
-		//Sign In Panel Button
-		signInButton = new JButton("Sign In");
+		//Home/Sign In Panel Button
+		signInSInButton = new JButton("Sign In");
+		signUpSInButton = new JButton("Sign Up");
 		//Sign Up Panel Button
-		signUpButton = new JButton("Sign Up");
+		signUpSUpButton = new JButton("Sign Up");
+		signInSUpButton = new JButton("Sign In");
 		//Movie Search Buttons
-		signOutButton = new JButton("Sign Out");
-		searchButton = new JButton("Search Movie");
-		recommendButton = new JButton("Get Recommendation");
+		signOutMSButton = new JButton("Sign Out");
+		searchMSButton = new JButton("Search Movie");
+		recsMSButton = new JButton("Get Recommendation");
 		//Movie Rate Buttons
+		rateMRButton = new JButton("Rate");
 		searchMRButton = new JButton("Search");
-		signOutMRButton = new JButton("Sing Out");
-		rateButton = new JButton("Rate");
+		recsMRButton = new JButton("Recommendations");
+		signOutMRButton = new JButton("Sign Out");
+		
 		//Movie Recommendations Buttons
 		searchRecButton = new JButton("Search");
 		signOutRecButton = new JButton("Sign Out");
@@ -308,16 +326,24 @@ public class MainFrame extends JFrame implements ActionListener
 		euclideanButton = new JButton("Euclidean Distance");
 		chebyshevButton = new JButton("Chebyshev");
 		
-		//ButtonListener
+		//ButtonListeners
 		ButtonListener listener = new ButtonListener();
-		signInButton.addActionListener(listener);
-		signUpButton.addActionListener(listener);
-		signOutButton.addActionListener(listener);
-		rateButton.addActionListener(listener);
-		searchButton.addActionListener(listener);
-		recommendButton.addActionListener(listener);
+		//Home/Sign In Listeners
+		signInSInButton.addActionListener(listener);
+		signUpSInButton.addActionListener(listener);
+		//Sign Up Listeners
+		signUpSUpButton.addActionListener(listener);
+		signInSUpButton.addActionListener(listener);
+		//Movie Search Listeners
+		signOutMSButton.addActionListener(listener);
+		searchMSButton.addActionListener(listener);
+		recsMSButton.addActionListener(listener);
+		//Movie Rate Listeners
+		rateMRButton.addActionListener(listener);
 		searchMRButton.addActionListener(listener);
+		recsMRButton.addActionListener(listener);
 		signOutMRButton.addActionListener(listener);
+		//Recommendations Listeners
 		searchRecButton.addActionListener(listener);
 		signOutRecButton.addActionListener(listener);
 		jaccardButton.addActionListener(listener);
@@ -387,7 +413,7 @@ public class MainFrame extends JFrame implements ActionListener
 								releaseMRLabel.setText(movieHash.get(title).get("releaseDate"));
 								imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
 								genreMRLabel.setText(movieHash.get(title).get("genre"));
-								cardLayout.show(mainPanel,"5");
+								changePage(4);
 								break;
 							}
 						}
@@ -398,50 +424,72 @@ public class MainFrame extends JFrame implements ActionListener
 
 		//Sign In Panel: Set Layout, Add Labels, TextFields & Buttons
 		signInPanel = new JPanel();
-		signInPanel.setLayout(new GridLayout(3,1,20,10));
+		//signInPanel.setLayout(new GridLayout(4,1,20,10));
+		signInPanel.setLayout(new GridLayout(8,1,20,10));
+		signInPanel.setBorder(new TitledBorder("Sign In using your UserID"));
+		
 		signInPanel.add(usernameSILabel);
 		signInPanel.add(usernameSITF);
-		signInPanel.add(signInButton);
-			
+		signInPanel.add(signInSInButton);
+		signInPanel.add(signUpSInButton);
+		
+		signUpSInButton.setBorderPainted(false);
+		signUpSInButton.setOpaque(false);
+		signUpSInButton.setBackground(Color.WHITE);
+		Font font = signUpSInButton.getFont();
+		Map attributes = font.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		signUpSInButton.setFont(font.deriveFont(attributes));
+		
+		//Sign Up Info Panel: Set Layout, Add Labels & TextFields
+		infoSignUpPanel = new JPanel();
+		infoSignUpPanel.setLayout(new GridLayout(6,2,20,10));
+		infoSignUpPanel.setBorder(new TitledBorder("State your Info to Sign Up"));
+		infoSignUpPanel.add(usernameSULabel);
+		infoSignUpPanel.add(usernameSUTF);
+		infoSignUpPanel.add(ageSULabel);
+		infoSignUpPanel.add(ageSUTF);
+		infoSignUpPanel.add(genderSULabel);
+		infoSignUpPanel.add(genderSUTF);
+		infoSignUpPanel.add(occupationSULabel);
+		infoSignUpPanel.add(occupationSUTF);
+		infoSignUpPanel.add(zipCodeSULabel);
+		infoSignUpPanel.add(zipCodeSUTF);
+		//Sign Up Button Panel: Set Layout, Add Labels & TextFields
+		buttonSignUpPanel = new JPanel();
+		buttonSignUpPanel.setBorder(new TitledBorder("Sign Up or Sign In"));
+		buttonSignUpPanel.setLayout(new GridLayout(1,1,20,10));
+		buttonSignUpPanel.add(signUpSUpButton);
+		buttonSignUpPanel.add(signInSUpButton);
 		
 		//Sign Up Panel: Set Layout, Add Labels, TextFields & Buttons
 		signUpPanel = new JPanel();
-		signUpPanel.setLayout(new GridLayout(6,2,20,10));
-		signUpPanel.add(usernameSULabel);
-		signUpPanel.add(usernameSUTF);
-		signUpPanel.add(ageLabel);
-		signUpPanel.add(ageSUTF);
-		signUpPanel.add(genderLabel);
-		signUpPanel.add(genderSUTF);
-		signUpPanel.add(occupationLabel);
-		signUpPanel.add(occupationSUTF);
-		signUpPanel.add(zipCodeLabel);
-		signUpPanel.add(zipCodeSUTF);
-		signUpPanel.add(signUpButton);
-		
+		signUpPanel.setLayout(new BorderLayout());
+		signUpPanel.add(infoSignUpPanel,BorderLayout.CENTER);
+		signUpPanel.add(buttonSignUpPanel,BorderLayout.SOUTH);
 		
 		//Movie Search InfoSearch Panel: Set Layout, Add Labels, TextFields & Button
 		infoSearchPanel = new JPanel();
 		infoSearchPanel.setLayout(new GridLayout(5,2,20,10));
 		infoSearchPanel.setBorder(new TitledBorder("Movie Search Info"));
 		infoSearchPanel.add(usernameMSLabel);
-		infoSearchPanel.add(signOutButton);
-		infoSearchPanel.add(idLabel);
-		infoSearchPanel.add(idTF);
+		infoSearchPanel.add(signOutMSButton);
+		infoSearchPanel.add(idMSLabel);
+		infoSearchPanel.add(idMSTF);
 		infoSearchPanel.add(titleMSLabel);
-		infoSearchPanel.add(titleTF);
+		infoSearchPanel.add(titleMSTF);
 		infoSearchPanel.add(releaseMSLabel);
-		infoSearchPanel.add(releaseTF);
+		infoSearchPanel.add(releaseMSTF);
 		infoSearchPanel.add(genreMSLabel);
-		infoSearchPanel.add(genreTF);
+		infoSearchPanel.add(genreMSTF);
 		
 		//Movie Search ButtonSearch Panel: Set Layout, Add Labels, Buttons & ListView
 		buttonSearchPanel = new JPanel();
 		buttonSearchPanel.setLayout(new GridLayout(1,1,20,10));
 		buttonSearchPanel.setBorder(new TitledBorder("Search Results & Recommendations"));
-		buttonSearchPanel.add(searchButton);
+		buttonSearchPanel.add(searchMSButton);
 		//buttonSearchPanel.add(resultsMSLabel);
-		buttonSearchPanel.add(recommendButton);
+		buttonSearchPanel.add(recsMSButton);
 		//buttonSearchPanel.add(movieList);
 		
 		//Movie Search JScroll Pane: Set Size, Border
@@ -452,7 +500,8 @@ public class MainFrame extends JFrame implements ActionListener
 		UIManager.put("ScrollBarUI", "my.package.MyScrollBarUI");*/
 		
 		//Movie Search Panel: Set Layout, Add Panels
-		movieSearchPanel = new JPanel(new BorderLayout());
+		movieSearchPanel = new JPanel();
+		movieSearchPanel.setLayout(new BorderLayout());
 		//movieSearchPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		movieSearchPanel.add(infoSearchPanel, BorderLayout.NORTH);
 		movieSearchPanel.add(movieListScrollPane, BorderLayout.CENTER);
@@ -480,10 +529,11 @@ public class MainFrame extends JFrame implements ActionListener
 		
 		//Movie Rate ButtonRate Panel: Set Layout, Add Labels, TextFields & Button
 		buttonRatePanel = new JPanel();
-		buttonRatePanel.setLayout(new FlowLayout());
+		buttonRatePanel.setLayout(new GridLayout(2,2,20,10));
 		buttonRatePanel.setBorder(new TitledBorder("Rate or Search for a Movie"));
-		buttonRatePanel.add(rateButton);
+		buttonRatePanel.add(rateMRButton);
 		buttonRatePanel.add(searchMRButton);
+		buttonRatePanel.add(recsMRButton);
 		buttonRatePanel.add(signOutMRButton);
 		
 		//Movie Rate Panel: Set Layout, Add Panels
@@ -495,15 +545,15 @@ public class MainFrame extends JFrame implements ActionListener
 		movieRatePanel.add(buttonRatePanel, BorderLayout.SOUTH);
 		
 		//Recommendations ButtonRecommendations Panel: Set Layout, Buttons
-		searchRecommendationsPanel = new JPanel();
-		searchRecommendationsPanel.setLayout(new GridLayout(3,2,20,10));
-		searchRecommendationsPanel.setBorder(new TitledBorder("Similarity Measures"));
-		searchRecommendationsPanel.add(jaccardButton);
-		searchRecommendationsPanel.add(roundedJaccardButton);
-		searchRecommendationsPanel.add(pearsonButton);
-		searchRecommendationsPanel.add(cosineButton);
-		searchRecommendationsPanel.add(euclideanButton);
-		searchRecommendationsPanel.add(chebyshevButton);
+		searchRecsPanel = new JPanel();
+		searchRecsPanel.setLayout(new GridLayout(3,2,20,10));
+		searchRecsPanel.setBorder(new TitledBorder("Similarity Measures"));
+		searchRecsPanel.add(jaccardButton);
+		searchRecsPanel.add(roundedJaccardButton);
+		searchRecsPanel.add(pearsonButton);
+		searchRecsPanel.add(cosineButton);
+		searchRecsPanel.add(euclideanButton);
+		searchRecsPanel.add(chebyshevButton);
 		
 		
 		//MovieSearch: MovieList List Model
@@ -556,7 +606,7 @@ public class MainFrame extends JFrame implements ActionListener
 								releaseMRLabel.setText(recommendationHash.get(title).get("releaseDate"));
 								imdbMRLabel.setText(recommendationHash.get(title).get("imdbURL"));
 								genreMRLabel.setText(recommendationHash.get(title).get("genre"));
-								cardLayout.show(mainPanel,"5");
+								changePage(4);
 								break;
 							}
 						}
@@ -565,25 +615,25 @@ public class MainFrame extends JFrame implements ActionListener
 				);
 		
 		//Recommendations JScroll Pane: Set Layout, AddPanels
-		recommendationListScrollPane = new JScrollPane(recommendationList);
-		recommendationListScrollPane.setPreferredSize(new Dimension(200, 200));
-		recommendationListScrollPane.setBorder(new TitledBorder("Recommendations List"));
+		recsListScrollPane = new JScrollPane(recommendationList);
+		recsListScrollPane.setPreferredSize(new Dimension(200, 200));
+		recsListScrollPane.setBorder(new TitledBorder("Recommendations List"));
 		
 		//Recommendations Button Recommendations Panel: Set Layout, Add Buttons
-		buttonRecommendationsPanel = new JPanel();
-		buttonRecommendationsPanel.setLayout(new FlowLayout());
-		buttonRecommendationsPanel.setBorder(new TitledBorder("Search for a Movie or Sign Out"));
+		buttonRecsPanel = new JPanel();
+		buttonRecsPanel.setLayout(new GridLayout(1,2,20,10));
+		buttonRecsPanel.setBorder(new TitledBorder("Search for a Movie or Sign Out"));
 		//buttonRecommendationsPanel.add(rateButton);
-		buttonRecommendationsPanel.add(searchRecButton);
-		buttonRecommendationsPanel.add(signOutRecButton);
+		buttonRecsPanel.add(searchRecButton);
+		buttonRecsPanel.add(signOutRecButton);
 		
 		//Recommendations Panel: Set Layout, Add Panels
 		recommendationsPanel = new JPanel();
 		//recommendationsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		recommendationsPanel.setLayout(new BorderLayout());
-		recommendationsPanel.add(searchRecommendationsPanel, BorderLayout.NORTH);
-		recommendationsPanel.add(recommendationListScrollPane, BorderLayout.CENTER);
-		recommendationsPanel.add(buttonRecommendationsPanel, BorderLayout.SOUTH);
+		recommendationsPanel.add(searchRecsPanel, BorderLayout.NORTH);
+		recommendationsPanel.add(recsListScrollPane, BorderLayout.CENTER);
+		recommendationsPanel.add(buttonRecsPanel, BorderLayout.SOUTH);
 		
 		//ImageIcon & Label
 		scotlandImage = new ImageIcon("scotland.jpg");
@@ -594,13 +644,13 @@ public class MainFrame extends JFrame implements ActionListener
 		cardLayout = new CardLayout();
 		mainPanel.setLayout(cardLayout);
 		mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		mainPanel.add(imageLabel, "3");
+		//mainPanel.add(imageLabel, "3");
 		mainPanel.add(signInPanel, "1");
 		mainPanel.add(signUpPanel, "2");
-		mainPanel.add(movieSearchPanel,"4");
-		mainPanel.add(movieRatePanel,"5");
-		mainPanel.add(recommendationsPanel,"6");
-		cardLayout.show(mainPanel, "3");
+		mainPanel.add(movieSearchPanel,"3");
+		mainPanel.add(movieRatePanel,"4");
+		mainPanel.add(recommendationsPanel,"5");
+		cardLayout.show(mainPanel, "1");
 		
 		
 		//Frame Staff
@@ -619,33 +669,27 @@ public class MainFrame extends JFrame implements ActionListener
 			
 		if(buttonString.equals("Home"))
 		{
-			this.setTitle("Home");
-			cardLayout.show(mainPanel,"3");
+			changePage(1);
 		}
 		else if(buttonString.equals("Sign In"))
 		{
-			this.setTitle("Sign In");
-			cardLayout.show(mainPanel,"1");
+			changePage(1);
 		}
 		else if(buttonString.equals("Sign Up"))
 		{
-			this.setTitle("Sign Up");
-			cardLayout.show(mainPanel,"2");
+			changePage(2);
 		}
 		else if(buttonString.equals("Movie Search"))
 		{
-			this.setTitle("Movie Search");
-			cardLayout.show(mainPanel,"4");
+			changePage(3);
 		}
 		else if(buttonString.equals("Movie Rate"))
 		{
-			this.setTitle("Movie Rate");
-			cardLayout.show(mainPanel,"5");
+			changePage(4);
 		}
 		else if(buttonString.equals("Movie Recommendations"))
 		{
-			this.setTitle("Movie Recommendations");
-			cardLayout.show(mainPanel, "6");
+			changePage(5);
 		}
 		else if(buttonString.equals("Exit"))
 			System.exit(0);
@@ -1348,11 +1392,45 @@ public class MainFrame extends JFrame implements ActionListener
 			return title;
 		}
 	
+	//Changes Page(Panel)
+	public void changePage(int panelNumber)
+	{
+		switch(panelNumber)
+		{
+			case 1:
+				setTitle("Home/Sign In ");
+				cardLayout.show(mainPanel, "1");
+				break;
+			case 2:
+				setTitle("Sign Up ");
+				cardLayout.show(mainPanel, "2");
+				break;
+			case 3:
+				setTitle("Movie Search");
+				cardLayout.show(mainPanel, "3");
+				break;
+			case 4:
+				setTitle("Movie Rate");
+				cardLayout.show(mainPanel, "4");
+				break;
+			case 5:
+				setTitle("Movie Recommendations");
+				cardLayout.show(mainPanel, "5");
+				break;
+			default:
+				setTitle("Home/Sign In ");
+				cardLayout.show(mainPanel, "1");
+				break;
+		}
+	}
+	
 	class ButtonListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			if(event.getSource() == signInButton){
+			//Home/Sign In Page
+			if(event.getSource() == signInSInButton)
+			{
 				userID = usernameSITF.getText();
 				
 				user = new OldUser(userID);
@@ -1360,7 +1438,12 @@ public class MainFrame extends JFrame implements ActionListener
 				if(user!=null)
 					usernameMSLabel.setText(user.getId());
 			}
-			if(event.getSource() == signUpButton)
+			if(event.getSource() == signUpSInButton)
+			{
+				changePage(2);
+			}
+			//Sign Up Page
+			if(event.getSource() == signUpSUpButton)
 			{
 				user = new NewUser(usernameSUTF.getText(), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
 				System.out.println(usernameSUTF.getText() + " " + user.getId());
@@ -1368,27 +1451,12 @@ public class MainFrame extends JFrame implements ActionListener
 				if(user!=null)
 					usernameMSLabel.setText(user.getId());
 			}
-			if(event.getSource() == signOutButton){
-				userID = null;
-				JOptionPane.showMessageDialog(null,"Signed Out");
+			if(event.getSource() == signInSUpButton)
+			{
+				changePage(1);
 			}
-			if(event.getSource() == rateButton){
-				
-				String rating = JOptionPane.showInputDialog("Rate " + titleMRLabel.getText());
-				System.out.println(userID);
-				if ((userID != null) && (userID.length() > 0) && (rating != null) && (rating.length() > 0)) {
-					ratedMRLabel.setText(rating);
-					try {
-						addDoc(userID,idMRLabel.getText(),rating);
-						System.out.println(userID);
-					} catch (IOException e){
-						e.printStackTrace();
-					}
-				    return;
-				}
-				
-			}
-			if(event.getSource() == searchButton){
+			//Movie Search Page
+			if(event.getSource() == searchMSButton){
 				System.out.println();
 				
 				//ArrayList Implementation
@@ -1415,7 +1483,7 @@ public class MainFrame extends JFrame implements ActionListener
 				try {		
 					if(!movieTitles.isEmpty())
 						movieTitles.clear();
-					movieHash = searchMovieHash("indexed\\uItemIndex", "id", idTF.getText(), "title", titleTF.getText(), "releaseDate", releaseTF.getText(), "genre", genreTF.getText());
+					movieHash = searchMovieHash("indexed\\uItemIndex", "id", idMSTF.getText(), "title", titleMSTF.getText(), "releaseDate", releaseMSTF.getText(), "genre", genreMSTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -1452,24 +1520,58 @@ public class MainFrame extends JFrame implements ActionListener
 					
 				
 			}
-			if(event.getSource() == recommendButton)
+			if(event.getSource() == recsMSButton)
 			{
-				setTitle("Movie Recommendations");
-				cardLayout.show(mainPanel, "6");
+				changePage(5);
+			}
+			if(event.getSource() == signOutMSButton){
+				userID = null;
+				JOptionPane.showMessageDialog(null,"Signed Out");
+			}
+			//Movie Rate Page
+			if(event.getSource() == rateMRButton){
+				
+				String rating = JOptionPane.showInputDialog("Rate " + titleMRLabel.getText());
+				System.out.println(userID);
+				if(user == null)
+				{
+					changePage(1);
+					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
+				}
+				else if((rating != null) && (rating.length() > 0))
+				{
+					ratedMRLabel.setText(rating);
+					try {
+						addDoc(userID,idMRLabel.getText(),rating);
+						System.out.println(userID);
+					} catch (IOException e){
+						e.printStackTrace();
+					}
+				    return;
+				}
+				/*
+				if ((userID != null) && (userID.length() > 0) && (rating != null) && (rating.length() > 0)) {
+					
+				}
+				*/
 			}
 			if(event.getSource() == searchMRButton)
 			{
-				setTitle("Movie Search");
-				cardLayout.show(mainPanel, "4");
+				changePage(3);
+			}
+			if(event.getSource() == recsMRButton)
+			{
+				changePage(5);
 			}
 			if(event.getSource() == signOutMRButton){
 				userID = null;
 				JOptionPane.showMessageDialog(null,"Signed Out");
+				changePage(1);
 			}
+			//Recommendations Page
 			if(event.getSource() == searchRecButton)
 			{
-				setTitle("Movie Search");
-				cardLayout.show(mainPanel, "4");
+				changePage(3);
 			}
 			if(event.getSource() == signOutRecButton){
 				userID = null;
@@ -1477,10 +1579,9 @@ public class MainFrame extends JFrame implements ActionListener
 			}
 			if((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton) || (event.getSource() == cosineButton) || (event.getSource() == euclideanButton) || (event.getSource() == chebyshevButton))
 			{
-				if(user==null)
+				if(user == null)
 				{
-					setTitle("Sign In");
-					cardLayout.show(mainPanel, "1");
+					changePage(1);
 					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
 				}
 				else
@@ -1597,16 +1698,11 @@ public class MainFrame extends JFrame implements ActionListener
 			{
 				if(user==null)
 				{
-					setTitle("Sign In");
-					cardLayout.show(mainPanel, "1");
+					changePage(1);
 					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
 				}
 				else
 				{
-
-					
-					
-					
 					int[][] um = null;
 					int[][] rum = null;
 					try {
@@ -1644,7 +1740,7 @@ public class MainFrame extends JFrame implements ActionListener
 			for(String title : recommendationHash.keySet())
 				System.out.println(title);
 			
-			recommendationListScrollPane.revalidate();
+			recsListScrollPane.revalidate();
 				
 			
 		}
