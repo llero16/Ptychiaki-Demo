@@ -21,7 +21,7 @@ public class UserSearcher
 		//Parse provided index directory
 		String indexDir = "indexed\\uUserIndex";					
 		//Parse provided query string
-		String q = "940";
+		String q = "946";
 
 		search(indexDir, q);
 	}

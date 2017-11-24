@@ -54,6 +54,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -69,6 +70,7 @@ public class MainFrame extends JFrame implements ActionListener
 	private JLabel usernameSILabel;
 	//Sign Up Labels
 	private JLabel usernameSULabel;
+	private static JLabel usernameNoSULabel; //Replaced the usernameSUTF TextField
 	private JLabel ageSULabel;
 	private JLabel genderSULabel;
 	private JLabel occupationSULabel;
@@ -92,12 +94,14 @@ public class MainFrame extends JFrame implements ActionListener
 	private JLabel genreTextMRLabel;
 	private JLabel genreMRLabel;
 	private JLabel ratedMRLabel;
+	private JLabel ratingMRLabel;
+	private JLabel averageRatingMRLabel;
 	
 	//TextFields
 	//Home/Sign In TextFields
 	private JTextField usernameSITF;
 	//Sign Up TextFields
-	private JTextField usernameSUTF;
+	private JTextField usernameSUTF; //Replaced by the usernameNoSULabel - Check in Labels
 	private JTextField ageSUTF;
 	private JTextField genderSUTF;
 	private JTextField occupationSUTF;
@@ -151,6 +155,7 @@ public class MainFrame extends JFrame implements ActionListener
 	private JPanel movieRatePanel;
 	private JPanel infoRatePanel;
 	private JPanel buttonRatePanel;
+	private JPanel ratingsRatePanel;
 	//Recommendations Panel
 	private JPanel recommendationsPanel;
 	private JPanel searchRecsPanel;
@@ -181,10 +186,10 @@ public class MainFrame extends JFrame implements ActionListener
 	
 	//Movie Search ArrayLists -> JList
 	private ArrayList<String> movieTitles;
-	private ArrayList<Document> movieDocs;
+	//private ArrayList<Document> movieDocs;
 	//Recommendations ArrayLists -> JList
-	private ArrayList<String> recommendationTitles;
-	private ArrayList<Document> recommendationDocs;
+	//private ArrayList<String> recommendationTitles;
+	//private ArrayList<Document> recommendationDocs;
 	
 	//Movie Search HashMap
 	private static HashMap<String,Document> movieHash;
@@ -211,15 +216,21 @@ public class MainFrame extends JFrame implements ActionListener
 	
 	private static String indexDataDirectory = "indexed\\uDataIndex";
 	private static String indexItemDirectory = "indexed\\uItemIndex";
+	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";
+	private static String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 	
-	private static int users = 943; //943 //5
-	private static int items = 1682; //1682 //4
+	private static int users; //943 //5
+	private static int items; //1682 //4
 	
 	private static int userRating = 5;
 	private static int similarUsersNo = 5;
 	
 	public MainFrame() throws IOException, ParseException
 	{
+		//Number of Users and Items
+		users = getUsersNo();
+		items = getItemsNo();
+		
 		//Menu Items
 		homeMI = new JMenuItem("Home");
 		signInMI = new JMenuItem("Sign In");
@@ -259,6 +270,7 @@ public class MainFrame extends JFrame implements ActionListener
 		usernameSILabel = new JLabel("Username");
 		//Sign Up Panel Labels
 		usernameSULabel = new JLabel("Username/User ID");
+		usernameNoSULabel = new JLabel("Your UserID will be: " + (users+1)); //Replaced usernameSUTF TextField
 		ageSULabel = new JLabel("Age");
 		genderSULabel = new JLabel("Gender");
 		occupationSULabel = new JLabel("Occupation");
@@ -281,13 +293,15 @@ public class MainFrame extends JFrame implements ActionListener
 		imdbMRLabel = new JLabel("IMDB URL");
 		genreTextMRLabel = new JLabel("Genre");
 		genreMRLabel = new JLabel("Genre");
-		ratedMRLabel = new JLabel("Unrated");
+		ratedMRLabel = new JLabel("Rated/Unrated");
+		ratingMRLabel = new JLabel("  ", SwingConstants.CENTER);
+		averageRatingMRLabel = new JLabel(" ", SwingConstants.CENTER);
 		
 		//TextFields
 		//Sign In Panel TextField
 		usernameSITF = new JTextField();
 		//Sign Up Panel TextFields
-		usernameSUTF = new JTextField();
+		usernameSUTF = new JTextField(); //Replaced by usernameNoSULabel
 		ageSUTF = new JTextField();
 		genderSUTF = new JTextField();
 		occupationSUTF = new JTextField();
@@ -307,7 +321,7 @@ public class MainFrame extends JFrame implements ActionListener
 		signUpSUpButton = new JButton("Sign Up");
 		signInSUpButton = new JButton("Sign In");
 		//Movie Search Buttons
-		signOutMSButton = new JButton("Sign Out");
+		signOutMSButton = new JButton("Sign In/Out");
 		searchMSButton = new JButton("Search Movie");
 		recsMSButton = new JButton("Get Recommendation");
 		//Movie Rate Buttons
@@ -355,10 +369,10 @@ public class MainFrame extends JFrame implements ActionListener
 		
 		//ArrayLists
 		movieTitles = new ArrayList<String>();
-	    movieDocs = new ArrayList<Document>();
+	    //movieDocs = new ArrayList<Document>();
 	    
-	    recommendationTitles = new ArrayList<String>();
-	    recommendationDocs = new ArrayList<Document>();
+	    //recommendationTitles = new ArrayList<String>();
+	    //recommendationDocs = new ArrayList<Document>();
 		//HashMap
 	    movieHash = new HashMap<String,Document>();	 
 		recommendationHash = new HashMap<String,Document>();
@@ -413,6 +427,23 @@ public class MainFrame extends JFrame implements ActionListener
 								releaseMRLabel.setText(movieHash.get(title).get("releaseDate"));
 								imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
 								genreMRLabel.setText(movieHash.get(title).get("genre"));
+								averageRatingMRLabel.setText(movieHash.get(title).get("averageRating"));
+								String tempRating;
+								if(user!= null)
+								{	
+									try {
+										tempRating = searchRating(user.getId(),movieHash.get(title).get("id"));
+										ratingMRLabel.setText(tempRating);
+										if(tempRating.equals(" - "))
+											ratedMRLabel.setText("Unrated");
+										else
+											ratedMRLabel.setText("Rated");
+									} catch (IOException e) {
+										e.printStackTrace();
+									} catch (ParseException e) {
+										e.printStackTrace();
+									}
+								}
 								changePage(4);
 								break;
 							}
@@ -446,7 +477,8 @@ public class MainFrame extends JFrame implements ActionListener
 		infoSignUpPanel.setLayout(new GridLayout(6,2,20,10));
 		infoSignUpPanel.setBorder(new TitledBorder("State your Info to Sign Up"));
 		infoSignUpPanel.add(usernameSULabel);
-		infoSignUpPanel.add(usernameSUTF);
+		//infoSignUpPanel.add(usernameSUTF); //Replaced by the Label bellow
+		infoSignUpPanel.add(usernameNoSULabel);
 		infoSignUpPanel.add(ageSULabel);
 		infoSignUpPanel.add(ageSUTF);
 		infoSignUpPanel.add(genderSULabel);
@@ -507,7 +539,13 @@ public class MainFrame extends JFrame implements ActionListener
 		movieSearchPanel.add(movieListScrollPane, BorderLayout.CENTER);
 		movieSearchPanel.add(buttonSearchPanel, BorderLayout.SOUTH);
 		
-		
+		//Movie Rate RatingsRate Panel: Set Layout, Add Labels
+		ratingsRatePanel = new JPanel();
+		ratingsRatePanel.setLayout(new GridLayout(1,2,20,10));
+		ratingsRatePanel.setBorder(new TitledBorder("Ratings"));
+		ratingsRatePanel.add(ratingMRLabel);
+		ratingsRatePanel.add(averageRatingMRLabel);
+				
 		
 		//Movie Rate InfoRate Panel: Set Layout, Add Labels, TextFields & Button
 		infoRatePanel= new JPanel();
@@ -524,6 +562,8 @@ public class MainFrame extends JFrame implements ActionListener
 		infoRatePanel.add(genreTextMRLabel);
 		infoRatePanel.add(genreMRLabel);
 		infoRatePanel.add(ratedMRLabel);
+		//infoRatePanel.add(ratingMRLabel);
+		infoRatePanel.add(ratingsRatePanel);
 		
 		
 		
@@ -606,6 +646,24 @@ public class MainFrame extends JFrame implements ActionListener
 								releaseMRLabel.setText(recommendationHash.get(title).get("releaseDate"));
 								imdbMRLabel.setText(recommendationHash.get(title).get("imdbURL"));
 								genreMRLabel.setText(recommendationHash.get(title).get("genre"));
+								averageRatingMRLabel.setText(recommendationHash.get(title).get("averageRating"));
+								
+								String tempRating;
+								if(user!= null)
+								{	
+									try {
+										tempRating = searchRating(user.getId(),recommendationHash.get(title).get("id"));
+										ratingMRLabel.setText(tempRating);
+										if(tempRating.equals(" - "))
+											ratedMRLabel.setText("Unrated");
+										else
+											ratedMRLabel.setText("Rated");
+									} catch (IOException e) {
+										e.printStackTrace();
+									} catch (ParseException e) {
+										e.printStackTrace();
+									}
+								}
 								changePage(4);
 								break;
 							}
@@ -692,17 +750,50 @@ public class MainFrame extends JFrame implements ActionListener
 			changePage(5);
 		}
 		else if(buttonString.equals("Exit"))
+		{
 			System.exit(0);
+			
+		}
 		else
 			System.out.println("Unexpected Error");
 	}
 
+	//Given UserID & ItemID returns the respective Rating if this exists
+	public static String searchRating(String userQuery, String itemQuery) throws IOException, ParseException {
+		
+		File file = new File(indexDataDirectory);
+		Directory directory = FSDirectory.open(file.toPath()); //3
+		IndexReader indexReader = DirectoryReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+		
+		String queryString = userQuery + " AND " + itemQuery;
+		String rating = " - ";
+		String[] fields = {"dataUserID", "dataItemID"};
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
+		Query query = parser.parse(queryString);               
+		
+		TopDocs hits = indexSearcher.search(query, 10);		
+		for(ScoreDoc scoreDoc : hits.scoreDocs) {
+			
+			Document document = indexSearcher.doc(scoreDoc.doc);                    
+			
+			rating = document.get("dataRating");
+		}
+		
+		indexReader.close();                        
+		System.out.print(rating);
+		return rating;
+	}
+	
+	//
 	//Add Rating (Index new Document)
+
+	//Indexes a new User Rating
 	public static void addDoc(String userID, String itemID, String rating)  throws IOException
 	{
 		
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get("indexed\\uDataIndex"));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
@@ -716,10 +807,71 @@ public class MainFrame extends JFrame implements ActionListener
 		document.add(new StringField("dataTimestamp", timestamp, Field.Store.YES));
 		
 		
+		
 		writer.addDocument(document);
 		writer.commit();
 		writer.close();
 	}
+	
+	//Add Rating (Index new Document)
+	public static void addUserDoc(String id, String age, String gender, String occupation, String zipCode)  throws IOException
+	{
+		Analyzer analyzer = new StandardAnalyzer();
+		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(index, config);
+		writer.commit();
+		Document document = new Document();
+		
+		document.add(new StringField("userID", id, Field.Store.YES));
+		document.add(new StringField("userAge", age, Field.Store.YES));
+		document.add(new StringField("userGender", gender, Field.Store.YES));
+		document.add(new StringField("userOccupation", occupation, Field.Store.YES));
+		document.add(new StringField("userZipCode", zipCode, Field.Store.YES));
+		
+		
+		writer.addDocument(document);
+		writer.commit();
+		writer.close();
+		
+		users++;
+		usernameNoSULabel.setText("Your UserID will be: " + (users+1));
+		System.out.println("Users are now " + users);
+		
+		indexUsersItemsNo(users,items);
+	}
+		
+
+	//Given the Item ID it returns the respective Average Rating
+	public static String itemRatingSearch(String itemQueryString, File itemFile) throws IOException, ParseException 
+	{
+		// Open index
+		Directory itemDirectory = FSDirectory.open(itemFile.toPath()); // 3
+		IndexReader itemIndexReader = DirectoryReader.open(itemDirectory);
+		IndexSearcher itemIndexSearcher = new IndexSearcher(itemIndexReader);
+
+		// Parse query
+		// QueryParser parser2 = new QueryParser( "id", new StandardAnalyzer());
+		String[] itemFields = { "itemID" };
+		MultiFieldQueryParser itemParser = new MultiFieldQueryParser(itemFields, new StandardAnalyzer());
+		Query itemQuery = itemParser.parse(itemQueryString);
+		String rating = null;
+		// Search index
+		TopDocs itemHits = itemIndexSearcher.search(itemQuery, 30);
+		for (ScoreDoc itemScoreDoc : itemHits.scoreDocs) {
+			// Retrieve matching document
+			Document itemDocument = itemIndexSearcher.doc(itemScoreDoc.doc);
+			// Display
+			//System.out.print(itemDocument.get("itemRating"));
+			rating = itemDocument.get("itemRating");
+		}
+
+		// Close Index Reader
+		itemIndexReader.close();
+		return rating;
+	}
+
+
 	
 	//Matches and returns HashMap with recommended Movie Titles and the respective Movie Documents containing Movie ID, Title, Release Date and Genre
 	public HashMap<String,Document> recommendedMovieHash(String indexDirectory, String idField, ArrayList<String> recommendedMovieIDs) throws IOException, ParseException
@@ -933,6 +1085,7 @@ public class MainFrame extends JFrame implements ActionListener
 	
 	//Prints Reccomended Movies along with Current User ID, # of Similar Users we set and the Rating we set as standard
 	public static void printRecommendedMovies(int currentUserID, int similarUsersNo, int userRating, ArrayList<String> recommendedMovies)
+
 	{
 		int i = 1;
 		System.out.println("Recommended Movies");
@@ -1225,6 +1378,68 @@ public class MainFrame extends JFrame implements ActionListener
 		return utilityMatrix;
 	}
 	
+	//Index Number of Users & Items
+	public static void indexUsersItemsNo(int users, int items) throws IOException
+	{
+	
+		Analyzer analyzer = new StandardAnalyzer();
+		FSDirectory index = FSDirectory.open(Paths.get(indexUsersItemsNoDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(index, config);
+		//writer.commit();
+		writer.deleteAll();
+		Document document = new Document();
+		
+		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+		
+		document.add(new StringField("UsersNo", String.format("%03d",users), Field.Store.YES));
+		System.out.println("Users: " + users);
+		document.add(new StringField("ItemsNo", String.format("%04d", items), Field.Store.YES));
+		System.out.println("Items: " + items);
+		//document.add(new StringField("dataRating", rating, Field.Store.YES));
+		document.add(new StringField("Timestamp", timestamp, Field.Store.YES));
+		System.out.println("Date: " + timestamp);
+		
+		
+		writer.addDocument(document);
+		//writer.commit();
+		writer.close();
+	}
+	
+	//Read Number of Users
+	public static int getUsersNo() throws IOException
+	{ 
+		File file = new File(indexUsersItemsNoDirectory);
+		Directory directory = FSDirectory.open(file.toPath()); 
+		IndexReader indexReader = DirectoryReader.open(directory);
+		int usersNo = 0;
+		for (int i = 0; i < indexReader.maxDoc(); i++) 
+		{
+			Document document = indexReader.document(i);
+			System.out.println("Users: " + document.get("UsersNo"));
+			usersNo = Integer.valueOf(document.get("UsersNo"));
+		}
+		indexReader.close();
+		return usersNo;
+	}
+	
+	//Read Number of Items
+	public static int getItemsNo()throws IOException
+	{
+		File file = new File(indexUsersItemsNoDirectory);
+		Directory directory = FSDirectory.open(file.toPath()); 
+		IndexReader indexReader = DirectoryReader.open(directory);
+		int itemsNo = 0;
+		for (int i = 0; i < indexReader.maxDoc(); i++) 
+		{
+			Document document = indexReader.document(i);
+			itemsNo = Integer.valueOf(document.get("ItemsNo"));
+			System.out.println("Items: " + document.get("ItemsNo"));
+		}
+		indexReader.close();
+		return itemsNo;
+	}
+	
 	//Returns Array consisting the whole Utility Matrix with 1s in place of 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
 	public static int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException
 	{
@@ -1431,10 +1646,20 @@ public class MainFrame extends JFrame implements ActionListener
 			//Home/Sign In Page
 			if(event.getSource() == signInSInButton)
 			{
-				userID = usernameSITF.getText();
-				
-				user = new OldUser(userID);
-				JOptionPane.showMessageDialog(null,"Signed In " + user.getId());
+				//userID = usernameSITF.getText();
+				int intUserID = Integer.valueOf(usernameSITF.getText());
+				System.out.println("Int UserID: " + intUserID);
+				if((intUserID >= 1) && (intUserID <= users))
+				{
+					user = new OldUser(String.format("%03d", intUserID));
+					JOptionPane.showMessageDialog(null,"Signed In " + user.getId());
+					signOutMSButton.setText("Sign Out");
+					changePage(3);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,"User " + usernameSITF.getText() + " does not exist!");
+				}
 				if(user!=null)
 					usernameMSLabel.setText(user.getId());
 			}
@@ -1445,11 +1670,21 @@ public class MainFrame extends JFrame implements ActionListener
 			//Sign Up Page
 			if(event.getSource() == signUpSUpButton)
 			{
-				user = new NewUser(usernameSUTF.getText(), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
+				user = new NewUser(String.format("%03d",users+1), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
+				/*try {
+					addUserDoc(String.format("%03d",users+1), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}*/
 				System.out.println(usernameSUTF.getText() + " " + user.getId());
 				JOptionPane.showMessageDialog(null,"Now Signed IN " + user.getId());
 				if(user!=null)
+				{
 					usernameMSLabel.setText(user.getId());
+					//userID = user.getId();
+				}
+				signOutMSButton.setText("Sign Out");
+				changePage(3);
 			}
 			if(event.getSource() == signInSUpButton)
 			{
@@ -1483,7 +1718,7 @@ public class MainFrame extends JFrame implements ActionListener
 				try {		
 					if(!movieTitles.isEmpty())
 						movieTitles.clear();
-					movieHash = searchMovieHash("indexed\\uItemIndex", "id", idMSTF.getText(), "title", titleMSTF.getText(), "releaseDate", releaseMSTF.getText(), "genre", genreMSTF.getText());
+					movieHash = searchMovieHash(indexItemDirectoryUpdated, "id", idMSTF.getText(), "title", titleMSTF.getText(), "releaseDate", releaseMSTF.getText(), "genre", genreMSTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -1525,14 +1760,25 @@ public class MainFrame extends JFrame implements ActionListener
 				changePage(5);
 			}
 			if(event.getSource() == signOutMSButton){
-				userID = null;
-				JOptionPane.showMessageDialog(null,"Signed Out");
+				if(user != null)
+				{
+					user = null;
+					JOptionPane.showMessageDialog(null,"Signed Out");
+					usernameMSLabel.setText("Uknown User");
+					signOutMSButton.setText("Sign In");
+				}
+				else
+				{
+					changePage(1);
+					signOutMSButton.setText("Sign Out");
+				}
+				//changePage(1);
 			}
 			//Movie Rate Page
 			if(event.getSource() == rateMRButton){
 				
 				String rating = JOptionPane.showInputDialog("Rate " + titleMRLabel.getText());
-				System.out.println(userID);
+				System.out.println(user.getId());
 				if(user == null)
 				{
 					changePage(1);
@@ -1542,8 +1788,8 @@ public class MainFrame extends JFrame implements ActionListener
 				{
 					ratedMRLabel.setText(rating);
 					try {
-						addDoc(userID,idMRLabel.getText(),rating);
-						System.out.println(userID);
+						addDoc(user.getId(),idMRLabel.getText(),rating);
+						System.out.println(user.getId());
 					} catch (IOException e){
 						e.printStackTrace();
 					}
@@ -1564,8 +1810,9 @@ public class MainFrame extends JFrame implements ActionListener
 				changePage(5);
 			}
 			if(event.getSource() == signOutMRButton){
-				userID = null;
+				user = null;
 				JOptionPane.showMessageDialog(null,"Signed Out");
+				signOutMSButton.setText("Sign In");
 				changePage(1);
 			}
 			//Recommendations Page
@@ -1574,8 +1821,10 @@ public class MainFrame extends JFrame implements ActionListener
 				changePage(3);
 			}
 			if(event.getSource() == signOutRecButton){
-				userID = null;
+				user = null;
 				JOptionPane.showMessageDialog(null,"Signed Out");
+				signOutMSButton.setText("Sign In");
+				changePage(1);
 			}
 			if((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton) || (event.getSource() == cosineButton) || (event.getSource() == euclideanButton) || (event.getSource() == chebyshevButton))
 			{
@@ -1595,16 +1844,16 @@ public class MainFrame extends JFrame implements ActionListener
 						e.printStackTrace();
 					}
 						
-					ArrayList<String> cum = currentUserMovies(Integer.valueOf(userID),um);
+					ArrayList<String> cum = currentUserMovies(Integer.valueOf(user.getId()),um);
 					
 					//Jaccard Similarity
 					if(event.getSource() == jaccardButton)
 					{
-						double [] jsm = jaccardSimilarityMatrix(Integer.valueOf(userID),um,cum);
-						ArrayList<Integer> jsu = similarUsers(Integer.valueOf(userID),similarUsersNo,jsm);
+						double [] jsm = jaccardSimilarityMatrix(Integer.valueOf(user.getId()),um,cum);
+						ArrayList<Integer> jsu = similarUsers(Integer.valueOf(user.getId()),similarUsersNo,jsm);
 						try {
 							ArrayList<String> jrm = recommendedMovies(jsu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash("indexed\\uItemIndex", "id", jrm);
+							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", jrm);
 						} catch (IOException e){
 							e.printStackTrace();
 						} catch (ParseException e){
@@ -1615,11 +1864,11 @@ public class MainFrame extends JFrame implements ActionListener
 					//Pearson Correlation
 					if(event.getSource() == pearsonButton)
 					{
-						double[] psm = pearsonSimilarityMatrix(Integer.valueOf(userID),um);
-						ArrayList<Integer> psu = similarUsers(Integer.valueOf(userID), similarUsersNo, psm);
+						double[] psm = pearsonSimilarityMatrix(Integer.valueOf(user.getId()),um);
+						ArrayList<Integer> psu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, psm);
 						try {
 							ArrayList<String> prm = recommendedMovies(psu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash("indexed\\uItemIndex", "id", prm);
+							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", prm);
 						} catch (IOException e){
 							e.printStackTrace();
 						} catch (ParseException e){
@@ -1638,11 +1887,11 @@ public class MainFrame extends JFrame implements ActionListener
 						} catch (ParseException e1) {
 							e1.printStackTrace();
 						}
-						double[] csm = cosineSimilarityMatrix(Integer.valueOf(userID), um, rssm);
-						ArrayList<Integer> csu = similarUsers(Integer.valueOf(userID), similarUsersNo, csm);
+						double[] csm = cosineSimilarityMatrix(Integer.valueOf(user.getId()), um, rssm);
+						ArrayList<Integer> csu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, csm);
 						try {
 							ArrayList<String> crm = recommendedMovies(csu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash("indexed\\uItemIndex", "id", crm);
+							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", crm);
 						} catch (IOException e){
 							e.printStackTrace();
 						} catch (ParseException e){
@@ -1651,11 +1900,11 @@ public class MainFrame extends JFrame implements ActionListener
 					}
 					if(event.getSource() == euclideanButton)
 					{
-						double[] esm = euclideanSimilarityMatrix(Integer.valueOf(userID),um);
-						ArrayList<Integer> esu = similarUsers(Integer.valueOf(userID), similarUsersNo, esm);
+						double[] esm = euclideanSimilarityMatrix(Integer.valueOf(user.getId()),um);
+						ArrayList<Integer> esu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, esm);
 						try {
 							ArrayList<String> erm = recommendedMovies(esu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash("indexed\\uItemIndex", "id", erm);
+							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", erm);
 						} catch (IOException e){
 							e.printStackTrace();
 						} catch (ParseException e){
@@ -1664,11 +1913,11 @@ public class MainFrame extends JFrame implements ActionListener
 					}
 					if(event.getSource() == chebyshevButton)
 					{
-						double[] chsm = chebyshevSimilarityMatrix(Integer.valueOf(userID),um);
-						ArrayList<Integer> chsu = similarUsers(Integer.valueOf(userID), similarUsersNo, chsm);
+						double[] chsm = chebyshevSimilarityMatrix(Integer.valueOf(user.getId()),um);
+						ArrayList<Integer> chsu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, chsm);
 						try {
 							ArrayList<String> chrm = recommendedMovies(chsu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash("indexed\\uItemIndex", "id", chrm);
+							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", chrm);
 						} catch (IOException e){
 							e.printStackTrace();
 						} catch (ParseException e){
@@ -1713,13 +1962,13 @@ public class MainFrame extends JFrame implements ActionListener
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					ArrayList<String> cum = currentUserMovies(Integer.valueOf(userID),um);
+					ArrayList<String> cum = currentUserMovies(Integer.valueOf(user.getId()),um);
 					
-					double [] jrsm = jaccardSimilarityMatrix(Integer.valueOf(userID),rum,cum);
-					ArrayList<Integer> jrsu = similarUsers(Integer.valueOf(userID),similarUsersNo,jrsm);
+					double [] jrsm = jaccardSimilarityMatrix(Integer.valueOf(user.getId()),rum,cum);
+					ArrayList<Integer> jrsu = similarUsers(Integer.valueOf(user.getId()),similarUsersNo,jrsm);
 					try {
 						ArrayList<String> jrrm = recommendedMovies(jrsu, cum, userRating, um);;
-						recommendationHash = recommendedMovieHash("indexed\\uItemIndex", "id", jrrm);
+						recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", jrrm);
 					} catch (IOException e){
 						e.printStackTrace();
 					} catch (ParseException e){
