@@ -52,12 +52,16 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -121,13 +125,13 @@ public class MainFrame extends JFrame implements ActionListener
 	private JButton signInSUpButton;
 	//Movie Search Buttons
 	private JButton searchMSButton;
-	private JButton signOutMSButton;
+	private JButton signInOutMSButton;
 	private JButton recsMSButton;
 	//Movie Rate Buttons
 	private JButton rateMRButton;
 	private JButton searchMRButton;
 	private JButton recsMRButton;
-	private JButton signOutMRButton;
+	private JButton signInOutMRButton;
 	//Recommendations Buttons
 	private JButton jaccardButton;
 	private JButton roundedJaccardButton;
@@ -321,14 +325,14 @@ public class MainFrame extends JFrame implements ActionListener
 		signUpSUpButton = new JButton("Sign Up");
 		signInSUpButton = new JButton("Sign In");
 		//Movie Search Buttons
-		signOutMSButton = new JButton("Sign In/Out");
+		signInOutMSButton = new JButton("Sign In/Out");
 		searchMSButton = new JButton("Search Movie");
 		recsMSButton = new JButton("Get Recommendation");
 		//Movie Rate Buttons
 		rateMRButton = new JButton("Rate");
 		searchMRButton = new JButton("Search");
 		recsMRButton = new JButton("Recommendations");
-		signOutMRButton = new JButton("Sign Out");
+		signInOutMRButton = new JButton("Sign In/Out");
 		
 		//Movie Recommendations Buttons
 		searchRecButton = new JButton("Search");
@@ -349,14 +353,14 @@ public class MainFrame extends JFrame implements ActionListener
 		signUpSUpButton.addActionListener(listener);
 		signInSUpButton.addActionListener(listener);
 		//Movie Search Listeners
-		signOutMSButton.addActionListener(listener);
+		signInOutMSButton.addActionListener(listener);
 		searchMSButton.addActionListener(listener);
 		recsMSButton.addActionListener(listener);
 		//Movie Rate Listeners
 		rateMRButton.addActionListener(listener);
 		searchMRButton.addActionListener(listener);
 		recsMRButton.addActionListener(listener);
-		signOutMRButton.addActionListener(listener);
+		signInOutMRButton.addActionListener(listener);
 		//Recommendations Listeners
 		searchRecButton.addActionListener(listener);
 		signOutRecButton.addActionListener(listener);
@@ -428,6 +432,8 @@ public class MainFrame extends JFrame implements ActionListener
 								imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
 								genreMRLabel.setText(movieHash.get(title).get("genre"));
 								averageRatingMRLabel.setText(movieHash.get(title).get("averageRating"));
+								if((movieHash.get(title).get("averageRating") == null) || movieHash.get(title).get("averageRating").equals(" "))
+									System.out.println(movieHash.get(title).get("averageRating"));
 								String tempRating;
 								if(user!= null)
 								{	
@@ -505,7 +511,7 @@ public class MainFrame extends JFrame implements ActionListener
 		infoSearchPanel.setLayout(new GridLayout(5,2,20,10));
 		infoSearchPanel.setBorder(new TitledBorder("Movie Search Info"));
 		infoSearchPanel.add(usernameMSLabel);
-		infoSearchPanel.add(signOutMSButton);
+		infoSearchPanel.add(signInOutMSButton);
 		infoSearchPanel.add(idMSLabel);
 		infoSearchPanel.add(idMSTF);
 		infoSearchPanel.add(titleMSLabel);
@@ -574,7 +580,7 @@ public class MainFrame extends JFrame implements ActionListener
 		buttonRatePanel.add(rateMRButton);
 		buttonRatePanel.add(searchMRButton);
 		buttonRatePanel.add(recsMRButton);
-		buttonRatePanel.add(signOutMRButton);
+		buttonRatePanel.add(signInOutMRButton);
 		
 		//Movie Rate Panel: Set Layout, Add Panels
 		movieRatePanel = new JPanel();
@@ -785,15 +791,13 @@ public class MainFrame extends JFrame implements ActionListener
 		return rating;
 	}
 	
-	//
-	//Add Rating (Index new Document)
-
-	//Indexes a new User Rating
-	public static void addDoc(String userID, String itemID, String rating)  throws IOException
+	
+	//Adds new or updates existing Item Rating
+	public static void addDataDoc(String userID, String itemID, String rating)  throws IOException
 	{
 		
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει  append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
@@ -812,6 +816,36 @@ public class MainFrame extends JFrame implements ActionListener
 		writer.commit();
 		writer.close();
 	}
+	
+
+	//Rates Item using UserID and ItemID
+	public static void rateDataItem(String userID, String itemID, String rating) throws IOException, ParseException
+	{
+		if(searchRating(userID,itemID) != null)
+			deleteDataDocument(userID,itemID);
+		addDataDoc(userID,itemID,rating);
+	}
+
+	//Deletes existing Item Rating given UserID and ItemID
+	public static void deleteDataDocument(String userID, String itemID) throws IOException
+	{
+		Analyzer analyzer = new StandardAnalyzer();
+		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(index, config);
+		writer.commit();
+		
+		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+		Query userQuery = new TermQuery(new Term("dataUserID", userID));
+		Query itemQuery = new TermQuery(new Term("dataItemID", itemID));
+		
+		queryBuilder.add(userQuery,BooleanClause.Occur.MUST);
+		queryBuilder.add(itemQuery, BooleanClause.Occur.MUST);
+		
+		writer.deleteDocuments(queryBuilder.build());
+		writer.close();
+	}
+	
 	
 	//Add Rating (Index new Document)
 	public static void addUserDoc(String id, String age, String gender, String occupation, String zipCode)  throws IOException
@@ -994,6 +1028,7 @@ public class MainFrame extends JFrame implements ActionListener
 				Document document = indexSearcher.doc(scoreDoc.doc);
 				//Put Movie Title and Document to HashMap
 				documentHash.put(document.get("title"), document);
+				System.out.println(document.get("title"));
 	
 			}
 		
@@ -1653,7 +1688,8 @@ public class MainFrame extends JFrame implements ActionListener
 				{
 					user = new OldUser(String.format("%03d", intUserID));
 					JOptionPane.showMessageDialog(null,"Signed In " + user.getId());
-					signOutMSButton.setText("Sign Out");
+					signInOutMSButton.setText("Sign Out");
+					signInOutMRButton.setText("Sign Out");
 					changePage(3);
 				}
 				else
@@ -1683,7 +1719,8 @@ public class MainFrame extends JFrame implements ActionListener
 					usernameMSLabel.setText(user.getId());
 					//userID = user.getId();
 				}
-				signOutMSButton.setText("Sign Out");
+				signInOutMSButton.setText("Sign Out");
+				signInOutMRButton.setText("Sign Out");
 				changePage(3);
 			}
 			if(event.getSource() == signInSUpButton)
@@ -1759,18 +1796,18 @@ public class MainFrame extends JFrame implements ActionListener
 			{
 				changePage(5);
 			}
-			if(event.getSource() == signOutMSButton){
+			if(event.getSource() == signInOutMSButton){
 				if(user != null)
 				{
 					user = null;
 					JOptionPane.showMessageDialog(null,"Signed Out");
 					usernameMSLabel.setText("Uknown User");
-					signOutMSButton.setText("Sign In");
+					signInOutMSButton.setText("Sign In");
 				}
 				else
 				{
 					changePage(1);
-					signOutMSButton.setText("Sign Out");
+					signInOutMSButton.setText("Sign Out");
 				}
 				//changePage(1);
 			}
@@ -1778,19 +1815,25 @@ public class MainFrame extends JFrame implements ActionListener
 			if(event.getSource() == rateMRButton){
 				
 				String rating = JOptionPane.showInputDialog("Rate " + titleMRLabel.getText());
-				System.out.println(user.getId());
-				if(user == null)
+				System.out.println("rating value" + rating);
+				
+				if(user == null && rating != null)
 				{
 					changePage(1);
 					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
 				}
 				else if((rating != null) && (rating.length() > 0))
 				{
-					ratedMRLabel.setText(rating);
+					System.out.println(user.getId());
+					ratedMRLabel.setText("Rated");
 					try {
-						addDoc(user.getId(),idMRLabel.getText(),rating);
+						//addDataDoc(user.getId(),idMRLabel.getText(),rating);
+						rateDataItem(user.getId(),idMRLabel.getText(),rating);
 						System.out.println(user.getId());
 					} catch (IOException e){
+						e.printStackTrace();
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				    return;
@@ -1809,11 +1852,18 @@ public class MainFrame extends JFrame implements ActionListener
 			{
 				changePage(5);
 			}
-			if(event.getSource() == signOutMRButton){
-				user = null;
-				JOptionPane.showMessageDialog(null,"Signed Out");
-				signOutMSButton.setText("Sign In");
-				changePage(1);
+			if(event.getSource() == signInOutMRButton){
+				if(user != null)
+				{
+					user = null;
+					JOptionPane.showMessageDialog(null,"Signed Out");
+					signInOutMRButton.setText("Sign In");
+				}
+				else
+				{
+					changePage(1);
+					signInOutMRButton.setText("Sign Out");
+				}
 			}
 			//Recommendations Page
 			if(event.getSource() == searchRecButton)
@@ -1823,7 +1873,7 @@ public class MainFrame extends JFrame implements ActionListener
 			if(event.getSource() == signOutRecButton){
 				user = null;
 				JOptionPane.showMessageDialog(null,"Signed Out");
-				signOutMSButton.setText("Sign In");
+				signInOutMSButton.setText("Sign In");
 				changePage(1);
 			}
 			if((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton) || (event.getSource() == cosineButton) || (event.getSource() == euclideanButton) || (event.getSource() == chebyshevButton))

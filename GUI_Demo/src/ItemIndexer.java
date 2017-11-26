@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,13 +11,27 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 
 public class ItemIndexer
 {
+
+	private static String indexDataDirectory = "indexed\\uDataIndex";
+	private static String indexItemDirectory = "indexed\\uItemIndex";
+	private static String indexItemRatings = "indexed\\Items&Ratings";
+	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";
 	
 	public static void main(String[] args) throws IOException
 	{
@@ -113,6 +128,88 @@ public class ItemIndexer
 		writer.addDocument(document);
 		writer.commit();
 	}
+	
+
+	//Retrieves wanted Document and Indexes it with Rating field to another directory 
+	public static void itemUpdatedIndex(float[] averageRatings) throws IOException, ParseException {
+		
+		File file = new File(indexItemDirectory);
+		Directory directory = FSDirectory.open(file.toPath());
+		IndexReader indexReader = DirectoryReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+		
+		Analyzer analyzer = new StandardAnalyzer();
+		FSDirectory index = FSDirectory.open(Paths.get(indexItemDirectoryUpdated)); 
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(index, config);
+		
+
+		String[] fields = {"id"};
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
+
+		String queryString;
+		Document document, document2;
+		Query query;
+		TopDocs hits;
+		System.out.println("Length " + averageRatings.length);
+		for (int i = 1; i < averageRatings.length + 1; i++) 
+		{
+			queryString = String.format("%04d", i);
+			//System.out.print(i + ". " + queryString + " ");
+			//System.out.println("outside");
+			query = parser.parse(queryString);
+			hits = indexSearcher.search(query, 10);
+			
+			String id, title, releaseDate, imdbURL, genre;
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				//System.out.println("inside");
+				document = indexSearcher.doc(scoreDoc.doc);
+				id = document.get("id");
+				title = document.get("title");
+				releaseDate = document.get("releaseDate");
+				imdbURL = document.get("imdbURL");
+				genre = document.get("genre");
+				
+				document2 = new Document();
+				
+				document2.add(new StringField("id", id, Field.Store.YES));
+				document2.add(new TextField("title", title, Field.Store.YES));
+				document2.add(new TextField("releaseDate", releaseDate, Field.Store.YES));
+				document2.add(new StringField("imdbURL", imdbURL, Field.Store.YES));
+				document2.add(new TextField("genre", genre, Field.Store.YES));
+				
+				document2.add(new StringField("averageRating", String.format("%2.1f", averageRatings[i]), Field.Store.YES));
+				//System.out.println(i + ". " + document.get("id") + " " + document.get("averageRating"));
+				
+				writer.addDocument(document2);
+			}
+			writer.commit();
+		}
+		
+		writer.close();
+	}
+
+	public static void indexItemRatings(float[] averageRatings) throws IOException, ParseException {
+
+		Analyzer analyzer = new StandardAnalyzer();
+		FSDirectory index = FSDirectory.open(Paths.get(indexItemRatings)); 
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(index, config);
+
+		writer.commit();
+
+		for (int i = 1; i < averageRatings.length; i++) {
+			Document document = new Document();
+			document.add(new StringField("itemID", String.format("%04d", i), Field.Store.YES));
+			document.add(new StringField("itemRating", String.format("%2.1f", averageRatings[i]), Field.Store.YES));
+
+			writer.addDocument(document);
+		}
+
+		writer.commit();
+		writer.close();
+	}
+	
 }
 
 
