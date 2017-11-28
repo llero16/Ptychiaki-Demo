@@ -22,6 +22,9 @@ we can see the movie's info and rate/rerate in case we are logged in.
 Ratings(Average Rating and Logged User Rating). It also allows the user to rate or rerate a movie and access Movie Search Panel and
 Recommendations Panel. It should only be accessible by the Movie Search and Recommendations Panels.
 
-5.Recommendations Panel. When here a user can get movie recommendations using six different similarity measures(Jaccard, Rounded Jaccard,
+5.Recommendations Panel. When here a user can get movie recommendations using six different similarity/distance measures(Jaccard, Rounded Jaccard,
 Euclidean, Cosine, Chebyshev and Pearson) and access the results in the Movie Rate Panel. The Recommendations Panel requires a logged in 
 user and should only be accessible by Movie Search and Movie Rate Panels.
+
+
+*You can Sign In as user "001" when needed to check the features
