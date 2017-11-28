@@ -27,4 +27,7 @@ Euclidean, Cosine, Chebyshev and Pearson) and access the results in the Movie Ra
 user and should only be accessible by Movie Search and Movie Rate Panels.
 
 
-*You can Sign In as user "001" when needed to check the features
+*You can Sign In as user "001" when needed to check the features. All users are formatted as 3-digit strings.
+**To search specifically for a movie ID you should search for a 4-digit string as it is formatted this way.
+**e.g. item "0001" is Toy Story(1995)
+
