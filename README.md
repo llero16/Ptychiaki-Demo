@@ -1,5 +1,5 @@
 # Ptychiaki-Demo
-Manual of Use
+Recommender System - Manual of Use
 -------------
 There are 5 Panels/Pages 1.Home/Sign In Panel, 2.Sign Up Panel, 3.Movie Search Panel, 4.Movie Rate Panel and 5.Recommendations Panel
 all currently(Eighth Commit) accessible through the Menu. Should the programing come to an end only panels 1, 2 and 3 will be accesible 
