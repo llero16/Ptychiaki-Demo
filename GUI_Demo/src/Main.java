@@ -4,9 +4,10 @@ import org.apache.lucene.queryparser.classic.ParseException;
 
 public class Main {
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, ParseException {
-		//MainFrame myFrame = new MainFrame();
-		MovieSearchDemo demo = new MovieSearchDemo();
+		MainFrame myFrame = new MainFrame();
+		//MovieSearchDemo demo = new MovieSearchDemo();
 	}
 
 }

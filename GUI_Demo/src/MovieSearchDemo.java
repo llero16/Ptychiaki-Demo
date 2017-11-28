@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -15,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -39,6 +37,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+@SuppressWarnings("serial")
 public class MovieSearchDemo extends JFrame {
 
 	// Movie Search Labels
@@ -115,9 +114,9 @@ public class MovieSearchDemo extends JFrame {
 	private String queryString;
 
 	private static String indexDataDirectory = "indexed\\uDataIndex";
-	private static String indexItemDirectory = "indexed\\uItemIndex";
+	//private static String indexItemDirectory = "indexed\\uItemIndex";
 	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";
-	private static String indexUsersItemsNoDirectory = "indexed\\Users&Items";
+	//private static String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 
 	public MovieSearchDemo() {
 		// Movie Search Labels
@@ -170,7 +169,7 @@ public class MovieSearchDemo extends JFrame {
 		searchMRButton.addActionListener(listener);
 		// recsMRButton.addActionListener(listener);
 		// signInOutMRButton.addActionListener(listener);
-
+		
 		// ArrayLists
 		movieTitles = new ArrayList<String>();
 
@@ -191,59 +190,12 @@ public class MovieSearchDemo extends JFrame {
 
 		// MovieSearch JList
 		movieList = new JList<String>(movieListModel);
+		movieList.setOpaque(false);
 		movieList.setVisibleRowCount(4);
 		movieList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// MovieList Selection Listener
-		movieList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent event) {
-
-				queryString = movieList.getSelectedValue().toString();
-
-				// ArrayList Implementation
-				/*
-				 * for(Document movieDoc: movieDocs) {
-				 * if(movieDoc.get("title").equals(queryString)) {
-				 * titleMRLabel.setText(movieDoc.get("title"));
-				 * idMRLabel.setText(movieDoc.get("id"));
-				 * releaseMRLabel.setText(movieDoc.get("releaseDate"));
-				 * imdbMRLabel.setText(movieDoc.get("imdbURL"));
-				 * genreMRLabel.setText(movieDoc.get("genre"));
-				 * cardLayout.show(mainPanel,"5"); break; } }
-				 */
-
-				// HashMap Implementation
-				for (String title : movieHash.keySet()) {
-					if (title.equals(queryString)) {
-						titleMRLabel.setText(movieHash.get(title).get("title"));
-						idMRLabel.setText(movieHash.get(title).get("id"));
-						releaseMRLabel.setText(movieHash.get(title).get("releaseDate"));
-						imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
-						genreMRLabel.setText(movieHash.get(title).get("genre"));
-						averageRatingMRLabel.setText(movieHash.get(title).get("averageRating"));
-						if ((movieHash.get(title).get("averageRating") == null)
-								|| movieHash.get(title).get("averageRating").equals(" "))
-							System.out.println(movieHash.get(title).get("averageRating"));
-						String tempRating;
-						if (user != null) {
-							try {
-								tempRating = searchRating(user.getId(), movieHash.get(title).get("id"));
-								ratingMRLabel.setText(tempRating);
-								if (tempRating.equals(" - "))
-									ratedMRLabel.setText("Unrated");
-								else
-									ratedMRLabel.setText("Rated");
-							} catch (IOException e) {
-								e.printStackTrace();
-							} catch (ParseException e) {
-								e.printStackTrace();
-							}
-						}
-						changePage(4);
-						break;
-					}
-				}
-			}
-		});
+		ListListener listListener = new ListListener();
+		movieList.addListSelectionListener(listListener);
 
 		// Movie Search InfoSearch Panel: Set Layout, Add Labels, TextFields &
 		// Button
@@ -275,7 +227,9 @@ public class MovieSearchDemo extends JFrame {
 		movieListScrollPane = new JScrollPane(movieList);
 		movieListScrollPane.setPreferredSize(new Dimension(200, 200));
 		movieListScrollPane.setBorder(new TitledBorder("Movie List"));
-		movieListScrollPane.getViewport().setBackground(Color.BLACK);
+		movieListScrollPane.setOpaque(false);
+		movieListScrollPane.getViewport().setOpaque(false);
+		//movieListScrollPane.getViewport().setBackground(Color.BLACK);
 		/*
 		 * sp.getVerticalScrollBar().setUI(new MyScrollBarUI());
 		 * UIManager.put("ScrollBarUI", "my.package.MyScrollBarUI");
@@ -444,7 +398,7 @@ public class MovieSearchDemo extends JFrame {
 				Document document = indexSearcher.doc(scoreDoc.doc);
 				// Put Movie Title and Document to HashMap
 				documentHash.put(document.get("title"), document);
-				System.out.println(document.get("title"));
+				//System.out.println(document.get("title"));
 
 			}
 
@@ -502,7 +456,9 @@ public class MovieSearchDemo extends JFrame {
 				}
 
 				// HashMap Implementation
-				movieListModel.removeAllElements();
+				
+				movieListModel = new DefaultListModel<String>();
+				//movieListModel.removeAllElements();
 				for (String movieTitle : movieHash.keySet())
 					movieListModel.addElement(movieTitle);
 				if (movieListModel.isEmpty())
@@ -522,6 +478,57 @@ public class MovieSearchDemo extends JFrame {
 			// Movie Rate Page
 			if (event.getSource() == searchMRButton) {
 				changePage(3);
+			}
+		}
+	}
+
+	class ListListener implements ListSelectionListener{
+		public void valueChanged(ListSelectionEvent event) {
+
+			queryString = movieList.getSelectedValue().toString();
+			
+			// ArrayList Implementation
+			/*
+			 * for(Document movieDoc: movieDocs) {
+			 * if(movieDoc.get("title").equals(queryString)) {
+			 * titleMRLabel.setText(movieDoc.get("title"));
+			 * idMRLabel.setText(movieDoc.get("id"));
+			 * releaseMRLabel.setText(movieDoc.get("releaseDate"));
+			 * imdbMRLabel.setText(movieDoc.get("imdbURL"));
+			 * genreMRLabel.setText(movieDoc.get("genre"));
+			 * cardLayout.show(mainPanel,"5"); break; } }
+			 */
+
+			// HashMap Implementation
+			for (String title : movieHash.keySet()) {
+				if (title.equals(queryString)) {
+					titleMRLabel.setText(movieHash.get(title).get("title"));
+					idMRLabel.setText(movieHash.get(title).get("id"));
+					releaseMRLabel.setText(movieHash.get(title).get("releaseDate"));
+					imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
+					genreMRLabel.setText(movieHash.get(title).get("genre"));
+					averageRatingMRLabel.setText(movieHash.get(title).get("averageRating"));
+					if ((movieHash.get(title).get("averageRating") == null)
+							|| movieHash.get(title).get("averageRating").equals(" "))
+						System.out.println(movieHash.get(title).get("averageRating"));
+					String tempRating;
+					if (user != null) {
+						try {
+							tempRating = searchRating(user.getId(), movieHash.get(title).get("id"));
+							ratingMRLabel.setText(tempRating);
+							if (tempRating.equals(" - "))
+								ratedMRLabel.setText("Unrated");
+							else
+								ratedMRLabel.setText("Rated");
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+					}
+					changePage(4);
+					break;
+				}
 			}
 		}
 	}
