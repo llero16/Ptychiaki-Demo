@@ -1,3 +1,4 @@
+package searcherClasses;
 import java.io.File;
 import java.io.IOException;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -13,15 +14,15 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-public class InfoSearcher 
+public class GenreSearcher 
 {
 
 	public static void main(String[] args) throws IOException, ParseException
 	{
 		//Parse provided index directory
-		String indexDir = "indexed\\uInfoIndex";					
+		String indexDir = "indexed\\uGenreIndex";					
 		//Parse provided query string
-		String q = "1682";
+		String q = "05";
 
 		search(indexDir, q);
 	}
@@ -35,7 +36,7 @@ public class InfoSearcher
 		    IndexSearcher is = new IndexSearcher(reader);
 		    
 		    //Parse query
-		    QueryParser parser = new QueryParser( "infoAmount", new StandardAnalyzer());
+		    QueryParser parser = new QueryParser( "genreID", new StandardAnalyzer());
 		     Query query = parser.parse(q);               
 		    long start = System.currentTimeMillis();
 		    //Search index
@@ -50,8 +51,8 @@ public class InfoSearcher
 		    	//Retrieve matching document
 		      Document doc = is.doc(scoreDoc.doc);                    
 		      //#8 Display filename
-		      System.out.print(doc.get("infoName") + " ");
-		      System.out.print(doc.get("infoAmount") + " ");
+		      System.out.print(doc.get("genreID") + " ");
+		      System.out.print(doc.get("genreName") + " ");
 		    }
 		    //Close IndexSearcher
 		   reader.close();                        

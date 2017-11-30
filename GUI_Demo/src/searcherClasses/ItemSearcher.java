@@ -1,11 +1,13 @@
+package searcherClasses;
 import java.io.File;
 import java.io.IOException;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -13,15 +15,15 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-public class UserSearcher 
+public class ItemSearcher 
 {
 
 	public static void main(String[] args) throws IOException, ParseException
 	{
 		//Parse provided index directory
-		String indexDir = "indexed\\uUserIndex";					
+		String indexDir = "indexed\\uItemIndex";					
 		//Parse provided query string
-		String q = "946";
+		String q = "1996";
 
 		search(indexDir, q);
 	}
@@ -35,11 +37,16 @@ public class UserSearcher
 		    IndexSearcher is = new IndexSearcher(reader);
 		    
 		    //Parse query
-		    QueryParser parser = new QueryParser( "userID", new StandardAnalyzer());
-		     Query query = parser.parse(q);               
+		    /*QueryParser parser = new QueryParser( "id", new StandardAnalyzer());
+		     Query query = parser.parse(q);*/               
+		     
+		     String[] fields = {"id", "title","releaseDate","genre"};
+		     MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
+		     Query query = parser.parse(q);         
+		     
 		    long start = System.currentTimeMillis();
 		    //Search index
-		    TopDocs hits = is.search(query, 30);		
+		    TopDocs hits = is.search(query, 500);		
 		    long end = System.currentTimeMillis();
 
 
@@ -50,11 +57,12 @@ public class UserSearcher
 		    	//Retrieve matching document
 		      Document doc = is.doc(scoreDoc.doc);                    
 		      //#8 Display filename
-		      System.out.print(doc.get("userID") + " ");
-		      System.out.print(doc.get("userAge") + " ");
-		      System.out.print(doc.get("userGender") + " ");
-		      System.out.print(doc.get("userOccupation") + " ");
-		      System.out.print(doc.get("userZipCode") + " ");
+		      System.out.print(doc.get("id") + " ");
+		      System.out.print(doc.get("title") + " ");
+		      System.out.print(doc.get("releaseDate") + " ");
+		      System.out.print(doc.get("imdbURL") + " ");
+		      System.out.print(doc.get("genre") + " ");
+		      System.out.println();
 		    }
 		    //Close IndexSearcher
 		   reader.close();                        

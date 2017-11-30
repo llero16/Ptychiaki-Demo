@@ -1,3 +1,4 @@
+package userClasses;
 public class OldUser extends User {
 
 	public OldUser(String id) {

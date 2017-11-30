@@ -1,3 +1,6 @@
+package testingClasses;
+import userClasses.User;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -36,6 +39,8 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+
+
 
 @SuppressWarnings("serial")
 public class MovieSearchDemo extends JFrame {

@@ -1,3 +1,4 @@
+package testingClasses;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,11 +15,11 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-public class DataSearcher 
+public class TestHashMap 
 {
 
-	private static String indexDataDirectory = "indexed\\uDataIndex";
-	private static String indexItemDirectory = "indexed\\uItemIndex";
+	//private static String indexDataDirectory = "indexed\\uDataIndex";
+	//private static String indexItemDirectory = "indexed\\uItemIndex";
 	private static String testDirectory = "indexed\\testing1310";
 	
 	public static void main(String[] args) throws IOException, ParseException
@@ -68,9 +69,9 @@ public class DataSearcher
 			System.out.print(document.get("dataUserID") + " ");
 			System.out.print(document.get("dataItemID") + " ");
 		   
-			String itemQueryString = document.get("dataItemID");
-			File itemFile = new File(indexItemDirectory);
-			titleSearch(itemQueryString,itemFile);
+			//String itemQueryString = document.get("dataItemID");
+			//File itemFile = new File(indexItemDirectory);
+			//titleSearch(itemQueryString,itemFile);
 		      
 			System.out.print(document.get("dataRating") + " ");
 			System.out.print(document.get("dataTimestamp") + " ");

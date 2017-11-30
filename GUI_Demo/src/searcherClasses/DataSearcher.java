@@ -1,3 +1,4 @@
+package searcherClasses;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,10 +15,10 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-public class TestHashMap 
+public class DataSearcher 
 {
 
-	private static String indexDataDirectory = "indexed\\uDataIndex";
+	//private static String indexDataDirectory = "indexed\\uDataIndex";
 	private static String indexItemDirectory = "indexed\\uItemIndex";
 	private static String testDirectory = "indexed\\testing1310";
 	
@@ -70,7 +71,7 @@ public class TestHashMap
 		   
 			String itemQueryString = document.get("dataItemID");
 			File itemFile = new File(indexItemDirectory);
-			//titleSearch(itemQueryString,itemFile);
+			titleSearch(itemQueryString,itemFile);
 		      
 			System.out.print(document.get("dataRating") + " ");
 			System.out.print(document.get("dataTimestamp") + " ");

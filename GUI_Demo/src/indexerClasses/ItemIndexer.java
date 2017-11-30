@@ -1,3 +1,4 @@
+package indexerClasses;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +29,7 @@ import org.apache.lucene.store.FSDirectory;
 public class ItemIndexer
 {
 
-	private static String indexDataDirectory = "indexed\\uDataIndex";
+	//private static String indexDataDirectory = "indexed\\uDataIndex";
 	private static String indexItemDirectory = "indexed\\uItemIndex";
 	private static String indexItemRatings = "indexed\\Items&Ratings";
 	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";

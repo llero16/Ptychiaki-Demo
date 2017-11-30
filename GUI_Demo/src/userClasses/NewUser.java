@@ -1,3 +1,4 @@
+package userClasses;
 public class NewUser extends User
 {
 

@@ -1,3 +1,4 @@
+package searcherClasses;
 
 public abstract class Searcher
 {

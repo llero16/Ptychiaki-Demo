@@ -64,27 +64,30 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import userClasses.NewUser;
+import userClasses.OldUser;
+import userClasses.User;
+
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame implements ActionListener
-{	
-	//Labels
-	//private JLabel imageLabel;
-	//Home/Sign In Labels
+public class MainFrame extends JFrame implements ActionListener {
+	// Labels
+	// Home/Sign In Labels
 	private JLabel usernameSILabel;
-	//Sign Up Labels
+	// Sign Up Labels
 	private JLabel usernameSULabel;
-	private static JLabel usernameNoSULabel; //Replaced the usernameSUTF TextField
+	private static JLabel usernameNoSULabel; // Replaced the usernameSUTF
+												// TextField
 	private JLabel ageSULabel;
 	private JLabel genderSULabel;
 	private JLabel occupationSULabel;
 	private JLabel zipCodeSULabel;
-	//Movie Search Labels
+	// Movie Search Labels
 	private JLabel usernameMSLabel;
-	private JLabel idMSLabel;	
+	private JLabel idMSLabel;
 	private JLabel titleMSLabel;
 	private JLabel releaseMSLabel;
 	private JLabel genreMSLabel;
-	//Movie Rate Labels
+	// Movie Rate Labels
 	private JLabel movieMRLabel;
 	private JLabel titleTextMRLabel;
 	private JLabel titleMRLabel;
@@ -99,39 +102,40 @@ public class MainFrame extends JFrame implements ActionListener
 	private JLabel ratedMRLabel;
 	private JLabel ratingMRLabel;
 	private JLabel averageRatingMRLabel;
-	
-	//TextFields
-	//Home/Sign In TextFields
+
+	// TextFields
+	// Home/Sign In TextFields
 	private JTextField usernameSITF;
-	//Sign Up TextFields
-	//private JTextField usernameSUTF; //Replaced by the usernameNoSULabel - Check in Labels
+	// Sign Up TextFields
+	// private JTextField usernameSUTF; //Replaced by the usernameNoSULabel -
+	// Check in Labels
 	private JTextField ageSUTF;
 	private JTextField genderSUTF;
 	private JTextField occupationSUTF;
 	private JTextField zipCodeSUTF;
-	//Movie Search TextFields
+	// Movie Search TextFields
 	private JTextField idMSTF;
 	private JTextField titleMSTF;
 	private JTextField releaseMSTF;
 	private JTextField genreMSTF;
-	
-	//Buttons
-	//Home/Sign In Buttons
+
+	// Buttons
+	// Home/Sign In Buttons
 	private JButton signInSInButton;
 	private JButton signUpSInButton;
-	//Sign Up Buttons
+	// Sign Up Buttons
 	private JButton signUpSUpButton;
 	private JButton signInSUpButton;
-	//Movie Search Buttons
+	// Movie Search Buttons
 	private JButton searchMSButton;
 	private JButton signInOutMSButton;
 	private JButton recsMSButton;
-	//Movie Rate Buttons
+	// Movie Rate Buttons
 	private JButton rateMRButton;
 	private JButton searchMRButton;
 	private JButton recsMRButton;
 	private JButton signInOutMRButton;
-	//Recommendations Buttons
+	// Recommendations Buttons
 	private JButton jaccardButton;
 	private JButton roundedJaccardButton;
 	private JButton pearsonButton;
@@ -140,37 +144,36 @@ public class MainFrame extends JFrame implements ActionListener
 	private JButton chebyshevButton;
 	private JButton searchRecButton;
 	private JButton signOutRecButton;
-	
-	
-	//Panels
+
+	// Panels
 	private JPanel mainPanel;
-	//Home/Sign In Panel
+	// Home/Sign In Panel
 	private JPanel signInPanel;
-	//Sign Up Panels
+	// Sign Up Panels
 	private JPanel signUpPanel;
 	private JPanel infoSignUpPanel;
 	private JPanel buttonSignUpPanel;
-	//Movie Search Panels
+	// Movie Search Panels
 	private JPanel movieSearchPanel;
 	private JPanel infoSearchPanel;
 	private JPanel buttonSearchPanel;
-	//Movie Rate Panels
+	// Movie Rate Panels
 	private JPanel movieRatePanel;
 	private JPanel infoRatePanel;
 	private JPanel buttonRatePanel;
 	private JPanel ratingsRatePanel;
-	//Recommendations Panel
+	// Recommendations Panel
 	private JPanel recommendationsPanel;
 	private JPanel searchRecsPanel;
 	private JPanel buttonRecsPanel;
-	
-	//JScroll Panes
-	//MovieSearch JScroll Pane
+
+	// JScroll Panes
+	// MovieSearch JScroll Pane
 	private JScrollPane movieListScrollPane;
-	//Recommendations List JScroll Pane
+	// Recommendations List JScroll Pane
 	private JScrollPane recsListScrollPane;
-	
-	//Menu, MenuBar & MenuItems
+
+	// Menu, MenuBar & MenuItems
 	private JMenu mainMenu;
 	private JMenuBar mainMB;
 	private JMenuItem homeMI;
@@ -180,62 +183,50 @@ public class MainFrame extends JFrame implements ActionListener
 	private JMenuItem movieRateMI;
 	private JMenuItem movieRecMI;
 	private JMenuItem exitMI;
-	
-	
-	//Movie Search JList
+
+	// Movie Search JList
 	private JList<String> movieList;
-	//Recommendations JList
+	// Recommendations JList
 	private JList<String> recommendationList;
-	
-	//Movie Search ArrayLists -> JList
+
+	// Movie Search ArrayLists -> JList
 	private ArrayList<String> movieTitles;
-	//private ArrayList<Document> movieDocs;
-	//Recommendations ArrayLists -> JList
-	//private ArrayList<String> recommendationTitles;
-	//private ArrayList<Document> recommendationDocs;
-	
-	//Movie Search HashMap
-	private static HashMap<String,Document> movieHash;
-	//Recommendations HashMap
-	private static HashMap<String,Document> recommendationHash;
-	
-	//Movie List ListModel
+
+	// Movie Search HashMap
+	private static HashMap<String, Document> movieHash;
+	// Recommendations HashMap
+	private static HashMap<String, Document> recommendationHash;
+
+	// Movie List ListModel
 	private DefaultListModel<String> movieListModel;
-	//Recommendation List ListModel
+	// Recommendation List ListModel
 	private DefaultListModel<String> recommendationListModel;
-	
-	
-	
-	//ImageIcon
-	//private ImageIcon scotlandImage;
-	
-	//CardLayout
+
+	// CardLayout
 	CardLayout cardLayout;
 	private String queryString;
-	
-	//Test String
-	//private static String userID;
+
+	// Test String
 	private static User user;
-	
+
 	private static String indexDataDirectory = "indexed\\uDataIndex";
 	private static String indexItemDirectory = "indexed\\uItemIndex";
 	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";
 	private static String indexUsersItemsNoDirectory = "indexed\\Users&Items";
-	
-	private static int users; //943 //5
-	private static int items; //1682 //4
-	
+
+	private static int users; // 943 //5
+	private static int items; // 1682 //4
+
 	private static int userRating = 5;
 	private static int similarUsersNo = 5;
-	
+
 	@SuppressWarnings("unchecked")
-	public MainFrame() throws IOException, ParseException
-	{
-		//Number of Users and Items
+	public MainFrame() throws IOException, ParseException {
+		// Number of Users and Items
 		users = getUsersNo();
 		items = getItemsNo();
-		
-		//Menu Items
+
+		// Menu Items
 		homeMI = new JMenuItem("Home");
 		signInMI = new JMenuItem("Sign In");
 		signUpMI = new JMenuItem("Sign Up");
@@ -243,9 +234,9 @@ public class MainFrame extends JFrame implements ActionListener
 		movieRateMI = new JMenuItem("Movie Rate");
 		movieRecMI = new JMenuItem("Movie Recommendations");
 		exitMI = new JMenuItem("Exit");
-		
-		//MenuListener, MenuItems: Add Listener
-		//MenuListener listener = new MenuListener();
+
+		// MenuListener, MenuItems: Add Listener
+		// MenuListener listener = new MenuListener();
 		homeMI.addActionListener(this);
 		signInMI.addActionListener(this);
 		signUpMI.addActionListener(this);
@@ -253,9 +244,8 @@ public class MainFrame extends JFrame implements ActionListener
 		movieRateMI.addActionListener(this);
 		movieRecMI.addActionListener(this);
 		exitMI.addActionListener(this);
-		
-		
-		//Main Menu: Add Home, Sign In, Sign Up, Exit MenuItems
+
+		// Main Menu: Add Home, Sign In, Sign Up, Exit MenuItems
 		mainMenu = new JMenu("What to do ?");
 		mainMenu.add(homeMI);
 		mainMenu.add(signInMI);
@@ -264,28 +254,30 @@ public class MainFrame extends JFrame implements ActionListener
 		mainMenu.add(movieRateMI);
 		mainMenu.add(movieRecMI);
 		mainMenu.add(exitMI);
-		
-		//Main Menu Bar: Add Main Menu
+
+		// Main Menu Bar: Add Main Menu
 		mainMB = new JMenuBar();
 		mainMB.add(mainMenu);
-		
-		//Labels
-		//Sign In Panel Label
+
+		// Labels
+		// Sign In Panel Label
 		usernameSILabel = new JLabel("Username");
-		//Sign Up Panel Labels
+		// Sign Up Panel Labels
 		usernameSULabel = new JLabel("Username/User ID");
-		usernameNoSULabel = new JLabel("Your UserID will be: " + (users+1)); //Replaced usernameSUTF TextField
+		usernameNoSULabel = new JLabel("Your UserID will be: " + (users + 1)); // Replaced
+																				// usernameSUTF
+																				// TextField
 		ageSULabel = new JLabel("Age");
 		genderSULabel = new JLabel("Gender");
 		occupationSULabel = new JLabel("Occupation");
 		zipCodeSULabel = new JLabel("Zip Code");
-		//Movie Search Labels
+		// Movie Search Labels
 		usernameMSLabel = new JLabel("Username");
 		idMSLabel = new JLabel("Movie ID");
 		titleMSLabel = new JLabel("Title");
 		releaseMSLabel = new JLabel("Release");
 		genreMSLabel = new JLabel("Genre");
-		//Movie Rate Labels
+		// Movie Rate Labels
 		movieMRLabel = new JLabel("MOVIE INFO", SwingConstants.CENTER);
 		titleTextMRLabel = new JLabel("Title");
 		titleMRLabel = new JLabel("Title");
@@ -300,41 +292,40 @@ public class MainFrame extends JFrame implements ActionListener
 		ratedMRLabel = new JLabel("Rated/Unrated");
 		ratingMRLabel = new JLabel("  ", SwingConstants.CENTER);
 		averageRatingMRLabel = new JLabel(" ", SwingConstants.CENTER);
-		
-		//TextFields
-		//Sign In Panel TextField
+
+		// TextFields
+		// Sign In Panel TextField
 		usernameSITF = new JTextField();
-		//Sign Up Panel TextFields
-		//usernameSUTF = new JTextField(); //Replaced by usernameNoSULabel
+		// Sign Up Panel TextFields
+		// usernameSUTF = new JTextField(); //Replaced by usernameNoSULabel
 		ageSUTF = new JTextField();
 		genderSUTF = new JTextField();
 		occupationSUTF = new JTextField();
 		zipCodeSUTF = new JTextField();
-		//Movie Search TextField
+		// Movie Search TextField
 		idMSTF = new JTextField();
 		titleMSTF = new JTextField();
 		releaseMSTF = new JTextField();
 		genreMSTF = new JTextField();
-			
-	
-		//Buttons
-		//Home/Sign In Panel Button
+
+		// Buttons
+		// Home/Sign In Panel Button
 		signInSInButton = new JButton("Sign In");
 		signUpSInButton = new JButton("Sign Up");
-		//Sign Up Panel Button
+		// Sign Up Panel Button
 		signUpSUpButton = new JButton("Sign Up");
 		signInSUpButton = new JButton("Sign In");
-		//Movie Search Buttons
+		// Movie Search Buttons
 		signInOutMSButton = new JButton("Sign In/Out");
 		searchMSButton = new JButton("Search Movie");
 		recsMSButton = new JButton("Get Recommendation");
-		//Movie Rate Buttons
+		// Movie Rate Buttons
 		rateMRButton = new JButton("Rate");
 		searchMRButton = new JButton("Search");
 		recsMRButton = new JButton("Recommendations");
 		signInOutMRButton = new JButton("Sign In/Out");
-		
-		//Movie Recommendations Buttons
+
+		// Movie Recommendations Buttons
 		searchRecButton = new JButton("Search");
 		signOutRecButton = new JButton("Sign Out");
 		jaccardButton = new JButton("Jaccard Similarity");
@@ -343,27 +334,27 @@ public class MainFrame extends JFrame implements ActionListener
 		cosineButton = new JButton("Cosine Similarity");
 		euclideanButton = new JButton("Euclidean Distance");
 		chebyshevButton = new JButton("Chebyshev");
-		
-		//ListListener
+
+		// ListListener
 		ListListener listListener = new ListListener();
-		//ButtonListener
+		// ButtonListener
 		ButtonListener buttonListener = new ButtonListener();
-		//Home/Sign In Listeners
+		// Home/Sign In Listeners
 		signInSInButton.addActionListener(buttonListener);
 		signUpSInButton.addActionListener(buttonListener);
-		//Sign Up Listeners
+		// Sign Up Listeners
 		signUpSUpButton.addActionListener(buttonListener);
 		signInSUpButton.addActionListener(buttonListener);
-		//Movie Search Listeners
+		// Movie Search Listeners
 		signInOutMSButton.addActionListener(buttonListener);
 		searchMSButton.addActionListener(buttonListener);
 		recsMSButton.addActionListener(buttonListener);
-		//Movie Rate Listeners
+		// Movie Rate Listeners
 		rateMRButton.addActionListener(buttonListener);
 		searchMRButton.addActionListener(buttonListener);
 		recsMRButton.addActionListener(buttonListener);
 		signInOutMRButton.addActionListener(buttonListener);
-		//Recommendations Listeners
+		// Recommendations Listeners
 		searchRecButton.addActionListener(buttonListener);
 		signOutRecButton.addActionListener(buttonListener);
 		jaccardButton.addActionListener(buttonListener);
@@ -372,107 +363,41 @@ public class MainFrame extends JFrame implements ActionListener
 		cosineButton.addActionListener(buttonListener);
 		euclideanButton.addActionListener(buttonListener);
 		chebyshevButton.addActionListener(buttonListener);
-		
-		//ArrayLists
-		movieTitles = new ArrayList<String>();
-	    //movieDocs = new ArrayList<Document>();
-	    
-	    //recommendationTitles = new ArrayList<String>();
-	    //recommendationDocs = new ArrayList<Document>();
-		//HashMap
-	    movieHash = new HashMap<String,Document>();	 
-		recommendationHash = new HashMap<String,Document>();
-		
-		//MovieSearch: MovieList List Model
-	    movieListModel = new DefaultListModel<String>();
-	    if(movieListModel.isEmpty())
-	    	System.out.println("ListModel Empty At Constructor");
-	    //ArrayList Implementation
-	    /*for(String title: movieTitles)
-	    	listModel.addElement(title);
-		*/
-	   //Hash Implementation
-	   for(String title: movieHash.keySet())
-	    	movieListModel.addElement(title);
-	    
-	    //MovieSearch JList
-	    movieList = new JList<String>(movieListModel);
-	    movieList.setVisibleRowCount(4);
-	    movieList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //MovieList Selection Listener
-	    movieList.addListSelectionListener(listListener);
-		/*movieList.addListSelectionListener(
-				new ListSelectionListener()
-				{
-					public void valueChanged(ListSelectionEvent event)
-					{
-		
-						queryString = movieList.getSelectedValue().toString();
-	
-						//ArrayList Implementation
-						for(Document movieDoc: movieDocs)
-						 * {
-							if(movieDoc.get("title").equals(queryString))
-							{
-								titleMRLabel.setText(movieDoc.get("title"));
-								idMRLabel.setText(movieDoc.get("id"));
-								releaseMRLabel.setText(movieDoc.get("releaseDate"));
-								imdbMRLabel.setText(movieDoc.get("imdbURL"));
-								genreMRLabel.setText(movieDoc.get("genre"));
-								cardLayout.show(mainPanel,"5");
-								break;
-							}
-						}
-						
-						//HashMap Implementation
-						for(String title: movieHash.keySet())
-						{
-							if(title.equals(queryString))
-							{
-								titleMRLabel.setText(movieHash.get(title).get("title"));
-								idMRLabel.setText(movieHash.get(title).get("id"));
-								releaseMRLabel.setText(movieHash.get(title).get("releaseDate"));
-								imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
-								genreMRLabel.setText(movieHash.get(title).get("genre"));
-								averageRatingMRLabel.setText(movieHash.get(title).get("averageRating"));
-								if((movieHash.get(title).get("averageRating") == null) || movieHash.get(title).get("averageRating").equals(" "))
-									System.out.println(movieHash.get(title).get("averageRating"));
-								String tempRating;
-								if(user!= null)
-								{	
-									try {
-										tempRating = searchRating(user.getId(),movieHash.get(title).get("id"));
-										ratingMRLabel.setText(tempRating);
-										if(tempRating.equals(" - "))
-											ratedMRLabel.setText("Unrated");
-										else
-											ratedMRLabel.setText("Rated");
-									} catch (IOException e) {
-										e.printStackTrace();
-									} catch (ParseException e) {
-										e.printStackTrace();
-									}
-								}
-								changePage(4);
-								break;
-							}
-						}
-					}
-				}
-				);*/
-			 
 
-		//Sign In Panel: Set Layout, Add Labels, TextFields & Buttons
+		// ArrayLists
+		movieTitles = new ArrayList<String>();
+
+		// HashMap
+		movieHash = new HashMap<String, Document>();
+		recommendationHash = new HashMap<String, Document>();
+
+		// MovieSearch: MovieList List Model
+		movieListModel = new DefaultListModel<String>();
+		if (movieListModel.isEmpty())
+			System.out.println("ListModel Empty At Constructor");
+
+		// Hash Implementation
+		for (String title : movieHash.keySet())
+			movieListModel.addElement(title);
+
+		// MovieSearch JList
+		movieList = new JList<String>(movieListModel);
+		movieList.setVisibleRowCount(4);
+		movieList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		// MovieList Selection Listener
+		movieList.addListSelectionListener(listListener);
+
+		// Sign In Panel: Set Layout, Add Labels, TextFields & Buttons
 		signInPanel = new JPanel();
-		//signInPanel.setLayout(new GridLayout(4,1,20,10));
-		signInPanel.setLayout(new GridLayout(8,1,20,10));
+		// signInPanel.setLayout(new GridLayout(4,1,20,10));
+		signInPanel.setLayout(new GridLayout(8, 1, 20, 10));
 		signInPanel.setBorder(new TitledBorder("Sign In using your UserID"));
-		
+
 		signInPanel.add(usernameSILabel);
 		signInPanel.add(usernameSITF);
 		signInPanel.add(signInSInButton);
 		signInPanel.add(signUpSInButton);
-		
+
 		signUpSInButton.setBorderPainted(false);
 		signUpSInButton.setOpaque(false);
 		signUpSInButton.setBackground(Color.WHITE);
@@ -481,13 +406,13 @@ public class MainFrame extends JFrame implements ActionListener
 		Map attributes = font.getAttributes();
 		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 		signUpSInButton.setFont(font.deriveFont(attributes));
-		
-		//Sign Up Info Panel: Set Layout, Add Labels & TextFields
+
+		// Sign Up Info Panel: Set Layout, Add Labels & TextFields
 		infoSignUpPanel = new JPanel();
-		infoSignUpPanel.setLayout(new GridLayout(6,2,20,10));
+		infoSignUpPanel.setLayout(new GridLayout(6, 2, 20, 10));
 		infoSignUpPanel.setBorder(new TitledBorder("State your Info to Sign Up"));
 		infoSignUpPanel.add(usernameSULabel);
-		//infoSignUpPanel.add(usernameSUTF); //Replaced by the Label bellow
+		// infoSignUpPanel.add(usernameSUTF); //Replaced by the Label bellow
 		infoSignUpPanel.add(usernameNoSULabel);
 		infoSignUpPanel.add(ageSULabel);
 		infoSignUpPanel.add(ageSUTF);
@@ -497,22 +422,23 @@ public class MainFrame extends JFrame implements ActionListener
 		infoSignUpPanel.add(occupationSUTF);
 		infoSignUpPanel.add(zipCodeSULabel);
 		infoSignUpPanel.add(zipCodeSUTF);
-		//Sign Up Button Panel: Set Layout, Add Labels & TextFields
+		// Sign Up Button Panel: Set Layout, Add Labels & TextFields
 		buttonSignUpPanel = new JPanel();
 		buttonSignUpPanel.setBorder(new TitledBorder("Sign Up or Sign In"));
-		buttonSignUpPanel.setLayout(new GridLayout(1,1,20,10));
+		buttonSignUpPanel.setLayout(new GridLayout(1, 1, 20, 10));
 		buttonSignUpPanel.add(signUpSUpButton);
 		buttonSignUpPanel.add(signInSUpButton);
-		
-		//Sign Up Panel: Set Layout, Add Labels, TextFields & Buttons
+
+		// Sign Up Panel: Set Layout, Add Labels, TextFields & Buttons
 		signUpPanel = new JPanel();
 		signUpPanel.setLayout(new BorderLayout());
-		signUpPanel.add(infoSignUpPanel,BorderLayout.CENTER);
-		signUpPanel.add(buttonSignUpPanel,BorderLayout.SOUTH);
-		
-		//Movie Search InfoSearch Panel: Set Layout, Add Labels, TextFields & Button
+		signUpPanel.add(infoSignUpPanel, BorderLayout.CENTER);
+		signUpPanel.add(buttonSignUpPanel, BorderLayout.SOUTH);
+
+		// Movie Search InfoSearch Panel: Set Layout, Add Labels, TextFields &
+		// Button
 		infoSearchPanel = new JPanel();
-		infoSearchPanel.setLayout(new GridLayout(5,2,20,10));
+		infoSearchPanel.setLayout(new GridLayout(5, 2, 20, 10));
 		infoSearchPanel.setBorder(new TitledBorder("Movie Search Info"));
 		infoSearchPanel.add(usernameMSLabel);
 		infoSearchPanel.add(signInOutMSButton);
@@ -524,42 +450,41 @@ public class MainFrame extends JFrame implements ActionListener
 		infoSearchPanel.add(releaseMSTF);
 		infoSearchPanel.add(genreMSLabel);
 		infoSearchPanel.add(genreMSTF);
-		
-		//Movie Search ButtonSearch Panel: Set Layout, Add Labels, Buttons & ListView
+
+		// Movie Search ButtonSearch Panel: Set Layout, Add Labels, Buttons &
+		// ListView
 		buttonSearchPanel = new JPanel();
-		buttonSearchPanel.setLayout(new GridLayout(1,1,20,10));
+		buttonSearchPanel.setLayout(new GridLayout(1, 1, 20, 10));
 		buttonSearchPanel.setBorder(new TitledBorder("Search Results & Recommendations"));
 		buttonSearchPanel.add(searchMSButton);
-		//buttonSearchPanel.add(resultsMSLabel);
+		// buttonSearchPanel.add(resultsMSLabel);
 		buttonSearchPanel.add(recsMSButton);
-		//buttonSearchPanel.add(movieList);
-		
-		//Movie Search JScroll Pane: Set Size, Border
+		// buttonSearchPanel.add(movieList);
+
+		// Movie Search JScroll Pane: Set Size, Border
 		movieListScrollPane = new JScrollPane(movieList);
 		movieListScrollPane.setPreferredSize(new Dimension(200, 200));
 		movieListScrollPane.setBorder(new TitledBorder("Movie List"));
-		/*sp.getVerticalScrollBar().setUI(new MyScrollBarUI());
-		UIManager.put("ScrollBarUI", "my.package.MyScrollBarUI");*/
-		
-		//Movie Search Panel: Set Layout, Add Panels
+
+		// Movie Search Panel: Set Layout, Add Panels
 		movieSearchPanel = new JPanel();
 		movieSearchPanel.setLayout(new BorderLayout());
-		//movieSearchPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		// movieSearchPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		movieSearchPanel.add(infoSearchPanel, BorderLayout.NORTH);
 		movieSearchPanel.add(movieListScrollPane, BorderLayout.CENTER);
 		movieSearchPanel.add(buttonSearchPanel, BorderLayout.SOUTH);
-		
-		//Movie Rate RatingsRate Panel: Set Layout, Add Labels
+
+		// Movie Rate RatingsRate Panel: Set Layout, Add Labels
 		ratingsRatePanel = new JPanel();
-		ratingsRatePanel.setLayout(new GridLayout(1,2,20,10));
+		ratingsRatePanel.setLayout(new GridLayout(1, 2, 20, 10));
 		ratingsRatePanel.setBorder(new TitledBorder("Ratings"));
 		ratingsRatePanel.add(ratingMRLabel);
 		ratingsRatePanel.add(averageRatingMRLabel);
-				
-		
-		//Movie Rate InfoRate Panel: Set Layout, Add Labels, TextFields & Button
-		infoRatePanel= new JPanel();
-		infoRatePanel.setLayout(new GridLayout(6,2,20,10));
+
+		// Movie Rate InfoRate Panel: Set Layout, Add Labels, TextFields &
+		// Button
+		infoRatePanel = new JPanel();
+		infoRatePanel.setLayout(new GridLayout(6, 2, 20, 10));
 		infoRatePanel.setBorder(new TitledBorder("Movie Info"));
 		infoRatePanel.add(titleTextMRLabel);
 		infoRatePanel.add(titleMRLabel);
@@ -572,31 +497,30 @@ public class MainFrame extends JFrame implements ActionListener
 		infoRatePanel.add(genreTextMRLabel);
 		infoRatePanel.add(genreMRLabel);
 		infoRatePanel.add(ratedMRLabel);
-		//infoRatePanel.add(ratingMRLabel);
+		// infoRatePanel.add(ratingMRLabel);
 		infoRatePanel.add(ratingsRatePanel);
-		
-		
-		
-		//Movie Rate ButtonRate Panel: Set Layout, Add Labels, TextFields & Button
+
+		// Movie Rate ButtonRate Panel: Set Layout, Add Labels, TextFields &
+		// Button
 		buttonRatePanel = new JPanel();
-		buttonRatePanel.setLayout(new GridLayout(2,2,20,10));
+		buttonRatePanel.setLayout(new GridLayout(2, 2, 20, 10));
 		buttonRatePanel.setBorder(new TitledBorder("Rate or Search for a Movie"));
 		buttonRatePanel.add(rateMRButton);
 		buttonRatePanel.add(searchMRButton);
 		buttonRatePanel.add(recsMRButton);
 		buttonRatePanel.add(signInOutMRButton);
-		
-		//Movie Rate Panel: Set Layout, Add Panels
+
+		// Movie Rate Panel: Set Layout, Add Panels
 		movieRatePanel = new JPanel();
-		//movieRatePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		// movieRatePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		movieRatePanel.setLayout(new BorderLayout());
 		movieRatePanel.add(movieMRLabel, BorderLayout.NORTH);
 		movieRatePanel.add(infoRatePanel, BorderLayout.CENTER);
 		movieRatePanel.add(buttonRatePanel, BorderLayout.SOUTH);
-		
-		//Recommendations ButtonRecommendations Panel: Set Layout, Buttons
+
+		// Recommendations ButtonRecommendations Panel: Set Layout, Buttons
 		searchRecsPanel = new JPanel();
-		searchRecsPanel.setLayout(new GridLayout(3,2,20,10));
+		searchRecsPanel.setLayout(new GridLayout(3, 2, 20, 10));
 		searchRecsPanel.setBorder(new TitledBorder("Similarity Measures"));
 		searchRecsPanel.add(jaccardButton);
 		searchRecsPanel.add(roundedJaccardButton);
@@ -604,125 +528,58 @@ public class MainFrame extends JFrame implements ActionListener
 		searchRecsPanel.add(cosineButton);
 		searchRecsPanel.add(euclideanButton);
 		searchRecsPanel.add(chebyshevButton);
-		
-		
-		//MovieSearch: MovieList List Model
-	    recommendationListModel = new DefaultListModel<String>();
-	    if(recommendationListModel.isEmpty())
-	    	System.out.println("ListModel Empty At Constructor");
-	    //ArrayList Implementation
-	    /*for(String title: movieTitles)
-	    	listModel.addElement(title);
-		*/
-	   //Hash Implementation
-	   for(String title: recommendationHash.keySet())
-	    	recommendationListModel.addElement(title);
-		
-		//Recommendation JList
+
+		// Recommendations RecommendationsList: List Model
+		recommendationListModel = new DefaultListModel<String>();
+		if (recommendationListModel.isEmpty())
+			System.out.println("ListModel Empty At Constructor");
+
+		// HashMap Implementation
+		for (String title : recommendationHash.keySet())
+			recommendationListModel.addElement(title);
+
+		// Recommendation JList
 		recommendationList = new JList<String>(recommendationListModel);
 		recommendationList.setVisibleRowCount(4);
 		recommendationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	    //MovieList Selection Listener
+		// MovieList Selection Listener
 		recommendationList.addListSelectionListener(listListener);
-		/*recommendationList.addListSelectionListener(
-				new ListSelectionListener()
-				{
-					public void valueChanged(ListSelectionEvent event)
-					{
-		
-						queryString = recommendationList.getSelectedValue().toString();
-	
-						//ArrayList Implementation
-						for(Document movieDoc: movieDocs)
-						 * {
-							if(movieDoc.get("title").equals(queryString))
-							{
-								titleMRLabel.setText(movieDoc.get("title"));
-								idMRLabel.setText(movieDoc.get("id"));
-								releaseMRLabel.setText(movieDoc.get("releaseDate"));
-								imdbMRLabel.setText(movieDoc.get("imdbURL"));
-								genreMRLabel.setText(movieDoc.get("genre"));
-								cardLayout.show(mainPanel,"5");
-								break;
-							}
-						}
-						
-						//HashMap Implementation
-						for(String title: recommendationHash.keySet())
-						{
-							if(title.equals(queryString))
-							{
-								titleMRLabel.setText(recommendationHash.get(title).get("title"));
-								idMRLabel.setText(recommendationHash.get(title).get("id"));
-								releaseMRLabel.setText(recommendationHash.get(title).get("releaseDate"));
-								imdbMRLabel.setText(recommendationHash.get(title).get("imdbURL"));
-								genreMRLabel.setText(recommendationHash.get(title).get("genre"));
-								averageRatingMRLabel.setText(recommendationHash.get(title).get("averageRating"));
-								
-								String tempRating;
-								if(user!= null)
-								{	
-									try {
-										tempRating = searchRating(user.getId(),recommendationHash.get(title).get("id"));
-										ratingMRLabel.setText(tempRating);
-										if(tempRating.equals(" - "))
-											ratedMRLabel.setText("Unrated");
-										else
-											ratedMRLabel.setText("Rated");
-									} catch (IOException e) {
-										e.printStackTrace();
-									} catch (ParseException e) {
-										e.printStackTrace();
-									}
-								}
-								changePage(4);
-								break;
-							}
-						}
-					}
-				}
-				);*/
-		
-		//Recommendations JScroll Pane: Set Layout, AddPanels
+
+		// Recommendations JScroll Pane: Set Layout, AddPanels
 		recsListScrollPane = new JScrollPane(recommendationList);
 		recsListScrollPane.setPreferredSize(new Dimension(200, 200));
 		recsListScrollPane.setBorder(new TitledBorder("Recommendations List"));
-		
-		//Recommendations Button Recommendations Panel: Set Layout, Add Buttons
+
+		// Recommendations Button Recommendations Panel: Set Layout, Add Buttons
 		buttonRecsPanel = new JPanel();
-		buttonRecsPanel.setLayout(new GridLayout(1,2,20,10));
+		buttonRecsPanel.setLayout(new GridLayout(1, 2, 20, 10));
 		buttonRecsPanel.setBorder(new TitledBorder("Search for a Movie or Sign Out"));
-		//buttonRecommendationsPanel.add(rateButton);
+		// buttonRecommendationsPanel.add(rateButton);
 		buttonRecsPanel.add(searchRecButton);
 		buttonRecsPanel.add(signOutRecButton);
-		
-		//Recommendations Panel: Set Layout, Add Panels
+
+		// Recommendations Panel: Set Layout, Add Panels
 		recommendationsPanel = new JPanel();
-		//recommendationsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		// recommendationsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		recommendationsPanel.setLayout(new BorderLayout());
 		recommendationsPanel.add(searchRecsPanel, BorderLayout.NORTH);
 		recommendationsPanel.add(recsListScrollPane, BorderLayout.CENTER);
 		recommendationsPanel.add(buttonRecsPanel, BorderLayout.SOUTH);
-		
-		//ImageIcon & Label
-		//scotlandImage = new ImageIcon("scotland.jpg");
-		//imageLabel = new JLabel(scotlandImage);
-		
-		//Main Panel: Set Layout, Add SignIn,SignUp Panels
+
+		// Main Panel: Set Layout, Add SignIn,SignUp Panels
 		mainPanel = new JPanel();
 		cardLayout = new CardLayout();
 		mainPanel.setLayout(cardLayout);
 		mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		//mainPanel.add(imageLabel, "3");
+		// mainPanel.add(imageLabel, "3");
 		mainPanel.add(signInPanel, "1");
 		mainPanel.add(signUpPanel, "2");
-		mainPanel.add(movieSearchPanel,"3");
-		mainPanel.add(movieRatePanel,"4");
-		mainPanel.add(recommendationsPanel,"5");
+		mainPanel.add(movieSearchPanel, "3");
+		mainPanel.add(movieRatePanel, "4");
+		mainPanel.add(recommendationsPanel, "5");
 		cardLayout.show(mainPanel, "1");
-		
-		
-		//Frame Staff
+
+		// Frame Staff
 		this.setContentPane(mainPanel);
 		this.setJMenuBar(mainMB);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -730,178 +587,148 @@ public class MainFrame extends JFrame implements ActionListener
 		this.setSize(350, 700);
 		this.setVisible(true);
 	}
-	
-	
-	public void actionPerformed(ActionEvent event)
-	{
+
+	public void actionPerformed(ActionEvent event) {
 		String buttonString = event.getActionCommand();
-			
-		if(buttonString.equals("Home"))
-		{
+
+		if (buttonString.equals("Home")) {
 			changePage(1);
-		}
-		else if(buttonString.equals("Sign In"))
-		{
+		} else if (buttonString.equals("Sign In")) {
 			changePage(1);
-		}
-		else if(buttonString.equals("Sign Up"))
-		{
+		} else if (buttonString.equals("Sign Up")) {
 			changePage(2);
-		}
-		else if(buttonString.equals("Movie Search"))
-		{
+		} else if (buttonString.equals("Movie Search")) {
 			changePage(3);
-		}
-		else if(buttonString.equals("Movie Rate"))
-		{
+		} else if (buttonString.equals("Movie Rate")) {
 			changePage(4);
-		}
-		else if(buttonString.equals("Movie Recommendations"))
-		{
+		} else if (buttonString.equals("Movie Recommendations")) {
 			changePage(5);
-		}
-		else if(buttonString.equals("Exit"))
-		{
+		} else if (buttonString.equals("Exit")) {
 			System.exit(0);
-			
-		}
-		else
+
+		} else
 			System.out.println("Unexpected Error");
 	}
 
-	//Given UserID & ItemID returns the respective Rating if this exists
+	// Given UserID & ItemID returns the respective Rating if this exists
 	public static String searchRating(String userQuery, String itemQuery) throws IOException, ParseException {
-		
+
 		File file = new File(indexDataDirectory);
-		Directory directory = FSDirectory.open(file.toPath()); //3
+		Directory directory = FSDirectory.open(file.toPath()); // 3
 		IndexReader indexReader = DirectoryReader.open(directory);
 		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-		
+
 		String queryString = userQuery + " AND " + itemQuery;
 		String rating = " - ";
-		String[] fields = {"dataUserID", "dataItemID"};
+		String[] fields = { "dataUserID", "dataItemID" };
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-		Query query = parser.parse(queryString);               
-		
-		TopDocs hits = indexSearcher.search(query, 10);		
-		for(ScoreDoc scoreDoc : hits.scoreDocs) {
-			
-			Document document = indexSearcher.doc(scoreDoc.doc);                    
-			
+		Query query = parser.parse(queryString);
+
+		TopDocs hits = indexSearcher.search(query, 10);
+		for (ScoreDoc scoreDoc : hits.scoreDocs) {
+			Document document = indexSearcher.doc(scoreDoc.doc);
 			rating = document.get("dataRating");
 		}
-		
-		indexReader.close();                        
-		//System.out.print(rating);
+
+		indexReader.close();
+		// System.out.print(rating);
 		return rating;
 	}
-	
-	
-	//Adds new or updates existing Item Rating
-	public static void addDataDoc(String userID, String itemID, String rating)  throws IOException
-	{
-		
+
+	// Adds new or updates existing Item Rating
+	public static void addDataDoc(String userID, String itemID, String rating) throws IOException {
+
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει  append όχι overwrite
+		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
+		// Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
 		Document document = new Document();
-		
+
 		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-		
+
 		document.add(new StringField("dataUserID", userID, Field.Store.YES));
 		document.add(new StringField("dataItemID", itemID, Field.Store.YES));
 		document.add(new StringField("dataRating", rating, Field.Store.YES));
 		document.add(new StringField("dataTimestamp", timestamp, Field.Store.YES));
-		
-		
-		
+
 		writer.addDocument(document);
 		writer.commit();
 		writer.close();
 	}
-	
 
-	//Rates Item using UserID and ItemID
-	public static void rateDataItem(String userID, String itemID, String rating) throws IOException, ParseException
-	{
-		if(searchRating(userID,itemID) != null)
-			deleteDataDocument(userID,itemID);
-		addDataDoc(userID,itemID,rating);
+	// Rates Item using UserID and ItemID
+	public static void rateDataItem(String userID, String itemID, String rating) throws IOException, ParseException {
+		if (searchRating(userID, itemID) != null)
+			deleteDataDocument(userID, itemID);
+		addDataDoc(userID, itemID, rating);
 	}
 
-	//Deletes existing Item Rating given UserID and ItemID
-	public static void deleteDataDocument(String userID, String itemID) throws IOException
-	{
+	// Deletes existing Item Rating given UserID and ItemID
+	public static void deleteDataDocument(String userID, String itemID) throws IOException {
 		Analyzer analyzer = new StandardAnalyzer();
 		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
-		
+
 		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
 		Query userQuery = new TermQuery(new Term("dataUserID", userID));
 		Query itemQuery = new TermQuery(new Term("dataItemID", itemID));
-		
-		queryBuilder.add(userQuery,BooleanClause.Occur.MUST);
+
+		queryBuilder.add(userQuery, BooleanClause.Occur.MUST);
 		queryBuilder.add(itemQuery, BooleanClause.Occur.MUST);
-		
+
 		writer.deleteDocuments(queryBuilder.build());
 		writer.close();
 	}
-	
-	
-	//Add Rating (Index new Document)
-	public static void addUserDoc(String id, String age, String gender, String occupation, String zipCode)  throws IOException
-	{
+
+	// Add Rating (Index new Document)
+	public static void addUserDoc(String id, String age, String gender, String occupation, String zipCode)
+			throws IOException {
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
+		//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
 		Document document = new Document();
-		
+
 		document.add(new StringField("userID", id, Field.Store.YES));
 		document.add(new StringField("userAge", age, Field.Store.YES));
 		document.add(new StringField("userGender", gender, Field.Store.YES));
 		document.add(new StringField("userOccupation", occupation, Field.Store.YES));
 		document.add(new StringField("userZipCode", zipCode, Field.Store.YES));
-		
-		
+
 		writer.addDocument(document);
 		writer.commit();
 		writer.close();
-		
-		users++;
-		usernameNoSULabel.setText("Your UserID will be: " + (users+1));
-		System.out.println("Users are now " + users);
-		
-		indexUsersItemsNo(users,items);
-	}
-		
 
-	//Given the Item ID it returns the respective Average Rating
-	public static String itemRatingSearch(String itemQueryString, File itemFile) throws IOException, ParseException 
-	{
+		users++;
+		usernameNoSULabel.setText("Your UserID will be: " + (users + 1));
+		System.out.println("Users are now " + users);
+
+		indexUsersItemsNo(users, items);
+	}
+
+	// Given the Item ID it returns the respective Average Rating
+	public static String itemRatingSearch(String itemQueryString, File itemFile) throws IOException, ParseException {
 		// Open index
 		Directory itemDirectory = FSDirectory.open(itemFile.toPath()); // 3
 		IndexReader itemIndexReader = DirectoryReader.open(itemDirectory);
 		IndexSearcher itemIndexSearcher = new IndexSearcher(itemIndexReader);
 
-		// Parse query
-		// QueryParser parser2 = new QueryParser( "id", new StandardAnalyzer());
 		String[] itemFields = { "itemID" };
 		MultiFieldQueryParser itemParser = new MultiFieldQueryParser(itemFields, new StandardAnalyzer());
 		Query itemQuery = itemParser.parse(itemQueryString);
 		String rating = null;
+
 		// Search index
 		TopDocs itemHits = itemIndexSearcher.search(itemQuery, 30);
 		for (ScoreDoc itemScoreDoc : itemHits.scoreDocs) {
 			// Retrieve matching document
 			Document itemDocument = itemIndexSearcher.doc(itemScoreDoc.doc);
-			// Display
-			//System.out.print(itemDocument.get("itemRating"));
 			rating = itemDocument.get("itemRating");
 		}
 
@@ -910,169 +737,159 @@ public class MainFrame extends JFrame implements ActionListener
 		return rating;
 	}
 
-
-	
-	//Matches and returns HashMap with recommended Movie Titles and the respective Movie Documents containing Movie ID, Title, Release Date and Genre
-	public HashMap<String,Document> recommendedMovieHash(String indexDirectory, String idField, ArrayList<String> recommendedMovieIDs) throws IOException, ParseException
-		{
-			//ArrayList to Contain FieldNames
-			ArrayList<String> fields = new ArrayList<String>();
-			//HashMap to Contain Movie Title and the Respective Document it Belongs to
-			HashMap<String,Document> documentHash = new HashMap<String,Document>();
-			
-			//Add wanted field to searched fields
-			fields.add(idField);
-			
-			//Match every Recommended Movie ID with the Respective Title and Document
-			for(String queryString:recommendedMovieIDs)
-			{
-				//Checks if there is at least one actual written TextField
-				File file = new File(indexDirectory);
-					
-				//Open index
-				Directory directory = FSDirectory.open(file.toPath()); //3
-				IndexReader indexReader = DirectoryReader.open(directory);
-				IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-					
-				//Multi-Parse the final Query
-				MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]), new StandardAnalyzer());
-				Query query = parser.parse(queryString);
-					
-				//Calculating Search Time
-				//long start = System.currentTimeMillis();
-				
-				//Search index
-				TopDocs hits = indexSearcher.search(query, 25);		
-				
-				//long end = System.currentTimeMillis();
-			
-				//Write search stats
-				//System.err.println("Found " + hits.totalHits + " topics(s) (in " + (end - start) + " milliseconds) that matched query '" + queryString + "':");
-					
-				for(ScoreDoc scoreDoc : hits.scoreDocs)
-				{
-					//Retrieve matching document
-					Document document = indexSearcher.doc(scoreDoc.doc);
-					//Put Movie Title and Document to HashMap
-					documentHash.put(document.get("title"), document);
-				}
-				
-				//Close IndexSearcher
-				indexReader.close();
-			}
-			return documentHash;               		 
-		}
-	
-	//Searches and returns HashMap with found Movie Titles and the respective Movie Documents containing Movie ID, Title, Release Date and Genre
-	public HashMap<String,Document> searchMovieHash(String indexDirectory, String fieldName1, String queryString1, String fieldName2, String queryString2, String fieldName3, String queryString3, String fieldName4, String queryString4) throws IOException, ParseException
-	{
-		//ArrayList to Contain FieldNames
+	// Matches and returns HashMap with recommended Movie Titles and the
+	// respective Movie Documents containing Movie ID, Title, Release Date and Genre
+	public HashMap<String, Document> recommendedMovieHash(String indexDirectory, String idField,
+			ArrayList<String> recommendedMovieIDs) throws IOException, ParseException {
+		// ArrayList to Contain FieldNames
 		ArrayList<String> fields = new ArrayList<String>();
-		//HashMap to Contain Movie Title and the Respective Document it Belongs to
-		HashMap<String,Document> documentHash = new HashMap<String,Document>();
-		
-		
-		//Conditions to form final QueryString(AND)
-		if(!queryString1.equals("")){
+		// HashMap to Contain Movie Title and the Respective Document it Belongs
+		// to
+		HashMap<String, Document> documentHash = new HashMap<String, Document>();
+
+		// Add wanted field to searched fields
+		fields.add(idField);
+
+		// Match every Recommended Movie ID with the Respective Title and
+		// Document
+		for (String queryString : recommendedMovieIDs) {
+			// Checks if there is at least one actual written TextField
+			File file = new File(indexDirectory);
+
+			// Open index
+			Directory directory = FSDirectory.open(file.toPath()); // 3
+			IndexReader indexReader = DirectoryReader.open(directory);
+			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+			// Multi-Parse the final Query
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]),
+					new StandardAnalyzer());
+			Query query = parser.parse(queryString);
+
+			// Calculating Search Time
+			// long start = System.currentTimeMillis();
+
+			// Search index
+			TopDocs hits = indexSearcher.search(query, 25);
+
+			// long end = System.currentTimeMillis();
+
+			// Write search stats
+			// System.err.println("Found " + hits.totalHits + " topics(s) (in "
+			// + (end - start) + " milliseconds) that matched query '" +
+			// queryString + "':");
+
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				// Retrieve matching document
+				Document document = indexSearcher.doc(scoreDoc.doc);
+				// Put Movie Title and Document to HashMap
+				documentHash.put(document.get("title"), document);
+			}
+
+			// Close IndexSearcher
+			indexReader.close();
+		}
+		return documentHash;
+	}
+
+	// Searches and returns HashMap with found Movie Titles and the respective
+	// Movie Documents containing Movie ID, Title, Release Date and Genre
+	public HashMap<String, Document> searchMovieHash(String indexDirectory, String fieldName1, String queryString1,
+			String fieldName2, String queryString2, String fieldName3, String queryString3, String fieldName4,
+			String queryString4) throws IOException, ParseException {
+		// ArrayList to Contain FieldNames
+		ArrayList<String> fields = new ArrayList<String>();
+		// HashMap to Contain Movie Title and the Respective Document it Belongs to
+		HashMap<String, Document> documentHash = new HashMap<String, Document>();
+
+		// Conditions to form final QueryString(AND)
+		if (!queryString1.equals("")) {
 			queryString = queryString1;
 			fields.add(fieldName1);
 		}
-		if(!queryString2.equals("")){
-			if(!fields.isEmpty())
+		if (!queryString2.equals("")) {
+			if (!fields.isEmpty())
 				queryString += " AND " + queryString2;
 			else
 				queryString = queryString2;
 			fields.add(fieldName2);
 		}
-		if(!queryString3.equals("")){
-			if(!fields.isEmpty())
+		if (!queryString3.equals("")) {
+			if (!fields.isEmpty())
 				queryString += " AND " + queryString3;
 			else
 				queryString = queryString3;
 			fields.add(fieldName3);
 		}
-		if(!queryString4.equals("")){
-			if(!fields.isEmpty())
+		if (!queryString4.equals("")) {
+			if (!fields.isEmpty())
 				queryString += " AND " + queryString4;
 			else
 				queryString = queryString4;
 			fields.add(fieldName4);
 		}
-		
-		
-		//Checks if there is at least one actual written TextField
-		if(!fields.isEmpty())
-		{
+
+		// Checks if there is at least one actual written TextField
+		if (!fields.isEmpty()) {
 			File file = new File(indexDirectory);
-			
-			//Open index
-			Directory directory = FSDirectory.open(file.toPath()); //3
+
+			// Open index
+			Directory directory = FSDirectory.open(file.toPath()); // 3
 			IndexReader indexReader = DirectoryReader.open(directory);
 			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-			
-			//Multi-Parse the final Query
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]), new StandardAnalyzer());
+
+			// Multi-Parse the final Query
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]),
+					new StandardAnalyzer());
 			Query query = parser.parse(queryString);
-			
-			//Calculating Search Time
-			//long start = System.currentTimeMillis();
-		
-			//Search index
-			TopDocs hits = indexSearcher.search(query, 25);		
-		
-			//long end = System.currentTimeMillis();
-	
-			//Write search stats
-			//System.err.println("Found " + hits.totalHits + " topics(s) (in " + (end - start) + " milliseconds) that matched query '" + queryString + "':");
-			
-			
-			
-			for(ScoreDoc scoreDoc : hits.scoreDocs)
-			{
-				//Retrieve matching document
+
+			// Calculating Search Time
+			// long start = System.currentTimeMillis();
+
+			// Search index
+			TopDocs hits = indexSearcher.search(query, 25);
+
+			// long end = System.currentTimeMillis();
+
+			// Write search stats
+			// System.err.println("Found " + hits.totalHits + " topics(s) (in "
+			// + (end - start) + " milliseconds) that matched query '" +
+			// queryString + "':");
+
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				// Retrieve matching document
 				Document document = indexSearcher.doc(scoreDoc.doc);
-				//Put Movie Title and Document to HashMap
+				// Put Movie Title and Document to HashMap
 				documentHash.put(document.get("title"), document);
-				//System.out.println(document.get("title"));
-	
 			}
-		
-			//Close IndexSearcher
+			// Close IndexSearcher
 			indexReader.close();
-			
 		}
-	
-		return documentHash;               		 
+		return documentHash;
 	}
-	
-	//Return Array of Row Averages
-	public static double[] rowAverages(int utilityMatrix[][])
-	{
+
+	// Return Array of Row Averages
+	public static double[] rowAverages(int utilityMatrix[][]) {
 		double temp;
-		double [] rowAverages = new double[users+1];
-		for(int i = 1; i <= users; i++)
-		{
+		double[] rowAverages = new double[users + 1];
+		for (int i = 1; i <= users; i++) {
 			temp = 0;
-			//System.out.print("User" + i + ". ");
-			for(int j = 1; j <= items; j++)
-			{
+			// System.out.print("User" + i + ". ");
+			for (int j = 1; j <= items; j++) {
 				temp += utilityMatrix[i][j];
-				//System.out.print(utilityMatrix[i][j] + " ");
 			}
-			//System.out.println();
 			rowAverages[i] = temp / items;
-			
+
 		}
-		
+
 		return rowAverages;
 	}
-	
-	//Returns Array with the Pearson Similarities between the given User and the rest of the Users
-	public static double[] pearsonSimilarityMatrix(int currentUser, int utilityMatrix[][])
-	{
-		double [] pearsonSimMatrix = new double [users+1];
-		//double [] averages = new double[users+1];
-		double [] userAverages = rowAverages(utilityMatrix);
+
+	// Returns Array with the Pearson Similarities between the given User and
+	// the rest of the Users
+	public static double[] pearsonSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
+		double[] pearsonSimMatrix = new double[users + 1];
+		double[] userAverages = rowAverages(utilityMatrix);
 		double rxs_rx;
 		double rys_ry;
 		double product;
@@ -1083,378 +900,347 @@ public class MainFrame extends JFrame implements ActionListener
 		double ryRoot;
 		double rxSum;
 		double rySum;
-		
+
 		System.out.println("Similarity to User " + currentUser);
-		for(int i = 1; i <= users; i++)
-		{
+		for (int i = 1; i <= users; i++) {
 			product = 1;
 			productSum = 0;
 			rxSum = 0;
 			rySum = 0;
-			
-			for(int j = 1; j <= items; j++)
-			{
-				
-				//Differences
+
+			for (int j = 1; j <= items; j++) {
+
+				// Differences
 				rxs_rx = utilityMatrix[currentUser][j] - userAverages[currentUser];
 				rys_ry = utilityMatrix[i][j] - userAverages[i];
-				
+
 				product = rxs_rx * rys_ry;
-				
-				//Sum of Products of Differences
+
+				// Sum of Products of Differences
 				productSum += product;
-				//productSum += rxs_rx * rys_ry;
-				
-				//Sum of Squares of Differences
-				rxs_rx2 = Math.pow(rxs_rx,2);
+				// productSum += rxs_rx * rys_ry;
+
+				// Sum of Squares of Differences
+				rxs_rx2 = Math.pow(rxs_rx, 2);
 				rxSum += rxs_rx2;
 				rys_ry2 = Math.pow(rys_ry, 2);
 				rySum += rys_ry2;
 			}
-			
-			
-			//Root Sum of Squares of Differences
+
+			// Root Sum of Squares of Differences
 			rxRoot = Math.sqrt(rxSum);
 			ryRoot = Math.sqrt(rySum);
-			
+
 			pearsonSimMatrix[i] = productSum / (rxRoot * ryRoot);
-			//System.out.println(i + ". " + pearsonSimMatrix[i]);
 		}
 		return pearsonSimMatrix;
 	}
-	
-	//Prints Reccomended Movies along with Current User ID, # of Similar Users we set and the Rating we set as standard
-	public static void printRecommendedMovies(int currentUserID, int similarUsersNo, int userRating, ArrayList<String> recommendedMovies)
+
+	// Prints Reccomended Movies along with Current User ID, # of Similar Users
+	// we set and the Rating we set as standard
+	public static void printRecommendedMovies(int currentUserID, int similarUsersNo, int userRating,
+			ArrayList<String> recommendedMovies)
 
 	{
 		int i = 1;
 		System.out.println("Recommended Movies");
-		for(String movie: recommendedMovies)
-		{
-			System.out.println(i +". " + movie);
+		for (String movie : recommendedMovies) {
+			System.out.println(i + ". " + movie);
 			i++;
 		}
 	}
-	
-	//Returns Array with the Chebyshev Similarities between the given User and the rest of the Users
-	public static double[] chebyshevSimilarityMatrix(int currentUser, int utilityMatrix[][])
-	{
-		double[] chebSimMatrix = new double[users+1];
+
+	// Returns Array with the Chebyshev Similarities between the given User and
+	// the rest of the Users
+	public static double[] chebyshevSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
+		double[] chebSimMatrix = new double[users + 1];
 		double sum, distance;
 		double dif = 0;
 		double difInf = 0;
-		for(int i = 1; i <= users; i++)
-		{
-			sum =0;
-			
-			for(int j = 1; j <= items; j++)
-			{
+		for (int i = 1; i <= users; i++) {
+			sum = 0;
+
+			for (int j = 1; j <= items; j++) {
 				dif = utilityMatrix[currentUser][j] - utilityMatrix[i][j];
 				difInf = Math.pow(dif, Double.POSITIVE_INFINITY);
 				sum += difInf;
 			}
-			
-			//Calculating the Euclidean Distance
-			distance = Math.pow(sum, 1/Double.POSITIVE_INFINITY);
-			
-			//Calculating and Storing the Euclidean Similarity by subtracting the Euclidean Distance from 1
+
+			// Calculating the Euclidean Distance
+			distance = Math.pow(sum, 1 / Double.POSITIVE_INFINITY);
+
+			// Calculating and Storing the Euclidean Similarity by subtracting
+			// the Euclidean Distance from 1
 			chebSimMatrix[i] = 1 - distance;
-				
+
 		}
-			
+
 		return chebSimMatrix;
 	}
-	
-	//Returns Array with the Euclidean Similarities between the given User and the rest of the Users
-	public static double[] euclideanSimilarityMatrix(int currentUser, int utilityMatrix[][])
-	{
-		double[] euclSimMatrix = new double[users+1];
+
+	// Returns Array with the Euclidean Similarities between the given User and
+	// the rest of the Users
+	public static double[] euclideanSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
+		double[] euclSimMatrix = new double[users + 1];
 		double sum, euclideanDistance;
 		double dif = 0;
 		double dif2 = 0;
-		for(int i = 1; i <= users; i++)
-		{
-			sum =0;
-			
-			for(int j = 1; j <= items; j++)
-			{
+		for (int i = 1; i <= users; i++) {
+			sum = 0;
+			for (int j = 1; j <= items; j++) {
 				dif = utilityMatrix[currentUser][j] - utilityMatrix[i][j];
 				dif2 = Math.pow(dif, 2);
 				sum += dif2;
 			}
-			
-			//Calculating the Euclidean Distance
+			// Calculating the Euclidean Distance
 			euclideanDistance = Math.sqrt(sum);
-			
-			//Calculating and Storing the Euclidean Similarity by subtracting the Euclidean Distance from 1
+
+			// Calculating and Storing the Euclidean Similarity by subtracting
+			// the Euclidean Distance from 1
 			euclSimMatrix[i] = 1 - euclideanDistance;
-				
 		}
-			
+
 		return euclSimMatrix;
 	}
-	
-	//Returns Array with the Jaccard Similarities between the given User and the rest of the Users
-	public static double[] jaccardSimilarityMatrix(int currentUser, int utilityMatrix[][], ArrayList<String> currentUserMovies)
-	{
-		double[] jacSimMatrix = new double[users+1];
-		
+
+	// Returns Array with the Jaccard Similarities between the given User and
+	// the rest of the Users
+	public static double[] jaccardSimilarityMatrix(int currentUser, int utilityMatrix[][],
+			ArrayList<String> currentUserMovies) {
+		double[] jacSimMatrix = new double[users + 1];
+
 		ArrayList<String> tempList = new ArrayList<String>();
 		ArrayList<String> intersectionList = new ArrayList<String>();
 		ArrayList<String> unionList = new ArrayList<String>();
-		
-		for(int i = 1; i <= users; i++)
-		{
-			for(int j = 1; j <= items; j++)
-			{
-				//Condition for Union
-				if(utilityMatrix[i][j] != 0)
-				{
+
+		for (int i = 1; i <= users; i++) {
+			for (int j = 1; j <= items; j++) {
+				// Condition for Union
+				if (utilityMatrix[i][j] != 0) {
 					tempList.add(String.format("%04d", j));
-					//Condition for Intersection
-					if(currentUserMovies.contains(String.format("%04d", j)))
+					// Condition for Intersection
+					if (currentUserMovies.contains(String.format("%04d", j)))
 						intersectionList.add(String.format("%04d", j));
 				}
 			}
-			
-			//Getting the Union between Searching User's Movies and the Rest 
+
+			// Getting the Union between Searching User's Movies and the Rest
 			unionList = union(currentUserMovies, tempList);
-			
-			//Calculating and Storing the Jaccard Coefficient in the jacSimMatrix 
+
+			// Calculating and Storing the Jaccard Coefficient in the
+			// jacSimMatrix
 			jacSimMatrix[i] = (double) intersectionList.size() / unionList.size();
-			
+
 			intersectionList.clear();
 			tempList.clear();
 		}
-		
+
 		return jacSimMatrix;
 	}
-	
-	//Return the Union(ArrayList) of the two given ArrayLists
-	public static ArrayList<String> union(ArrayList<String> List1,ArrayList<String> List2)
-	{
+
+	// Return the Union(ArrayList) of the two given ArrayLists
+	public static ArrayList<String> union(ArrayList<String> List1, ArrayList<String> List2) {
 		HashSet<String> set = new HashSet<String>();
-		
+
 		set.addAll(List1);
 		set.addAll(List2);
-		
+
 		return new ArrayList<String>(set);
 	}
-	
-	
-	//Returns ArrayList of Movies with #userRated rating and higher by similar Users
-	public static ArrayList<String> recommendedMovies(ArrayList<Integer> similarUsers, ArrayList<String> currentUserMovies, int userRating, int[][] utilityMatrix) throws IOException, ParseException
-	{
+
+	// Returns ArrayList of Movies with #userRated rating and higher by similar
+	// Users
+	public static ArrayList<String> recommendedMovies(ArrayList<Integer> similarUsers,
+			ArrayList<String> currentUserMovies, int userRating, int[][] utilityMatrix)
+			throws IOException, ParseException {
 		ArrayList<String> suggestions = new ArrayList<String>();
 		String itemID;
-        for(int user: similarUsers)
-        {
-        	for(int j = 1; j <= users; j++)
-        	{
-        		itemID = String.format("%04d", j);
-        		if(utilityMatrix[user][j] >= userRating && !suggestions.contains(itemID))
-        			suggestions.add(itemID);
-        	}
-        }
-        
-        suggestions = removeMoviesInCommon(suggestions, currentUserMovies);
-        //suggestions = replaceIdWithTitle(suggestions);
+		for (int user : similarUsers) {
+			for (int j = 1; j <= users; j++) {
+				itemID = String.format("%04d", j);
+				if (utilityMatrix[user][j] >= userRating && !suggestions.contains(itemID))
+					suggestions.add(itemID);
+			}
+		}
+
+		suggestions = removeMoviesInCommon(suggestions, currentUserMovies);
+		// suggestions = replaceIdWithTitle(suggestions);
 		return suggestions;
 	}
-	
-	//Removes Items' IDs from higlyRatedMovies ArrayList the movies it has in common with the currentUserMovies ArrayLists
-	public static ArrayList<String> removeMoviesInCommon(ArrayList<String> highlyRatedMovies, ArrayList<String> currentUserMovies)
-	{
-		
-        for(String movie: currentUserMovies)
-        	if(highlyRatedMovies.contains(movie))
-        		highlyRatedMovies.remove(movie);
-        
+
+	// Removes Items' IDs from higlyRatedMovies ArrayList the movies it has in
+	// common with the currentUserMovies ArrayLists
+	public static ArrayList<String> removeMoviesInCommon(ArrayList<String> highlyRatedMovies,
+			ArrayList<String> currentUserMovies) {
+
+		for (String movie : currentUserMovies)
+			if (highlyRatedMovies.contains(movie))
+				highlyRatedMovies.remove(movie);
+
 		return highlyRatedMovies;
 	}
-	
-	//Returns ArrayList with Titles instead of Item IDs
-	public static ArrayList<String> replaceIdWithTitle(ArrayList<String> highlyRatedMovies) throws IOException, ParseException
-	{
+
+	// Returns ArrayList with Titles instead of Item IDs
+	public static ArrayList<String> replaceIdWithTitle(ArrayList<String> highlyRatedMovies)
+			throws IOException, ParseException {
 		String titleTemp;
 		ArrayList<String> titlesList = new ArrayList<String>();
-		for(String suggestion: highlyRatedMovies)
-		{
+		for (String suggestion : highlyRatedMovies) {
 			String itemQueryString = suggestion;
 			File itemFile = new File(indexItemDirectory);
-			titleTemp = titleSearch(itemQueryString,itemFile);
-			
-			//highlyRatedMovies.remove(suggestion);
+			titleTemp = titleSearch(itemQueryString, itemFile);
 			titlesList.add(titleTemp);
 		}
-		
+
 		return titlesList;
 	}
-	
-	//Returns ArrayList with the #similarUsersNo most similar users to the user given as parameter
-	@SuppressWarnings({ "unchecked", "rawtypes"})
-	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo, double[] cosineSimilarityMatrix)
-	{
-		//Putting the similarities in a map with respective users as keys
+
+	// Returns ArrayList with the #similarUsersNo most similar users to the user
+	// given as parameter
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo,
+			double[] cosineSimilarityMatrix) {
+		// Putting the similarities in a map with respective users as keys
 		Map<Integer, Double> cosineSimilarityMap = new HashMap<Integer, Double>();
-        for(int i = 1; i <= users; i++)
-        	cosineSimilarityMap.put(i, cosineSimilarityMatrix[i]);
-        cosineSimilarityMap.remove(currentUser);
-        
-        //Sorting the map by values(similarity)
-        Map<Integer, Double> map;
-        map = sortByValues(cosineSimilarityMap);
-        Set set = map.entrySet();
-        Iterator iterator = set.iterator();
-        
-        //Selecting 5 most similar users and store the in ArratList similarUsers;
-        //ArrayList<String> similarUsers = new ArrayList<String>();
-        ArrayList<Integer> similarUsers = new ArrayList<Integer>();
-        
-        int counter = 0;
-        while(iterator.hasNext() && counter<5)
-        //while(counter < similarUsersNo)
-        {
-        	Map.Entry entry = (Map.Entry) iterator.next();
-            /*System.out.print(entry.getKey() + ":\t");
-            System.out.println(entry.getValue());*/
-            //similarUsers.add(String.format("%03d", entry.getKey()));
-            similarUsers.add((Integer) entry.getKey());
-            counter ++;
-        }
-        
+		for (int i = 1; i <= users; i++)
+			cosineSimilarityMap.put(i, cosineSimilarityMatrix[i]);
+		cosineSimilarityMap.remove(currentUser);
+
+		// Sorting the map by values(similarity)
+		Map<Integer, Double> map;
+		map = sortByValues(cosineSimilarityMap);
+		Set set = map.entrySet();
+		Iterator iterator = set.iterator();
+
+		// Selecting 5 most similar users and store the in ArratList
+		// similarUsers;
+		ArrayList<Integer> similarUsers = new ArrayList<Integer>();
+
+		int counter = 0;
+		while (iterator.hasNext() && counter < 5)
+		// while(counter < similarUsersNo)
+		{
+			Map.Entry entry = (Map.Entry) iterator.next();
+			similarUsers.add((Integer) entry.getKey());
+			counter++;
+		}
+
 		return similarUsers;
 	}
-	
-	//Returns ArrayList of Item IDs of the Movies the given User has rated
-	public static ArrayList<String> currentUserMovies(int currentUser, int[][] utilityMatrix)
-	{
+
+	// Returns ArrayList of Item IDs of the Movies the given User has rated
+	public static ArrayList<String> currentUserMovies(int currentUser, int[][] utilityMatrix) {
 		ArrayList<String> movies = new ArrayList<String>();
-        for(int j=1; j<=items; j++)
-        {
-        	if(utilityMatrix[currentUser][j] !=0)
-        		movies.add(String.format("%04d", j));
-        	
-        }
-        
-        return movies;
+		for (int j = 1; j <= items; j++) {
+			if (utilityMatrix[currentUser][j] != 0)
+				movies.add(String.format("%04d", j));
+
+		}
+
+		return movies;
 	}
-	
-	//Returns Array with the Cosine Similarities between the given User and the rest of the Users
-	public static double[] cosineSimilarityMatrix(int currentUser, int utilityMatrix[][], double rssMatrix[])
-	{
-		double[] cosSimMatrix = new double[users+1];
+
+	// Returns Array with the Cosine Similarities between the given User and the
+	// rest of the Users
+	public static double[] cosineSimilarityMatrix(int currentUser, int utilityMatrix[][], double rssMatrix[]) {
+		double[] cosSimMatrix = new double[users + 1];
 		double productSum;
 		System.out.println("Similarity to User " + currentUser);
-		for(int j = 1; j <= users; j++)
-		{
+		for (int j = 1; j <= users; j++) {
 			productSum = 0;
-			for(int k = 1; k <= items; k++)
-			{
-				
-				//productSum += utilityMatrix[currentUser][k] * utilityMatrix[j][k];
-				if(utilityMatrix[currentUser][k]!=0 && utilityMatrix[j][k]!=0)
-				{
+			for (int k = 1; k <= items; k++) {
+				if (utilityMatrix[currentUser][k] != 0 && utilityMatrix[j][k] != 0) {
 					productSum += utilityMatrix[currentUser][k] * utilityMatrix[j][k];
-					
+
 				}
 			}
-			
-			
-			cosSimMatrix[j] = productSum / (rssMatrix[currentUser]*rssMatrix[j]);
-			//System.out.println(j + ". " + cosSimMatrix[j]);
+
+			cosSimMatrix[j] = productSum / (rssMatrix[currentUser] * rssMatrix[j]);
 		}
 		return cosSimMatrix;
 	}
-	
-	//Returns Array consisting the whole Utility Matrix
-	public static int[][] utilityMatrixPopulator(String directoryString) throws IOException, ParseException
-	{
+
+	// Returns Array consisting the whole Utility Matrix
+	public static int[][] utilityMatrixPopulator(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-		
+
 		String userString, itemString, ratingString, queryString;
 		int itemTemp, ratingTemp;
 		Query query;
 		TopDocs hits;
-		int[][] utilityMatrix = new int[users+5][items+5];
-		
-		String[] fields = {"dataUserID"};
+		int[][] utilityMatrix = new int[users + 5][items + 5];
+
+		String[] fields = { "dataUserID" };
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-				
-		
-		for(int i = 1; i <= users; i++)
-		{
+
+		for (int i = 1; i <= users; i++) {
 			userString = String.format("%03d", i);
 			queryString = userString;
-			query = parser.parse(queryString);    
-			
-			//We get the matches to User i
-			hits = indexSearcher.search(query, items);		
-			
-			//For each match to User i we get the Item ID and Item Rating
-			//Using i (User ID) and itemTemp (Item ID) as indexes we populate
-			//the Utility Matrix
-			for(ScoreDoc scoreDoc : hits.scoreDocs) 
-			{
-				Document document = indexSearcher.doc(scoreDoc.doc);                    
-				
+			query = parser.parse(queryString);
+
+			// We get the matches to User i
+			hits = indexSearcher.search(query, items);
+
+			// For each match to User i we get the Item ID and Item Rating
+			// Using i (User ID) and itemTemp (Item ID) as indexes we populate
+			// the Utility Matrix
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				Document document = indexSearcher.doc(scoreDoc.doc);
+
 				itemString = document.get("dataItemID");
 				itemTemp = Integer.valueOf(itemString);
-				
+
 				ratingString = document.get("dataRating");
 				ratingTemp = Integer.valueOf(ratingString);
-				
+
 				utilityMatrix[i][itemTemp] = ratingTemp;
-				//System.out.println(i + " " + itemTemp + ": " + utilityMatrix[i][itemTemp]);
 			}
 		}
-		
-		indexReader.close(); 
-		
+
+		indexReader.close();
+
 		return utilityMatrix;
 	}
-	
-	//Index Number of Users & Items
-	public static void indexUsersItemsNo(int users, int items) throws IOException
-	{
-	
+
+	// Index Number of Users & Items
+	public static void indexUsersItemsNo(int users, int items) throws IOException {
+
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexUsersItemsNoDirectory));	//Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		FSDirectory index = FSDirectory.open(Paths.get(indexUsersItemsNoDirectory)); 
+		// Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
-		//writer.commit();
+		// writer.commit();
 		writer.deleteAll();
 		Document document = new Document();
-		
+
 		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-		
-		document.add(new StringField("UsersNo", String.format("%03d",users), Field.Store.YES));
+
+		document.add(new StringField("UsersNo", String.format("%03d", users), Field.Store.YES));
 		System.out.println("Users: " + users);
+
 		document.add(new StringField("ItemsNo", String.format("%04d", items), Field.Store.YES));
 		System.out.println("Items: " + items);
-		//document.add(new StringField("dataRating", rating, Field.Store.YES));
+
 		document.add(new StringField("Timestamp", timestamp, Field.Store.YES));
 		System.out.println("Date: " + timestamp);
-		
-		
+
 		writer.addDocument(document);
-		//writer.commit();
+		// writer.commit();
 		writer.close();
 	}
-	
-	//Read Number of Users
-	public static int getUsersNo() throws IOException
-	{ 
+
+	// Read Number of Users
+	public static int getUsersNo() throws IOException {
 		File file = new File(indexUsersItemsNoDirectory);
-		Directory directory = FSDirectory.open(file.toPath()); 
+		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		int usersNo = 0;
-		for (int i = 0; i < indexReader.maxDoc(); i++) 
-		{
+		for (int i = 0; i < indexReader.maxDoc(); i++) {
 			Document document = indexReader.document(i);
 			System.out.println("Users: " + document.get("UsersNo"));
 			usersNo = Integer.valueOf(document.get("UsersNo"));
@@ -1462,16 +1248,14 @@ public class MainFrame extends JFrame implements ActionListener
 		indexReader.close();
 		return usersNo;
 	}
-	
-	//Read Number of Items
-	public static int getItemsNo()throws IOException
-	{
+
+	// Read Number of Items
+	public static int getItemsNo() throws IOException {
 		File file = new File(indexUsersItemsNoDirectory);
-		Directory directory = FSDirectory.open(file.toPath()); 
+		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		int itemsNo = 0;
-		for (int i = 0; i < indexReader.maxDoc(); i++) 
-		{
+		for (int i = 0; i < indexReader.maxDoc(); i++) {
 			Document document = indexReader.document(i);
 			itemsNo = Integer.valueOf(document.get("ItemsNo"));
 			System.out.println("Items: " + document.get("ItemsNo"));
@@ -1479,224 +1263,198 @@ public class MainFrame extends JFrame implements ActionListener
 		indexReader.close();
 		return itemsNo;
 	}
-	
-	//Returns Array consisting the whole Utility Matrix with 1s in place of 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
-	public static int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException
-	{
+
+	// Returns Array consisting the whole Utility Matrix with 1s in place of
+	// 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
+	public static int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-			
+
 		String userString, itemString, ratingString, queryString;
 		int itemTemp, ratingTemp;
 		Query query;
 		TopDocs hits;
-		int[][] utilityMatrix = new int[users+5][items+5];
-			
-		String[] fields = {"dataUserID"};
+		int[][] utilityMatrix = new int[users + 5][items + 5];
+
+		String[] fields = { "dataUserID" };
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-					
-			
-		for(int i = 1; i <= users; i++)
-		{
+
+		for (int i = 1; i <= users; i++) {
 			userString = String.format("%03d", i);
 			queryString = userString;
-			query = parser.parse(queryString);    
-				
-			//We get the matches to User i
-			hits = indexSearcher.search(query, items);		
-			
-			//For each match to User i we get the Item ID and Item Rating
-			//Using i (User ID) and itemTemp (Item ID) as indexes we populate
-			//the Utility Matrix
-			for(ScoreDoc scoreDoc : hits.scoreDocs) 
-			{
-				Document document = indexSearcher.doc(scoreDoc.doc);                    
-					
+			query = parser.parse(queryString);
+
+			// We get the matches to User i
+			hits = indexSearcher.search(query, items);
+
+			// For each match to User i we get the Item ID and Item Rating
+			// Using i (User ID) and itemTemp (Item ID) as indexes we populate
+			// the Utility Matrix
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				Document document = indexSearcher.doc(scoreDoc.doc);
+
 				itemString = document.get("dataItemID");
 				itemTemp = Integer.valueOf(itemString);
-				
+
 				ratingString = document.get("dataRating");
 				ratingTemp = Integer.valueOf(ratingString);
-				
-				//Redundant Condition - Utility Matrix element already equals 0
-				/*if(ratingTemp <= 2)
-					utilityMatrix[i][itemTemp] = 0;*/
-				if(ratingTemp > 3)
+
+				// Redundant Condition - Utility Matrix element already equals 0
+				/*
+				 * if(ratingTemp <= 2) utilityMatrix[i][itemTemp] = 0;
+				 */
+				if (ratingTemp > 3)
 					utilityMatrix[i][itemTemp] = 1;
-				//System.out.println(i + " " + itemTemp + ": " + utilityMatrix[i][itemTemp]);
 			}
 		}
-			
-		indexReader.close(); 
-			
+
+		indexReader.close();
+
 		return utilityMatrix;
 	}
-		
-	
-	//Returns Array with the Root Sum of Squares of the Users' Ratings
-	public static double[] rootSumSquaresMatrix(String directoryString) throws IOException, ParseException
-	{
+
+	// Returns Array with the Root Sum of Squares of the Users' Ratings
+	public static double[] rootSumSquaresMatrix(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-		
+
 		String userString, ratingString, queryString;
 		int ratingTemp, sumOfSquares;
 		Query query;
 		TopDocs hits;
-		
-		double[] rssMatrix = new double[users+5];
-		
-		String[] fields = {"dataUserID"};
+
+		double[] rssMatrix = new double[users + 5];
+
+		String[] fields = { "dataUserID" };
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-					
-		for(int i = 1; i <= users; i++)
-		{
+
+		for (int i = 1; i <= users; i++) {
 			userString = String.format("%03d", i);
 			queryString = userString;
-			query = parser.parse(queryString);    
-			
-			//We get the matches to User i
-			hits = indexSearcher.search(query, items);		
-			
+			query = parser.parse(queryString);
+
+			// We get the matches to User i
+			hits = indexSearcher.search(query, items);
+
 			sumOfSquares = 0;
-			
-			//For each match to User i we get the Item ID and Item Rating
-			//Using i (User ID) and itemTemp (Item ID) as indexes we populate
-			//the Utility Matrix
-			for(ScoreDoc scoreDoc : hits.scoreDocs)
-			{
-				Document document = indexSearcher.doc(scoreDoc.doc);                    
+
+			// For each match to User i we get the Item ID and Item Rating
+			// Using i (User ID) and itemTemp (Item ID) as indexes we populate
+			// the Utility Matrix
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				Document document = indexSearcher.doc(scoreDoc.doc);
 
 				ratingString = document.get("dataRating");
 				ratingTemp = Integer.valueOf(ratingString);
-				
-				//We calculate the Sum of Squares of each User
-				sumOfSquares += Math.pow(ratingTemp,2);
+
+				// We calculate the Sum of Squares of each User
+				sumOfSquares += Math.pow(ratingTemp, 2);
 			}
-			
-			//We store each User's Root of the Sum of Squares for later use in the Cosine Similarity
-			rssMatrix[i] =  Math.sqrt(sumOfSquares);
+
+			// We store each User's Root of the Sum of Squares for later use in
+			// the Cosine Similarity
+			rssMatrix[i] = Math.sqrt(sumOfSquares);
 		}
-		
-		indexReader.close(); 
-		
+
+		indexReader.close();
+
 		return rssMatrix;
 	}
-	
-	//Returns a sorted by values HashMap of Users as keys and the respective Cosine Similarities as values
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static HashMap sortByValues(Map<Integer, Double> cosineSimilarityMap) { 
-	       List list = new LinkedList(cosineSimilarityMap.entrySet());
-	       // Defined Custom Comparator here
-	       Collections.sort(list, new Comparator(){
-	            public int compare(Object o1, Object o2)
-	            {
-	               return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
-	            }
-	       }.reversed());
 
-	       // Here I am copying the sorted list in HashMap
-	       // using LinkedHashMap to preserve the insertion order
-	       HashMap sortedHashMap = new LinkedHashMap();
-	       for (Iterator it = list.iterator(); it.hasNext();) {
-	              Map.Entry entry = (Map.Entry) it.next();
-	              sortedHashMap.put(entry.getKey(), entry.getValue());
-	       } 
-	       return sortedHashMap;
-	}
-	
-	//Returns Title(String) of the given Item ID
-	public static String titleSearch(String itemQueryString, File itemFile) throws IOException, ParseException{
-			//Open index
-			String title = "";
-			Directory itemDirectory = FSDirectory.open(itemFile.toPath()); //3
-			IndexReader itemIndexReader = DirectoryReader.open(itemDirectory);
-			IndexSearcher itemIndexSearcher = new IndexSearcher(itemIndexReader);
-			    
-			//Parse query
-			//QueryParser parser2 = new QueryParser( "id", new StandardAnalyzer());
-			String[] itemFields = {"id", "genre"};
-			MultiFieldQueryParser itemParser = new MultiFieldQueryParser( itemFields, new StandardAnalyzer());
-			Query itemQuery = itemParser.parse(itemQueryString);               
-			    
-			//Search index
-			TopDocs itemHits = itemIndexSearcher.search(itemQuery, 30);
-			for(ScoreDoc itemScoreDoc : itemHits.scoreDocs) {
-				//Retrieve matching document
-				Document itemDocument = itemIndexSearcher.doc(itemScoreDoc.doc);                    
-			    //Display
-				//System.out.print(itemDocument.get("id") + " ");
-				//System.out.print(itemDocument.get("title") + " ");
-				//System.out.print(itemDocument.get("releaseDate") + " ");
-				//System.out.println();
-				//System.out.print(itemDocument.get("imdbURL") + " ");
-				//System.out.print(itemDocument.get("genre") + " ");
-				
-				title = itemDocument.get("title");
+	// Returns a sorted by values HashMap of Users as keys and the respective
+	// Cosine Similarities as values
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static HashMap sortByValues(Map<Integer, Double> cosineSimilarityMap) {
+		List list = new LinkedList(cosineSimilarityMap.entrySet());
+		// Defined Custom Comparator here
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
 			}
-			   
-			//Close Index Reader
-			itemIndexReader.close();                        
-			 
-			return title;
+		}.reversed());
+
+		// Here I am copying the sorted list in HashMap
+		// using LinkedHashMap to preserve the insertion order
+		HashMap sortedHashMap = new LinkedHashMap();
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry entry = (Map.Entry) it.next();
+			sortedHashMap.put(entry.getKey(), entry.getValue());
 		}
-	
-	//Changes Page(Panel)
-	public void changePage(int panelNumber)
-	{
-		switch(panelNumber)
-		{
-			case 1:
-				setTitle("Home/Sign In ");
-				cardLayout.show(mainPanel, "1");
-				break;
-			case 2:
-				setTitle("Sign Up ");
-				cardLayout.show(mainPanel, "2");
-				break;
-			case 3:
-				setTitle("Movie Search");
-				cardLayout.show(mainPanel, "3");
-				break;
-			case 4:
-				setTitle("Movie Rate");
-				cardLayout.show(mainPanel, "4");
-				break;
-			case 5:
-				setTitle("Movie Recommendations");
-				cardLayout.show(mainPanel, "5");
-				break;
-			default:
-				setTitle("Home/Sign In ");
-				cardLayout.show(mainPanel, "1");
-				break;
+		return sortedHashMap;
+	}
+
+	// Returns Title(String) of the given Item ID
+	public static String titleSearch(String itemQueryString, File itemFile) throws IOException, ParseException {
+		// Open index
+		String title = "";
+		Directory itemDirectory = FSDirectory.open(itemFile.toPath()); // 3
+		IndexReader itemIndexReader = DirectoryReader.open(itemDirectory);
+		IndexSearcher itemIndexSearcher = new IndexSearcher(itemIndexReader);
+
+		// Parse query
+		String[] itemFields = { "id", "genre" };
+		MultiFieldQueryParser itemParser = new MultiFieldQueryParser(itemFields, new StandardAnalyzer());
+		Query itemQuery = itemParser.parse(itemQueryString);
+
+		// Search index
+		TopDocs itemHits = itemIndexSearcher.search(itemQuery, 30);
+		for (ScoreDoc itemScoreDoc : itemHits.scoreDocs) {
+			// Retrieve matching document
+			Document itemDocument = itemIndexSearcher.doc(itemScoreDoc.doc);
+
+			title = itemDocument.get("title");
+		}
+
+		// Close Index Reader
+		itemIndexReader.close();
+
+		return title;
+	}
+
+	// Changes Page(Panel)
+	public void changePage(int panelNumber) {
+		switch (panelNumber) {
+		case 1:
+			setTitle("Home/Sign In ");
+			cardLayout.show(mainPanel, "1");
+			break;
+		case 2:
+			setTitle("Sign Up ");
+			cardLayout.show(mainPanel, "2");
+			break;
+		case 3:
+			setTitle("Movie Search");
+			cardLayout.show(mainPanel, "3");
+			break;
+		case 4:
+			setTitle("Movie Rate");
+			cardLayout.show(mainPanel, "4");
+			break;
+		case 5:
+			setTitle("Movie Recommendations");
+			cardLayout.show(mainPanel, "5");
+			break;
+		default:
+			setTitle("Home/Sign In ");
+			cardLayout.show(mainPanel, "1");
+			break;
 		}
 	}
-	
-	
-	class ListListener implements ListSelectionListener{
+
+	class ListListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent event) {
-			if(event.getSource() == movieList)
-			{
+			if (event.getSource() == movieList) {
+
+				if (movieList.getSelectedValue() == null)
+					return;
+
 				queryString = movieList.getSelectedValue().toString();
-				
-				// ArrayList Implementation
-				/*
-				 * for(Document movieDoc: movieDocs) {
-				 * if(movieDoc.get("title").equals(queryString)) {
-				 * titleMRLabel.setText(movieDoc.get("title"));
-				 * idMRLabel.setText(movieDoc.get("id"));
-				 * releaseMRLabel.setText(movieDoc.get("releaseDate"));
-				 * imdbMRLabel.setText(movieDoc.get("imdbURL"));
-				 * genreMRLabel.setText(movieDoc.get("genre"));
-				 * cardLayout.show(mainPanel,"5"); break; } }
-				 */
 
 				// HashMap Implementation
 				for (String title : movieHash.keySet()) {
@@ -1707,9 +1465,7 @@ public class MainFrame extends JFrame implements ActionListener
 						imdbMRLabel.setText(movieHash.get(title).get("imdbURL"));
 						genreMRLabel.setText(movieHash.get(title).get("genre"));
 						averageRatingMRLabel.setText(movieHash.get(title).get("averageRating"));
-						/*if ((movieHash.get(title).get("averageRating") == null)
-								|| movieHash.get(title).get("averageRating").equals(" "))
-							System.out.println(movieHash.get(title).get("averageRating"));*/
+						
 						String tempRating;
 						if (user != null) {
 							try {
@@ -1729,46 +1485,30 @@ public class MainFrame extends JFrame implements ActionListener
 						break;
 					}
 				}
-				
+
 			}
-			if(event.getSource() == recommendationList)
-			{
+			if (event.getSource() == recommendationList) {
+
+				if (recommendationList.getSelectedValue() == null)
+					return;
 				queryString = recommendationList.getSelectedValue().toString();
-				
-				//ArrayList Implementation
-				/*for(Document movieDoc: movieDocs)
-				{
-					if(movieDoc.get("title").equals(queryString))
-					{
-						titleMRLabel.setText(movieDoc.get("title"));
-						idMRLabel.setText(movieDoc.get("id"));
-						releaseMRLabel.setText(movieDoc.get("releaseDate"));
-						imdbMRLabel.setText(movieDoc.get("imdbURL"));
-						genreMRLabel.setText(movieDoc.get("genre"));
-						cardLayout.show(mainPanel,"5");
-						break;
-					}
-				}*/
-				
-				//HashMap Implementation
-				for(String title: recommendationHash.keySet())
-				{
-					if(title.equals(queryString))
-					{
+
+				// HashMap Implementation
+				for (String title : recommendationHash.keySet()) {
+					if (title.equals(queryString)) {
 						titleMRLabel.setText(recommendationHash.get(title).get("title"));
 						idMRLabel.setText(recommendationHash.get(title).get("id"));
 						releaseMRLabel.setText(recommendationHash.get(title).get("releaseDate"));
 						imdbMRLabel.setText(recommendationHash.get(title).get("imdbURL"));
 						genreMRLabel.setText(recommendationHash.get(title).get("genre"));
 						averageRatingMRLabel.setText(recommendationHash.get(title).get("averageRating"));
-						
+
 						String tempRating;
-						if(user!= null)
-						{	
+						if (user != null) {
 							try {
-								tempRating = searchRating(user.getId(),recommendationHash.get(title).get("id"));
+								tempRating = searchRating(user.getId(), recommendationHash.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
-								if(tempRating.equals(" - "))
+								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
 								else
 									ratedMRLabel.setText("Rated");
@@ -1784,216 +1524,166 @@ public class MainFrame extends JFrame implements ActionListener
 				}
 			}
 		}
-	} 
-	
-	class ButtonListener implements ActionListener
-	{
-		public void actionPerformed(ActionEvent event)
-		{
-			//Home/Sign In Page
-			if(event.getSource() == signInSInButton)
-			{
-				//userID = usernameSITF.getText();
+	}
+
+	class ButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			// Home/Sign In Page
+			if (event.getSource() == signInSInButton) {
 				int intUserID = Integer.valueOf(usernameSITF.getText());
-				if((intUserID >= 1) && (intUserID <= users))
-				{
+				if ((intUserID >= 1) && (intUserID <= users)) {
 					user = new OldUser(String.format("%03d", intUserID));
-					JOptionPane.showMessageDialog(null,"Signed In as User " + user.getId());
+					JOptionPane.showMessageDialog(null, "Signed In as User " + user.getId());
 					signInOutMSButton.setText("Sign Out");
 					signInOutMRButton.setText("Sign Out");
 					changePage(3);
+				} else {
+					JOptionPane.showMessageDialog(null, "User " + usernameSITF.getText() + " does not exist!");
 				}
-				else
-				{
-					JOptionPane.showMessageDialog(null,"User " + usernameSITF.getText() + " does not exist!");
-				}
-				if(user!=null)
+				if (user != null)
 					usernameMSLabel.setText(user.getId());
 			}
-			if(event.getSource() == signUpSInButton)
-			{
+			if (event.getSource() == signUpSInButton) {
 				changePage(2);
 			}
-			//Sign Up Page
-			if(event.getSource() == signUpSUpButton)
-			{
-				user = new NewUser(String.format("%03d",users+1), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
-				/*try {
-					addUserDoc(String.format("%03d",users+1), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
+			// Sign Up Page
+			if (event.getSource() == signUpSUpButton) {
+				user = new NewUser(String.format("%03d", users + 1), ageSUTF.getText(), genderSUTF.getText(),
+						occupationSUTF.getText(), zipCodeSUTF.getText());
+				try {
+					addUserDoc(String.format("%03d", users + 1), ageSUTF.getText(), genderSUTF.getText(),
+							occupationSUTF.getText(), zipCodeSUTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
-				}*/
-	
-				JOptionPane.showMessageDialog(null,"Signed In as User " + user.getId());
-				if(user!=null)
-				{
+				}
+
+				JOptionPane.showMessageDialog(null, "Signed In as User " + user.getId());
+				if (user != null) {
 					usernameMSLabel.setText(user.getId());
-					//userID = user.getId();
+					// userID = user.getId();
 				}
 				signInOutMSButton.setText("Sign Out");
 				signInOutMRButton.setText("Sign Out");
 				changePage(3);
 			}
-			if(event.getSource() == signInSUpButton)
-			{
+			if (event.getSource() == signInSUpButton) {
 				changePage(1);
 			}
-			//Movie Search Page
-			if(event.getSource() == searchMSButton){
-				
-				//ArrayList Implementation
-				/*try {		
-					if(!movieTitles.isEmpty())
-						movieTitles.clear();
-					movieTitles = searchMovieTitles("indexed\\uItemIndex", "id", idTF.getText(), "title", titleTF.getText(), "releaseDate", releaseTF.getText(), "genre", genreTF.getText());
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+			// Movie Search Page
+			if (event.getSource() == searchMSButton) {
+
+				// HashMap Implementation
 				try {
-					if(!movieDocs.isEmpty())
-						movieDocs.clear();
-					movieDocs = searchMovieDocs("indexed\\uItemIndex", "id", idTF.getText(), "title", titleTF.getText(), "releaseDate", releaseTF.getText(), "genre", genreTF.getText());
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}*/
-				
-				//HashMap Implementation
-				try {		
-					if(!movieTitles.isEmpty())
+					if (!movieTitles.isEmpty())
 						movieTitles.clear();
-					movieHash = searchMovieHash(indexItemDirectoryUpdated, "id", idMSTF.getText(), "title", titleMSTF.getText(), "releaseDate", releaseMSTF.getText(), "genre", genreMSTF.getText());
+					movieHash = searchMovieHash(indexItemDirectoryUpdated, "id", idMSTF.getText(), "title",
+							titleMSTF.getText(), "releaseDate", releaseMSTF.getText(), "genre", genreMSTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
-				
-				//ArrayList Implementation
-				/*listModel.removeAllElements();
-				for(String movieTitle : movieTitles)
-					listModel.addElement(movieTitle);
-				if(listModel.isEmpty())
-					System.out.println("ListModel Empty After Search");
-				movieList.setModel(listModel);*/
-				
-				//HashMap Implementation
+
+				// HashMap Implementation
 				movieListModel = new DefaultListModel<String>();
-				//movieListModel.removeAllElements();
-				for(String movieTitle : movieHash.keySet())
+				// movieListModel.removeAllElements();
+				for (String movieTitle : movieHash.keySet())
 					movieListModel.addElement(movieTitle);
-				if(movieListModel.isEmpty())
-					System.out.println("ListModel Empty After Search");
+				if (movieListModel.isEmpty()) {
+					JOptionPane.showMessageDialog(null, "No results found.");
+					// System.out.println("ListModel Empty After Search");
+				}
+
 				movieList.setModel(movieListModel);
-				
+
 				System.out.println("Movies In List After Search");
-				
-				//ArrayList Implementation
-				/*for(String movieTitle : movieTitles)
-					System.out.println(movieTitle);*/
-				
-				//HashMap Implementation
-				for(String title : movieHash.keySet())
+
+				// HashMap Implementation
+				for (String title : movieHash.keySet())
 					System.out.println(title);
-				
+
 				movieListScrollPane.revalidate();
-					
-				
+
 			}
-			if(event.getSource() == recsMSButton)
-			{
+			if (event.getSource() == recsMSButton) {
 				changePage(5);
 			}
-			if(event.getSource() == signInOutMSButton){
-				if(user != null)
-				{
-					JOptionPane.showMessageDialog(null,"Signed Out User " + user.getId());
+			if (event.getSource() == signInOutMSButton) {
+				if (user != null) {
+					JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 					user = null;
 					usernameMSLabel.setText("Uknown User");
 					signInOutMSButton.setText("Sign In");
-				}
-				else
-				{
+				} else {
 					changePage(1);
 					signInOutMSButton.setText("Sign Out");
 				}
-				//changePage(1);
+				// changePage(1);
 			}
-			//Movie Rate Page
-			if(event.getSource() == rateMRButton){
-				
-				String rating = JOptionPane.showInputDialog("Rate " + titleMRLabel.getText());
-				
-				if(user == null && rating != null)
-				{
+			// Movie Rate Page
+			if (event.getSource() == rateMRButton) {
+
+				if (user == null) {
 					changePage(1);
-					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
-				}
-				else if((rating != null) && (rating.length() > 0))
-				{
-					
-					ratedMRLabel.setText("Rated");
+					JOptionPane.showMessageDialog(null, "You need to Sign In or Sing Up first...");
+				} else {
+					String stringRating = JOptionPane.showInputDialog("Rate " + titleMRLabel.getText());
+
 					try {
-						//addDataDoc(user.getId(),idMRLabel.getText(),rating);
-						rateDataItem(user.getId(),idMRLabel.getText(),rating);
-					} catch (IOException e){
-						e.printStackTrace();
-					} catch (ParseException e) {
-						e.printStackTrace();
+						int intRating = Integer.parseInt(stringRating);
+						if (intRating > 5 || intRating < 1) {
+							JOptionPane.showMessageDialog(null, "Your rating must be between 1 and 5.");
+						} else {
+							JOptionPane.showMessageDialog(null, "The number you chose is " + intRating + ".");
+							ratedMRLabel.setText("Rated");
+							ratingMRLabel.setText(stringRating);
+							try {
+								rateDataItem(user.getId(), idMRLabel.getText(), stringRating);
+							} catch (IOException e) {
+								e.printStackTrace();
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}
+							return;
+						}
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(null, "The text you typed is not an integer.");
 					}
-				    return;
 				}
-				/*
-				if ((userID != null) && (userID.length() > 0) && (rating != null) && (rating.length() > 0)) {
-					
-				}
-				*/
 			}
-			if(event.getSource() == searchMRButton)
-			{
+			if (event.getSource() == searchMRButton) {
 				changePage(3);
 			}
-			if(event.getSource() == recsMRButton)
-			{
+			if (event.getSource() == recsMRButton) {
 				changePage(5);
 			}
-			if(event.getSource() == signInOutMRButton){
-				if(user != null)
-				{
-					JOptionPane.showMessageDialog(null,"Signed Out User " + user.getId());
+			if (event.getSource() == signInOutMRButton) {
+				if (user != null) {
+					JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 					user = null;
 					signInOutMRButton.setText("Sign In");
-				}
-				else
-				{
+				} else {
 					changePage(1);
 					signInOutMRButton.setText("Sign Out");
 				}
 			}
-			//Recommendations Page
-			if(event.getSource() == searchRecButton)
-			{
+			// Recommendations Page
+			if (event.getSource() == searchRecButton) {
 				changePage(3);
 			}
-			if(event.getSource() == signOutRecButton)
-			{
-				JOptionPane.showMessageDialog(null,"Signed Out User " + user.getId());
+			if (event.getSource() == signOutRecButton) {
+				JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 				user = null;
 				signInOutMSButton.setText("Sign In");
 				changePage(1);
 			}
-			if((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton) || (event.getSource() == cosineButton) || (event.getSource() == euclideanButton) || (event.getSource() == chebyshevButton))
-			{
-				if(user == null)
-				{
+			if ((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton)
+					|| (event.getSource() == cosineButton) || (event.getSource() == euclideanButton)
+					|| (event.getSource() == chebyshevButton)) {
+				if (user == null) {
 					changePage(1);
-					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
-				}
-				else
-				{
+					JOptionPane.showMessageDialog(null, "You need to Sign In or Sing Up first...");
+				} else {
 					int[][] um = null;
 					try {
 						um = utilityMatrixPopulator(indexDataDirectory);
@@ -2002,42 +1692,39 @@ public class MainFrame extends JFrame implements ActionListener
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-						
-					ArrayList<String> cum = currentUserMovies(Integer.valueOf(user.getId()),um);
-					
-					//Jaccard Similarity
-					if(event.getSource() == jaccardButton)
-					{
-						double [] jsm = jaccardSimilarityMatrix(Integer.valueOf(user.getId()),um,cum);
-						ArrayList<Integer> jsu = similarUsers(Integer.valueOf(user.getId()),similarUsersNo,jsm);
+
+					ArrayList<String> cum = currentUserMovies(Integer.valueOf(user.getId()), um);
+
+					// Jaccard Similarity
+					if (event.getSource() == jaccardButton) {
+						double[] jsm = jaccardSimilarityMatrix(Integer.valueOf(user.getId()), um, cum);
+						ArrayList<Integer> jsu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, jsm);
 						try {
 							ArrayList<String> jrm = recommendedMovies(jsu, cum, userRating, um);
 							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", jrm);
-						} catch (IOException e){
+						} catch (IOException e) {
 							e.printStackTrace();
-						} catch (ParseException e){
+						} catch (ParseException e) {
 							e.printStackTrace();
 						}
 					}
-					
-					//Pearson Correlation
-					if(event.getSource() == pearsonButton)
-					{
-						double[] psm = pearsonSimilarityMatrix(Integer.valueOf(user.getId()),um);
+
+					// Pearson Correlation
+					if (event.getSource() == pearsonButton) {
+						double[] psm = pearsonSimilarityMatrix(Integer.valueOf(user.getId()), um);
 						ArrayList<Integer> psu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, psm);
 						try {
 							ArrayList<String> prm = recommendedMovies(psu, cum, userRating, um);
 							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", prm);
-						} catch (IOException e){
+						} catch (IOException e) {
 							e.printStackTrace();
-						} catch (ParseException e){
+						} catch (ParseException e) {
 							e.printStackTrace();
 						}
 					}
-					
-					//Cosine Similarity
-					if(event.getSource() == cosineButton)
-					{
+
+					// Cosine Similarity
+					if (event.getSource() == cosineButton) {
 						double[] rssm = null;
 						try {
 							rssm = rootSumSquaresMatrix(indexDataDirectory);
@@ -2051,66 +1738,49 @@ public class MainFrame extends JFrame implements ActionListener
 						try {
 							ArrayList<String> crm = recommendedMovies(csu, cum, userRating, um);
 							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", crm);
-						} catch (IOException e){
+						} catch (IOException e) {
 							e.printStackTrace();
-						} catch (ParseException e){
+						} catch (ParseException e) {
 							e.printStackTrace();
 						}
 					}
-					if(event.getSource() == euclideanButton)
-					{
-						double[] esm = euclideanSimilarityMatrix(Integer.valueOf(user.getId()),um);
+
+					// Euclidean Distance
+					if (event.getSource() == euclideanButton) {
+						double[] esm = euclideanSimilarityMatrix(Integer.valueOf(user.getId()), um);
 						ArrayList<Integer> esu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, esm);
 						try {
 							ArrayList<String> erm = recommendedMovies(esu, cum, userRating, um);
 							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", erm);
-						} catch (IOException e){
+						} catch (IOException e) {
 							e.printStackTrace();
-						} catch (ParseException e){
+						} catch (ParseException e) {
 							e.printStackTrace();
 						}
 					}
-					if(event.getSource() == chebyshevButton)
-					{
-						double[] chsm = chebyshevSimilarityMatrix(Integer.valueOf(user.getId()),um);
+
+					// Chebyshev Similarity
+					if (event.getSource() == chebyshevButton) {
+						double[] chsm = chebyshevSimilarityMatrix(Integer.valueOf(user.getId()), um);
 						ArrayList<Integer> chsu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, chsm);
 						try {
 							ArrayList<String> chrm = recommendedMovies(chsu, cum, userRating, um);
 							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", chrm);
-						} catch (IOException e){
+						} catch (IOException e) {
 							e.printStackTrace();
-						} catch (ParseException e){
+						} catch (ParseException e) {
 							e.printStackTrace();
-						}	
+						}
 					}
 				}
-				
-				/*//HashMap Implementation
-				recommendationListModel.removeAllElements();
-				for(String recommendationTitle : recommendationHash.keySet())
-					recommendationListModel.addElement(recommendationTitle);
-				if(recommendationListModel.isEmpty())
-					System.out.println("ListModel Empty After Search");
-				recommendationList.setModel(recommendationListModel);
-				
-				//HashMap Implementation
-				for(String title : recommendationHash.keySet())
-					System.out.println(title);
-				
-				recommendationListScrollPane.revalidate();*/
-				
 			}
-				
-				
-			if(event.getSource() == roundedJaccardButton)
-			{
-				if(user==null)
-				{
+
+			// Rounded Jaccard Similarity
+			if (event.getSource() == roundedJaccardButton) {
+				if (user == null) {
 					changePage(1);
-					JOptionPane.showMessageDialog(null,"You need to Sign In or Sing Up first...");
-				}
-				else
-				{
+					JOptionPane.showMessageDialog(null, "You need to Sign In or Sing Up first...");
+				} else {
 					int[][] um = null;
 					int[][] rum = null;
 					try {
@@ -2121,248 +1791,37 @@ public class MainFrame extends JFrame implements ActionListener
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					ArrayList<String> cum = currentUserMovies(Integer.valueOf(user.getId()),um);
-					
-					double [] jrsm = jaccardSimilarityMatrix(Integer.valueOf(user.getId()),rum,cum);
-					ArrayList<Integer> jrsu = similarUsers(Integer.valueOf(user.getId()),similarUsersNo,jrsm);
+					ArrayList<String> cum = currentUserMovies(Integer.valueOf(user.getId()), um);
+
+					double[] jrsm = jaccardSimilarityMatrix(Integer.valueOf(user.getId()), rum, cum);
+					ArrayList<Integer> jrsu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, jrsm);
 					try {
-						ArrayList<String> jrrm = recommendedMovies(jrsu, cum, userRating, um);;
+						ArrayList<String> jrrm = recommendedMovies(jrsu, cum, userRating, um);
+						;
 						recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", jrrm);
-					} catch (IOException e){
+					} catch (IOException e) {
 						e.printStackTrace();
-					} catch (ParseException e){
+					} catch (ParseException e) {
 						e.printStackTrace();
 					}
 				}
 			}
-				
-			//HashMap Implementation
+
+			// HashMap Implementation
 			recommendationListModel = new DefaultListModel<String>();
-			//recommendationListModel.removeAllElements();
-			for(String recommendationTitle : recommendationHash.keySet())
+			// recommendationListModel.removeAllElements();
+			for (String recommendationTitle : recommendationHash.keySet())
 				recommendationListModel.addElement(recommendationTitle);
-			if(recommendationListModel.isEmpty())
+			if (recommendationListModel.isEmpty())
 				System.out.println("ListModel Empty After Search");
 			recommendationList.setModel(recommendationListModel);
-			
-			//HashMap Implementation
-			for(String title : recommendationHash.keySet())
+
+			// HashMap Implementation
+			for (String title : recommendationHash.keySet())
 				System.out.println(title);
-			
+
 			recsListScrollPane.revalidate();
-				
-			
+
 		}
 	}
-
-	
-	
-	// ScrollBar Customizer Method(Incomplete)
-	/*public class MyScrollBarUI extends BasicScrollBarUI {
-
-	    @Override
-	    protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-	        // your code
-	    }
-
-	    @Override
-	    protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-	        // your code
-	    }
-	}*/
-	
-	//Searches and returns ArrayList with found Movie Titles
-	/*public ArrayList<String> searchMovieTitles(String indexDirectory, String fieldName1, String queryString1, String fieldName2, String queryString2, String fieldName3, String queryString3, String fieldName4, String queryString4) throws IOException, ParseException
-		{
-			//Parse provided index directory
-			//String indexDir = "indexed\\uItemIndex";				
-			
-			ArrayList<String> fields = new ArrayList<String>();
-			ArrayList<String> documentsNames = new ArrayList<String>();
-			queryString = "";
-			
-			if(!queryString1.equals("")){
-				queryString = queryString1;
-				fields.add(fieldName1);
-			}
-			if(!queryString2.equals("")){
-				if(!fields.isEmpty())
-					queryString += " AND " + queryString2;
-				else
-					queryString += queryString2;
-				fields.add(fieldName2);
-			}
-			if(!queryString3.equals("")){
-				if(!fields.isEmpty())
-					queryString += " AND " + queryString3;
-				else
-					queryString += queryString3;
-				fields.add(fieldName3);
-			}
-			if(!queryString4.equals("")){
-				if(!fields.isEmpty())
-					queryString += " AND " + queryString4;
-				else
-					queryString += queryString4;
-				fields.add(fieldName4);
-			}
-			
-			if(!fields.isEmpty())
-			{
-				File file = new File(indexDirectory);
-				
-				//Open index
-				Directory directory = FSDirectory.open(file.toPath()); //3
-				IndexReader indexReader = DirectoryReader.open(directory);
-				IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-				
-				//Parse query
-				//QueryParser parser = new QueryParser( "dataUserID", new StandardAnalyzer());
-				//String[] fields = {"dataItemID", "dataRating"};
-				//String[] fields = {fieldName1, fieldName2, fieldName3, fieldName4};
-				MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]), new StandardAnalyzer());
-				Query query = parser.parse(queryString);
-				//long start = System.currentTimeMillis();
-			
-				//Search index
-				TopDocs hits = indexSearcher.search(query, 25);		
-			
-				//long end = System.currentTimeMillis();
-		
-				//Write search stats
-				//System.err.println("Found " + hits.totalHits + " topics(s) (in " + (end - start) + " milliseconds) that matched query '" + queryString + "':");
-				
-				
-				for(ScoreDoc scoreDoc : hits.scoreDocs)
-				{
-					//Retrieve matching document
-					Document document = indexSearcher.doc(scoreDoc.doc);                    
-					documentsNames.add(document.get("title"));
-		
-				}
-			
-				//Close IndexSearcher
-				indexReader.close();
-				
-			}
-		
-			return documentsNames;               		 
-		}
-	*/		
-		//Searches and returns ArrayList with found Movie Documents containing Movie ID, Title, Release Date and Genre
-		/*public ArrayList<Document> searchMovieDocs(String indexDirectory, String fieldName1, String queryString1, String fieldName2, String queryString2, String fieldName3, String queryString3, String fieldName4, String queryString4) throws IOException, ParseException
-		{
-			//ArrayList to Contain FieldNames
-			ArrayList<String> fields = new ArrayList<String>();
-			//ArrayList to Contain Documents
-			ArrayList<Document> documents = new ArrayList<Document>();
-			queryString = " ";
-			System.out.println("Searched Fields");
-			
-			//Sub-QueryStrings formed to OR QueryString
-			if(!queryString1.equals("")){
-				System.out.println("ID Search: " + queryString1);
-				queryString = queryString1;
-				fields.add(fieldName1);
-			}
-			if(!queryString2.equals("")){
-				System.out.println("Title Search: " + queryString2);
-				queryString += " " + queryString2;
-				fields.add(fieldName2);
-			}
-			if(!queryString3.equals("")){
-				System.out.println("ReleaseDate Search: " + queryString3);
-				queryString += " " + queryString3;
-				fields.add(fieldName3);
-			}
-			if(!queryString4.equals("")){
-				System.out.println("Genre Search: " + queryString4);
-				queryString += " " + queryString4;
-				fields.add(fieldName4);
-			}
-			
-			//Sub-QueryStrings formed to AND QueryString
-			if(!queryString1.equals("")){
-				queryString = queryString1;
-				fields.add(fieldName1);
-			}
-			if(!queryString2.equals("")){
-				if(!fields.isEmpty())
-					queryString += " AND " + queryString2;
-				else
-					queryString += queryString2;
-				fields.add(fieldName2);
-			}
-			if(!queryString3.equals("")){
-				if(!fields.isEmpty())
-					queryString += " AND " + queryString3;
-				else
-					queryString += queryString3;
-				fields.add(fieldName3);
-			}
-			if(!queryString4.equals("")){
-				if(!fields.isEmpty())
-					queryString += " AND " + queryString4;
-				else
-					queryString += queryString4;
-				fields.add(fieldName4);
-			}
-			
-			
-			if(!fields.isEmpty())
-			{
-				File file = new File(indexDirectory);
-				
-				//Open index
-				Directory directory = FSDirectory.open(file.toPath());
-				IndexReader indexReader = DirectoryReader.open(directory);
-				IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-						
-						
-				//Parse query
-				//QueryParser parser = new QueryParser( "dataUserID", new StandardAnalyzer());
-				//String[] fields = {"dataItemID", "dataRating"};
-				//String[] fields = {fieldName1, fieldName2, fieldName3, fieldName4};
-				MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]), new StandardAnalyzer());
-				Query query = parser.parse(queryString);
-				
-				//Calculating Searching Time
-				//long start = System.currentTimeMillis();
-					
-				//Search index
-				TopDocs hits = indexSearcher.search(query, 25);		
-					
-				//long end = System.currentTimeMillis();
-		
-				
-				//System.err.println("Found " + hits.totalHits + " topics(s) (in " + (end - start) + " milliseconds) that matched query '" + queryString + "':");
-					
-				//Counting variable
-				int counter = 1;
-					
-				for(ScoreDoc scoreDoc : hits.scoreDocs)
-				{
-					//Retrieve matching document
-					Document document = indexSearcher.doc(scoreDoc.doc);                    
-					//Display
-					System.out.println();
-					System.out.println("Result " + counter);
-					System.out.print("ID: "			+ document.get("id") + " ");
-					System.out.print("Title: "		+ document.get("title") + " ");
-					System.out.print("Release: " 	+ document.get("releaseDate") + " ");
-					System.out.print("Genre: " 		+ document.get("genre") + " ");
-					documents.add(document);
-					System.out.println();
-					counter++;
-				}
-				
-				//Close IndexSearcher
-				indexReader.close();
-			}
-			
-			return documents;                        
-			 
-		}
-		*/
-	
 }

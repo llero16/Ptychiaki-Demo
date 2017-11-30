@@ -40,7 +40,7 @@ public class CosineSimilarity {
 		int similarUsersNo = 5;
 		
 		int [][] um = utilityMatrixPopulator(indexDataDirectory);
-		int [][] rum = utilityMatrixPopulatorRounded(indexDataDirectory);
+		//int [][] rum = utilityMatrixPopulatorRounded(indexDataDirectory);
 		ArrayList<String> cum = currentUserMovies(currentUserID,um);
 		
 		//Pearson Similarity Test
