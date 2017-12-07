@@ -400,18 +400,18 @@ public class CosineSimilarity {
 	}
 	
 	//Returns ArrayList with the #similarUsersNo most similar users to the user given as parameter
-	@SuppressWarnings({ "unchecked", "rawtypes"})
-	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo, double[] cosineSimilarityMatrix)
+	@SuppressWarnings({"rawtypes"})
+	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo, double similarityMatrix[])
 	{
 		//Putting the similarities in a map with respective users as keys
-		Map<Integer, Double> cosineSimilarityMap = new HashMap<Integer, Double>();
+		Map<Integer, Double> similarityMap = new HashMap<Integer, Double>();
         for(int i = 1; i <= users; i++)
-        	cosineSimilarityMap.put(i, cosineSimilarityMatrix[i]);
-        cosineSimilarityMap.remove(currentUser);
+        	similarityMap.put(i, similarityMatrix[i]);
+        similarityMap.remove(currentUser);
         
         //Sorting the map by values(similarity)
         Map<Integer, Double> map;
-        map = sortByValues(cosineSimilarityMap);
+        map = sortByValues(similarityMap);
         Set set = map.entrySet();
         Iterator iterator = set.iterator();
         
@@ -637,8 +637,8 @@ public class CosineSimilarity {
 	
 	//Returns a sorted by values HashMap of Users as keys and the respective Cosine Similarities as values
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static HashMap sortByValues(Map<Integer, Double> cosineSimilarityMap) { 
-	       List list = new LinkedList(cosineSimilarityMap.entrySet());
+	private static HashMap<Integer,Double> sortByValues(Map<Integer, Double> similarityMap) { 
+	       List list = new LinkedList(similarityMap.entrySet());
 	       // Defined Custom Comparator here
 	       Collections.sort(list, new Comparator(){
 	            public int compare(Object o1, Object o2)

@@ -210,7 +210,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static User user;
 
 	private static String indexDataDirectory = "indexed\\uDataIndex";
-	private static String indexItemDirectory = "indexed\\uItemIndex";
+	//private static String indexItemDirectory = "indexed\\uItemIndex";
 	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";
 	private static String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 
@@ -611,7 +611,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	}
 
 	// Given UserID & ItemID returns the respective Rating if this exists
-	public static String searchRating(String userQuery, String itemQuery) throws IOException, ParseException {
+	public static String searchDataRating(String userQuery, String itemQuery) throws IOException, ParseException {
 
 		File file = new File(indexDataDirectory);
 		Directory directory = FSDirectory.open(file.toPath()); // 3
@@ -635,6 +635,13 @@ public class MainFrame extends JFrame implements ActionListener {
 		return rating;
 	}
 
+	// Rates Item using UserID and ItemID
+	public static void rateDataItem(String userID, String itemID, String rating) throws IOException, ParseException {
+		if (searchDataRating(userID, itemID) != null)
+			deleteDataDoc(userID, itemID);
+		addDataDoc(userID, itemID, rating);
+	}
+	
 	// Adds new or updates existing Item Rating
 	public static void addDataDoc(String userID, String itemID, String rating) throws IOException {
 
@@ -658,15 +665,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		writer.close();
 	}
 
-	// Rates Item using UserID and ItemID
-	public static void rateDataItem(String userID, String itemID, String rating) throws IOException, ParseException {
-		if (searchRating(userID, itemID) != null)
-			deleteDataDocument(userID, itemID);
-		addDataDoc(userID, itemID, rating);
-	}
-
 	// Deletes existing Item Rating given UserID and ItemID
-	public static void deleteDataDocument(String userID, String itemID) throws IOException {
+	public static void deleteDataDoc(String userID, String itemID) throws IOException {
 		Analyzer analyzer = new StandardAnalyzer();
 		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -712,8 +712,36 @@ public class MainFrame extends JFrame implements ActionListener {
 		indexUsersItemsNo(users, items);
 	}
 
-	// Given the Item ID it returns the respective Average Rating
-	public static String itemRatingSearch(String itemQueryString, File itemFile) throws IOException, ParseException {
+	// Indexes Number of Users & Items
+	public static void indexUsersItemsNo(int users, int items) throws IOException {
+
+		Analyzer analyzer = new StandardAnalyzer();
+		FSDirectory index = FSDirectory.open(Paths.get(indexUsersItemsNoDirectory)); 
+		// Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
+		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(index, config);
+		// writer.commit();
+		writer.deleteAll();
+		Document document = new Document();
+
+		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+
+		document.add(new StringField("UsersNo", String.format("%03d", users), Field.Store.YES));
+		System.out.println("Users: " + users);
+
+		document.add(new StringField("ItemsNo", String.format("%04d", items), Field.Store.YES));
+		System.out.println("Items: " + items);
+
+		document.add(new StringField("Timestamp", timestamp, Field.Store.YES));
+		System.out.println("Date: " + timestamp);
+
+		writer.addDocument(document);
+		// writer.commit();
+		writer.close();
+	}
+	
+/*	// Given the Item ID it returns the respective Average Rating
+	public static String searchItemRating(String itemQueryString, File itemFile) throws IOException, ParseException {
 		// Open index
 		Directory itemDirectory = FSDirectory.open(itemFile.toPath()); // 3
 		IndexReader itemIndexReader = DirectoryReader.open(itemDirectory);
@@ -736,97 +764,41 @@ public class MainFrame extends JFrame implements ActionListener {
 		itemIndexReader.close();
 		return rating;
 	}
-
-	// Matches and returns HashMap with recommended Movie Titles and the
-	// respective Movie Documents containing Movie ID, Title, Release Date and Genre
-	public HashMap<String, Document> recommendedMovieHash(String indexDirectory, String idField,
-			ArrayList<String> recommendedMovieIDs) throws IOException, ParseException {
-		// ArrayList to Contain FieldNames
-		ArrayList<String> fields = new ArrayList<String>();
-		// HashMap to Contain Movie Title and the Respective Document it Belongs
-		// to
-		HashMap<String, Document> documentHash = new HashMap<String, Document>();
-
-		// Add wanted field to searched fields
-		fields.add(idField);
-
-		// Match every Recommended Movie ID with the Respective Title and
-		// Document
-		for (String queryString : recommendedMovieIDs) {
-			// Checks if there is at least one actual written TextField
-			File file = new File(indexDirectory);
-
-			// Open index
-			Directory directory = FSDirectory.open(file.toPath()); // 3
-			IndexReader indexReader = DirectoryReader.open(directory);
-			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-
-			// Multi-Parse the final Query
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]),
-					new StandardAnalyzer());
-			Query query = parser.parse(queryString);
-
-			// Calculating Search Time
-			// long start = System.currentTimeMillis();
-
-			// Search index
-			TopDocs hits = indexSearcher.search(query, 25);
-
-			// long end = System.currentTimeMillis();
-
-			// Write search stats
-			// System.err.println("Found " + hits.totalHits + " topics(s) (in "
-			// + (end - start) + " milliseconds) that matched query '" +
-			// queryString + "':");
-
-			for (ScoreDoc scoreDoc : hits.scoreDocs) {
-				// Retrieve matching document
-				Document document = indexSearcher.doc(scoreDoc.doc);
-				// Put Movie Title and Document to HashMap
-				documentHash.put(document.get("title"), document);
-			}
-
-			// Close IndexSearcher
-			indexReader.close();
-		}
-		return documentHash;
-	}
-
+*/
+	
 	// Searches and returns HashMap with found Movie Titles and the respective
 	// Movie Documents containing Movie ID, Title, Release Date and Genre
-	public HashMap<String, Document> searchMovieHash(String indexDirectory, String fieldName1, String queryString1,
-			String fieldName2, String queryString2, String fieldName3, String queryString3, String fieldName4,
-			String queryString4) throws IOException, ParseException {
+	public HashMap<String, Document> searchItemDocs(String indexDirectory, String itemIDQuery, String itemTitleQuery, String itemReleaseQuery, String itemGenreQuery) throws IOException, ParseException {
 		// ArrayList to Contain FieldNames
 		ArrayList<String> fields = new ArrayList<String>();
 		// HashMap to Contain Movie Title and the Respective Document it Belongs to
 		HashMap<String, Document> documentHash = new HashMap<String, Document>();
-
+		String queryString = " ";
 		// Conditions to form final QueryString(AND)
-		if (!queryString1.equals("")) {
-			queryString = queryString1;
-			fields.add(fieldName1);
+		if (!itemIDQuery.equals("")) {
+			queryString = itemIDQuery;
+			fields.add("id");
 		}
-		if (!queryString2.equals("")) {
+		if (!itemTitleQuery.equals("")) {
 			if (!fields.isEmpty())
-				queryString += " AND " + queryString2;
+				queryString += " AND " + itemTitleQuery;
 			else
-				queryString = queryString2;
-			fields.add(fieldName2);
+				queryString = itemTitleQuery;
+			fields.add("title");
 		}
-		if (!queryString3.equals("")) {
+		if (!itemReleaseQuery.equals("")) {
 			if (!fields.isEmpty())
-				queryString += " AND " + queryString3;
+				queryString += " AND " + itemReleaseQuery;
 			else
-				queryString = queryString3;
-			fields.add(fieldName3);
+				queryString = itemReleaseQuery;
+			fields.add("releaseDate");
 		}
-		if (!queryString4.equals("")) {
+		if (!itemGenreQuery.equals("")) {
 			if (!fields.isEmpty())
-				queryString += " AND " + queryString4;
+				queryString += " AND " + itemGenreQuery;
 			else
-				queryString = queryString4;
-			fields.add(fieldName4);
+				queryString = itemGenreQuery;
+			fields.add("genre");
 		}
 
 		// Checks if there is at least one actual written TextField
@@ -868,21 +840,58 @@ public class MainFrame extends JFrame implements ActionListener {
 		return documentHash;
 	}
 
-	// Return Array of Row Averages
-	public static double[] rowAverages(int utilityMatrix[][]) {
-		double temp;
-		double[] rowAverages = new double[users + 1];
-		for (int i = 1; i <= users; i++) {
-			temp = 0;
-			// System.out.print("User" + i + ". ");
-			for (int j = 1; j <= items; j++) {
-				temp += utilityMatrix[i][j];
+	// Matches and returns HashMap with recommended Movie Titles and the
+	// respective Movie Documents containing Movie ID, Title, Release Date and Genre
+	public HashMap<String, Document> recommendedItemDocs(String indexDirectory, ArrayList<String> recommendedMovieIDs) throws IOException, ParseException {
+		// ArrayList to Contain FieldNames
+		ArrayList<String> fields = new ArrayList<String>();
+		// HashMap to Contain Movie Title and the Respective Document it Belongs
+		// to
+		HashMap<String, Document> documentHash = new HashMap<String, Document>();
+
+		// Add wanted field to searched fields
+		fields.add("id");
+
+		// Match every Recommended Movie ID with the Respective Title and
+		// Document
+		for (String queryString : recommendedMovieIDs) {
+			// Checks if there is at least one actual written TextField
+			File file = new File(indexDirectory);
+
+			// Open index
+			Directory directory = FSDirectory.open(file.toPath());
+			IndexReader indexReader = DirectoryReader.open(directory);
+			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+			// Multi-Parse the final Query
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]),
+					new StandardAnalyzer());
+			Query query = parser.parse(queryString);
+
+			// Calculating Search Time
+			// long start = System.currentTimeMillis();
+
+			// Search index
+			TopDocs hits = indexSearcher.search(query, 25);
+
+			// long end = System.currentTimeMillis();
+
+			// Write search stats
+			// System.err.println("Found " + hits.totalHits + " topics(s) (in "
+			// + (end - start) + " milliseconds) that matched query '" +
+			// queryString + "':");
+
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				// Retrieve matching document
+				Document document = indexSearcher.doc(scoreDoc.doc);
+				// Put Movie Title and Document to HashMap
+				documentHash.put(document.get("title"), document);
 			}
-			rowAverages[i] = temp / items;
 
+			// Close IndexSearcher
+			indexReader.close();
 		}
-
-		return rowAverages;
+		return documentHash;
 	}
 
 	// Returns Array with the Pearson Similarities between the given User and
@@ -936,20 +945,23 @@ public class MainFrame extends JFrame implements ActionListener {
 		return pearsonSimMatrix;
 	}
 
-	// Prints Reccomended Movies along with Current User ID, # of Similar Users
-	// we set and the Rating we set as standard
-	public static void printRecommendedMovies(int currentUserID, int similarUsersNo, int userRating,
-			ArrayList<String> recommendedMovies)
+	// Return Array of Row Averages
+	public static double[] rowAverages(int utilityMatrix[][]) {
+		double temp;
+		double[] rowAverages = new double[users + 1];
+		for (int i = 1; i <= users; i++) {
+			temp = 0;
+			// System.out.print("User" + i + ". ");
+			for (int j = 1; j <= items; j++) {
+				temp += utilityMatrix[i][j];
+			}
+			rowAverages[i] = temp / items;
 
-	{
-		int i = 1;
-		System.out.println("Recommended Movies");
-		for (String movie : recommendedMovies) {
-			System.out.println(i + ". " + movie);
-			i++;
 		}
-	}
 
+		return rowAverages;
+	}
+	
 	// Returns Array with the Chebyshev Similarities between the given User and
 	// the rest of the Users
 	public static double[] chebyshevSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
@@ -1040,8 +1052,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
 	// Return the Union(ArrayList) of the two given ArrayLists
 	public static ArrayList<String> union(ArrayList<String> List1, ArrayList<String> List2) {
+		
 		HashSet<String> set = new HashSet<String>();
-
 		set.addAll(List1);
 		set.addAll(List2);
 
@@ -1063,81 +1075,9 @@ public class MainFrame extends JFrame implements ActionListener {
 			}
 		}
 
-		suggestions = removeMoviesInCommon(suggestions, currentUserMovies);
+		suggestions = removeCommons(suggestions, currentUserMovies);
 		// suggestions = replaceIdWithTitle(suggestions);
 		return suggestions;
-	}
-
-	// Removes Items' IDs from higlyRatedMovies ArrayList the movies it has in
-	// common with the currentUserMovies ArrayLists
-	public static ArrayList<String> removeMoviesInCommon(ArrayList<String> highlyRatedMovies,
-			ArrayList<String> currentUserMovies) {
-
-		for (String movie : currentUserMovies)
-			if (highlyRatedMovies.contains(movie))
-				highlyRatedMovies.remove(movie);
-
-		return highlyRatedMovies;
-	}
-
-	// Returns ArrayList with Titles instead of Item IDs
-	public static ArrayList<String> replaceIdWithTitle(ArrayList<String> highlyRatedMovies)
-			throws IOException, ParseException {
-		String titleTemp;
-		ArrayList<String> titlesList = new ArrayList<String>();
-		for (String suggestion : highlyRatedMovies) {
-			String itemQueryString = suggestion;
-			File itemFile = new File(indexItemDirectory);
-			titleTemp = titleSearch(itemQueryString, itemFile);
-			titlesList.add(titleTemp);
-		}
-
-		return titlesList;
-	}
-
-	// Returns ArrayList with the #similarUsersNo most similar users to the user
-	// given as parameter
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo,
-			double[] cosineSimilarityMatrix) {
-		// Putting the similarities in a map with respective users as keys
-		Map<Integer, Double> cosineSimilarityMap = new HashMap<Integer, Double>();
-		for (int i = 1; i <= users; i++)
-			cosineSimilarityMap.put(i, cosineSimilarityMatrix[i]);
-		cosineSimilarityMap.remove(currentUser);
-
-		// Sorting the map by values(similarity)
-		Map<Integer, Double> map;
-		map = sortByValues(cosineSimilarityMap);
-		Set set = map.entrySet();
-		Iterator iterator = set.iterator();
-
-		// Selecting 5 most similar users and store the in ArratList
-		// similarUsers;
-		ArrayList<Integer> similarUsers = new ArrayList<Integer>();
-
-		int counter = 0;
-		while (iterator.hasNext() && counter < 5)
-		// while(counter < similarUsersNo)
-		{
-			Map.Entry entry = (Map.Entry) iterator.next();
-			similarUsers.add((Integer) entry.getKey());
-			counter++;
-		}
-
-		return similarUsers;
-	}
-
-	// Returns ArrayList of Item IDs of the Movies the given User has rated
-	public static ArrayList<String> currentUserMovies(int currentUser, int[][] utilityMatrix) {
-		ArrayList<String> movies = new ArrayList<String>();
-		for (int j = 1; j <= items; j++) {
-			if (utilityMatrix[currentUser][j] != 0)
-				movies.add(String.format("%04d", j));
-
-		}
-
-		return movies;
 	}
 
 	// Returns Array with the Cosine Similarities between the given User and the
@@ -1160,6 +1100,152 @@ public class MainFrame extends JFrame implements ActionListener {
 		return cosSimMatrix;
 	}
 
+	// Returns Array with the Root Sum of Squares of the Users' Ratings
+	public static double[] rootSumSquaresMatrix(String directoryString) throws IOException, ParseException {
+		File file = new File(directoryString);
+
+		Directory directory = FSDirectory.open(file.toPath());
+		IndexReader indexReader = DirectoryReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+		String userString, ratingString, queryString;
+		int ratingTemp, sumOfSquares;
+		Query query;
+		TopDocs hits;
+
+		double[] rssMatrix = new double[users + 5];
+
+		String[] fields = { "dataUserID" };
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
+
+		for (int i = 1; i <= users; i++) {
+			userString = String.format("%03d", i);
+			queryString = userString;
+			query = parser.parse(queryString);
+
+			// We get the matches to User i
+			hits = indexSearcher.search(query, items);
+
+			sumOfSquares = 0;
+
+			// For each match to User i we get the Item ID and Item Rating
+			// Using i (User ID) and itemTemp (Item ID) as indexes we populate
+			// the Utility Matrix
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+				Document document = indexSearcher.doc(scoreDoc.doc);
+
+				ratingString = document.get("dataRating");
+				ratingTemp = Integer.valueOf(ratingString);
+
+				// We calculate the Sum of Squares of each User
+				sumOfSquares += Math.pow(ratingTemp, 2);
+			}
+
+			// We store each User's Root of the Sum of Squares for later use in
+			// the Cosine Similarity
+			rssMatrix[i] = Math.sqrt(sumOfSquares);
+		}
+
+		indexReader.close();
+
+		return rssMatrix;
+	}
+
+	// Returns ArrayList with the #similarUsersNo most similar users to the user
+	// given as parameter
+	@SuppressWarnings("rawtypes")
+	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo,
+			double similarityMatrix[]) {
+		// Putting the similarities in a map with respective users as keys
+		Map<Integer, Double> similarityMap = new HashMap<Integer, Double>();
+		for (int i = 1; i <= users; i++)
+			similarityMap.put(i, similarityMatrix[i]);
+		similarityMap.remove(currentUser);
+
+		// Sorting the map by values(similarity)
+		Map<Integer, Double> map;
+		map = sortByValues(similarityMap);
+		Set set = map.entrySet();
+		Iterator iterator = set.iterator();
+
+		// Selecting 5 most similar users and store the in ArratList
+		// similarUsers;
+		ArrayList<Integer> similarUsers = new ArrayList<Integer>();
+
+		int counter = 0;
+		while (iterator.hasNext() && counter < similarUsersNo)
+		// while(counter < similarUsersNo)
+		{
+			Map.Entry entry = (Map.Entry) iterator.next();
+			similarUsers.add((Integer) entry.getKey());
+			counter++;
+		}
+
+		return similarUsers;
+	}
+
+	// Returns a sorted by values HashMap of Users as keys and the respective
+	// Similarities as values
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static HashMap<Integer, Double> sortByValues(Map<Integer, Double> similarityMap) {
+		List list = new LinkedList(similarityMap.entrySet());
+		// Defined Custom Comparator here
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
+			}
+		}.reversed());
+
+		// Here I am copying the sorted list in HashMap
+		// using LinkedHashMap to preserve the insertion order
+		HashMap sortedHashMap = new LinkedHashMap();
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry entry = (Map.Entry) it.next();
+			sortedHashMap.put(entry.getKey(), entry.getValue());
+		}
+		return sortedHashMap;
+	}
+	
+	// Returns ArrayList of Item IDs of the Movies the given User has rated
+	public static ArrayList<String> currentUserMovies(int currentUser, int[][] utilityMatrix) {
+		ArrayList<String> movies = new ArrayList<String>();
+		for (int j = 1; j <= items; j++) {
+			if (utilityMatrix[currentUser][j] != 0)
+				movies.add(String.format("%04d", j));
+
+		}
+
+		return movies;
+	}
+
+	// Removes Items' IDs from higlyRatedMovies ArrayList the movies it has in
+	// common with the currentUserMovies ArrayLists
+	public static ArrayList<String> removeCommons(ArrayList<String> highlyRatedMovies,
+			ArrayList<String> currentUserMovies) {
+
+		for (String movie : currentUserMovies)
+			if (highlyRatedMovies.contains(movie))
+				highlyRatedMovies.remove(movie);
+
+		return highlyRatedMovies;
+	}
+
+/*	// Returns ArrayList with Titles instead of Item IDs
+	public static ArrayList<String> replaceIdWithTitle(ArrayList<String> highlyRatedMovies)
+			throws IOException, ParseException {
+		String titleTemp;
+		ArrayList<String> titlesList = new ArrayList<String>();
+		for (String suggestion : highlyRatedMovies) {
+			String itemQueryString = suggestion;
+			File itemFile = new File(indexItemDirectory);
+			titleTemp = searchItemTitle(itemQueryString, itemFile);
+			titlesList.add(titleTemp);
+		}
+
+		return titlesList;
+	}*/
+
+	
 	// Returns Array consisting the whole Utility Matrix
 	public static int[][] utilityMatrixPopulator(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
@@ -1204,34 +1290,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		indexReader.close();
 
 		return utilityMatrix;
-	}
-
-	// Index Number of Users & Items
-	public static void indexUsersItemsNo(int users, int items) throws IOException {
-
-		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexUsersItemsNoDirectory)); 
-		// Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
-		IndexWriterConfig config = new IndexWriterConfig(analyzer);
-		IndexWriter writer = new IndexWriter(index, config);
-		// writer.commit();
-		writer.deleteAll();
-		Document document = new Document();
-
-		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-
-		document.add(new StringField("UsersNo", String.format("%03d", users), Field.Store.YES));
-		System.out.println("Users: " + users);
-
-		document.add(new StringField("ItemsNo", String.format("%04d", items), Field.Store.YES));
-		System.out.println("Items: " + items);
-
-		document.add(new StringField("Timestamp", timestamp, Field.Store.YES));
-		System.out.println("Date: " + timestamp);
-
-		writer.addDocument(document);
-		// writer.commit();
-		writer.close();
 	}
 
 	// Read Number of Users
@@ -1316,81 +1374,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		return utilityMatrix;
 	}
 
-	// Returns Array with the Root Sum of Squares of the Users' Ratings
-	public static double[] rootSumSquaresMatrix(String directoryString) throws IOException, ParseException {
-		File file = new File(directoryString);
-
-		Directory directory = FSDirectory.open(file.toPath());
-		IndexReader indexReader = DirectoryReader.open(directory);
-		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-
-		String userString, ratingString, queryString;
-		int ratingTemp, sumOfSquares;
-		Query query;
-		TopDocs hits;
-
-		double[] rssMatrix = new double[users + 5];
-
-		String[] fields = { "dataUserID" };
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-
-		for (int i = 1; i <= users; i++) {
-			userString = String.format("%03d", i);
-			queryString = userString;
-			query = parser.parse(queryString);
-
-			// We get the matches to User i
-			hits = indexSearcher.search(query, items);
-
-			sumOfSquares = 0;
-
-			// For each match to User i we get the Item ID and Item Rating
-			// Using i (User ID) and itemTemp (Item ID) as indexes we populate
-			// the Utility Matrix
-			for (ScoreDoc scoreDoc : hits.scoreDocs) {
-				Document document = indexSearcher.doc(scoreDoc.doc);
-
-				ratingString = document.get("dataRating");
-				ratingTemp = Integer.valueOf(ratingString);
-
-				// We calculate the Sum of Squares of each User
-				sumOfSquares += Math.pow(ratingTemp, 2);
-			}
-
-			// We store each User's Root of the Sum of Squares for later use in
-			// the Cosine Similarity
-			rssMatrix[i] = Math.sqrt(sumOfSquares);
-		}
-
-		indexReader.close();
-
-		return rssMatrix;
-	}
-
-	// Returns a sorted by values HashMap of Users as keys and the respective
-	// Cosine Similarities as values
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static HashMap sortByValues(Map<Integer, Double> cosineSimilarityMap) {
-		List list = new LinkedList(cosineSimilarityMap.entrySet());
-		// Defined Custom Comparator here
-		Collections.sort(list, new Comparator() {
-			public int compare(Object o1, Object o2) {
-				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
-			}
-		}.reversed());
-
-		// Here I am copying the sorted list in HashMap
-		// using LinkedHashMap to preserve the insertion order
-		HashMap sortedHashMap = new LinkedHashMap();
-		for (Iterator it = list.iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
-			sortedHashMap.put(entry.getKey(), entry.getValue());
-		}
-		return sortedHashMap;
-	}
-
-	// Returns Title(String) of the given Item ID
-	public static String titleSearch(String itemQueryString, File itemFile) throws IOException, ParseException {
+/*	// Returns Title(String) of the given Item ID
+	public static String searchItemTitle(String itemQueryString, File itemFile) throws IOException, ParseException {
 		// Open index
 		String title = "";
 		Directory itemDirectory = FSDirectory.open(itemFile.toPath()); // 3
@@ -1415,7 +1400,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		itemIndexReader.close();
 
 		return title;
-	}
+	}*/
 
 	// Changes Page(Panel)
 	public void changePage(int panelNumber) {
@@ -1469,7 +1454,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						String tempRating;
 						if (user != null) {
 							try {
-								tempRating = searchRating(user.getId(), movieHash.get(title).get("id"));
+								tempRating = searchDataRating(user.getId(), movieHash.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
 								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
@@ -1506,7 +1491,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						String tempRating;
 						if (user != null) {
 							try {
-								tempRating = searchRating(user.getId(), recommendationHash.get(title).get("id"));
+								tempRating = searchDataRating(user.getId(), recommendationHash.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
 								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
@@ -1576,8 +1561,8 @@ public class MainFrame extends JFrame implements ActionListener {
 				try {
 					if (!movieTitles.isEmpty())
 						movieTitles.clear();
-					movieHash = searchMovieHash(indexItemDirectoryUpdated, "id", idMSTF.getText(), "title",
-							titleMSTF.getText(), "releaseDate", releaseMSTF.getText(), "genre", genreMSTF.getText());
+					movieHash = searchItemDocs(indexItemDirectoryUpdated, idMSTF.getText(),
+							titleMSTF.getText(), releaseMSTF.getText(), genreMSTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -1701,7 +1686,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						ArrayList<Integer> jsu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, jsm);
 						try {
 							ArrayList<String> jrm = recommendedMovies(jsu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", jrm);
+							recommendationHash = recommendedItemDocs(indexItemDirectoryUpdated, jrm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -1715,7 +1700,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						ArrayList<Integer> psu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, psm);
 						try {
 							ArrayList<String> prm = recommendedMovies(psu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", prm);
+							recommendationHash = recommendedItemDocs(indexItemDirectoryUpdated, prm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -1737,7 +1722,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						ArrayList<Integer> csu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, csm);
 						try {
 							ArrayList<String> crm = recommendedMovies(csu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", crm);
+							recommendationHash = recommendedItemDocs(indexItemDirectoryUpdated, crm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -1751,7 +1736,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						ArrayList<Integer> esu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, esm);
 						try {
 							ArrayList<String> erm = recommendedMovies(esu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", erm);
+							recommendationHash = recommendedItemDocs(indexItemDirectoryUpdated, erm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -1765,7 +1750,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						ArrayList<Integer> chsu = similarUsers(Integer.valueOf(user.getId()), similarUsersNo, chsm);
 						try {
 							ArrayList<String> chrm = recommendedMovies(chsu, cum, userRating, um);
-							recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", chrm);
+							recommendationHash = recommendedItemDocs(indexItemDirectoryUpdated, chrm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -1798,7 +1783,7 @@ public class MainFrame extends JFrame implements ActionListener {
 					try {
 						ArrayList<String> jrrm = recommendedMovies(jrsu, cum, userRating, um);
 						;
-						recommendationHash = recommendedMovieHash(indexItemDirectoryUpdated, "id", jrrm);
+						recommendationHash = recommendedItemDocs(indexItemDirectoryUpdated, jrrm);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ParseException e) {
