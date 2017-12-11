@@ -149,7 +149,19 @@ public class SearchingAndIndexing {
 				queryString = itemGenreQuery;
 			fields.add("genre");
 		}
-
+		
+		//QueryBuilder does not function correctly with Lucene - (or maybe I can't make it work) 
+		/*BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+		Query idQuery = new TermQuery(new Term("id", itemIDQuery));
+		Query titleQuery = new TermQuery(new Term("title", itemTitleQuery));
+		Query releaseQuery = new TermQuery(new Term("releaseDate", itemReleaseQuery));
+		Query genreQuery = new TermQuery(new Term("genre", itemGenreQuery));
+		
+		queryBuilder.add(idQuery, BooleanClause.Occur.MUST);
+		queryBuilder.add(titleQuery, BooleanClause.Occur.MUST);
+		queryBuilder.add(releaseQuery, BooleanClause.Occur.MUST);
+		queryBuilder.add(genreQuery, BooleanClause.Occur.MUST);*/
+		
 		// Checks if there is at least one actual written TextField
 		if (!fields.isEmpty()) {
 			File file = new File(indexDirectory);
@@ -163,6 +175,7 @@ public class SearchingAndIndexing {
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[fields.size()]),
 					new StandardAnalyzer());
 			Query query = parser.parse(queryString);
+			//Query query = parser.parse(queryBuilder.toString());
 
 			// Calculating Search Time
 			// long start = System.currentTimeMillis();
@@ -279,7 +292,7 @@ public class SearchingAndIndexing {
 	public String searchDataRating(String userQuery, String itemQuery) throws IOException, ParseException {
 
 		File file = new File(indexDataDirectory);
-		Directory directory = FSDirectory.open(file.toPath()); // 3
+		Directory directory = FSDirectory.open(file.toPath()); 
 		IndexReader indexReader = DirectoryReader.open(directory);
 		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 

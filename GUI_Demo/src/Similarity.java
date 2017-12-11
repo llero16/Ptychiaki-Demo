@@ -25,30 +25,29 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-/*import userClasses.NewUser;
-import userClasses.OldUser;*/
-import userClasses.User;
+import searcherClasses.Searcher;
 
 public class Similarity {
 
-	//private String indexDataDirectory = "indexed\\uDataIndex";
-	//private String indexItemDirectory = "indexed\\uItemIndex";
-	//private static String indexUsersItemsNoDirectory = "indexed\\Users&Items";
-	
-	private User user;
-	private static int users;
-	private static int items;
-	
-	public Similarity(int users, int items, User user)
-	{
-		users = Similarity.users;
-		items = Similarity.items;
-		user = this.user;
+	// private String indexDataDirectory = "indexed\\uDataIndex";
+	// private String indexItemDirectory = "indexed\\uItemIndex";
+	// private static String indexUsersItemsNoDirectory =
+	// "indexed\\Users&Items";
+
+	// private User user;
+	private int users;
+	private int items;
+
+	private static Searcher dataSearcher = new Searcher();
+
+	public Similarity() throws IOException {
+		users = dataSearcher.getUsersNo();
+		items = dataSearcher.getItemsNo();
+		// user = Indexer.user;
 	}
-	
 
 	// Returns Array consisting the whole Utility Matrix
-	public static int[][] utilityMatrixPopulator(String directoryString) throws IOException, ParseException {
+	public int[][] utilityMatrixPopulator(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
 		Directory directory = FSDirectory.open(file.toPath());
@@ -85,6 +84,7 @@ public class Similarity {
 				ratingTemp = Integer.valueOf(ratingString);
 
 				utilityMatrix[i][itemTemp] = ratingTemp;
+
 			}
 		}
 
@@ -93,9 +93,8 @@ public class Similarity {
 		return utilityMatrix;
 	}
 
-	// Returns Array consisting the whole Utility Matrix with 1s in place of
-	// 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
-	public static int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException {
+	// Returns Array consisting the whole Utility Matrix with 1s in place of 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
+	public int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
 		Directory directory = FSDirectory.open(file.toPath());
@@ -146,22 +145,25 @@ public class Similarity {
 	}
 
 	// Returns ArrayList of Item IDs of the Movies the given User has rated
-	public static ArrayList<String> currentUserMovies(int currentUser, int[][] utilityMatrix) {
+	public ArrayList<String> currentUserMovies(int currentUser, int[][] utilityMatrix) {
 		ArrayList<String> movies = new ArrayList<String>();
 		for (int j = 1; j <= items; j++) {
-			if (utilityMatrix[currentUser][j] != 0)
+			if (utilityMatrix[currentUser][j] != 0) {
 				movies.add(String.format("%04d", j));
+			}
 
 		}
 
 		return movies;
 	}
+
 	
-	// Returns ArrayList of Movies with #userRated rating and higher by similar
-	// Users
-	public static ArrayList<String> recommendedMovies(ArrayList<Integer> similarUsers,
-			ArrayList<String> currentUserMovies, int userRating, int[][] utilityMatrix)
-			throws IOException, ParseException {
+	//If we are to include Users with the movies we should change the ArrayList to HashMap
+	//If we are to choose based on Average Rating instead of Similar Users' Rating we should change userRating to averageRating
+	
+	// Returns ArrayList of Movies. The more Similar the User the higher the movie on the list
+	public ArrayList<String> recommendedMovies(ArrayList<Integer> similarUsers, ArrayList<String> currentUserMovies,
+			int userRating, int[][] utilityMatrix) throws IOException, ParseException {
 		ArrayList<String> suggestions = new ArrayList<String>();
 		String itemID;
 		for (int user : similarUsers) {
@@ -176,11 +178,10 @@ public class Similarity {
 		// suggestions = replaceIdWithTitle(suggestions);
 		return suggestions;
 	}
-	
+
 	// Removes Items' IDs from higlyRatedMovies ArrayList the movies it has in
 	// common with the currentUserMovies ArrayLists
-	public static ArrayList<String> removeCommons(ArrayList<String> highlyRatedMovies,
-			ArrayList<String> currentUserMovies) {
+	public ArrayList<String> removeCommons(ArrayList<String> highlyRatedMovies, ArrayList<String> currentUserMovies) {
 
 		for (String movie : currentUserMovies)
 			if (highlyRatedMovies.contains(movie))
@@ -188,12 +189,10 @@ public class Similarity {
 
 		return highlyRatedMovies;
 	}
-	
-	// Returns ArrayList with the #similarUsersNo most similar users to the user
-	// given as parameter
+
+	// Returns ArrayList with the #similarUsersNo most similar users to the user given as parameter
 	@SuppressWarnings("rawtypes")
-	public static ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo,
-			double similarityMatrix[]) {
+	public ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo, double similarityMatrix[]) {
 		// Putting the similarities in a map with respective users as keys
 		Map<Integer, Double> similarityMap = new HashMap<Integer, Double>();
 		for (int i = 1; i <= users; i++)
@@ -222,10 +221,9 @@ public class Similarity {
 		return similarUsers;
 	}
 
-	// Returns a sorted by values HashMap of Users as keys and the respective
-	// Similarities as values
+	// Returns a sorted by values HashMap of Users as keys and the respective Similarities as values
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static HashMap<Integer, Double> sortByValues(Map<Integer, Double> similarityMap) {
+	private HashMap<Integer, Double> sortByValues(Map<Integer, Double> similarityMap) {
 		List list = new LinkedList(similarityMap.entrySet());
 		// Defined Custom Comparator here
 		Collections.sort(list, new Comparator() {
@@ -243,10 +241,9 @@ public class Similarity {
 		}
 		return sortedHashMap;
 	}
-	
-	// Returns Array with the Cosine Similarities between the given User and the
-	// rest of the Users
-	public static double[] cosineSimilarityMatrix(int currentUser, int utilityMatrix[][], double rssMatrix[]) {
+
+	// Returns Array with the Cosine Similarities between the given User and the rest of the Users
+	public double[] cosineSimilarityMatrix(int currentUser, int utilityMatrix[][], double rssMatrix[]) {
 		double[] cosSimMatrix = new double[users + 1];
 		double productSum;
 		System.out.println("Similarity to User " + currentUser);
@@ -263,9 +260,9 @@ public class Similarity {
 		}
 		return cosSimMatrix;
 	}
-	
+
 	// Returns Array with the Root Sum of Squares of the Users' Ratings
-	public static double[] rootSumSquaresMatrix(String directoryString) throws IOException, ParseException {
+	public double[] rootSumSquaresMatrix(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
 		Directory directory = FSDirectory.open(file.toPath());
@@ -315,16 +312,16 @@ public class Similarity {
 		return rssMatrix;
 	}
 
-	// Returns Array with the Jaccard Similarities between the given User and
-	// the rest of the Users
-	public static double[] jaccardSimilarityMatrix(int currentUser, int utilityMatrix[][],
-			ArrayList<String> currentUserMovies) {
+	// Returns Array with the Jaccard Similarities between the given User and the rest of the Users
+	public double[] jaccardSimilarityMatrix(int currentUser, int utilityMatrix[][], ArrayList<String> currentUserMovies) {
+		
 		double[] jacSimMatrix = new double[users + 1];
-
 		ArrayList<String> tempList = new ArrayList<String>();
 		ArrayList<String> intersectionList = new ArrayList<String>();
 		ArrayList<String> unionList = new ArrayList<String>();
 
+		System.out.println("Jaccard Similarity User: " + currentUser);
+		System.out.println("User\tJacSimilarity");
 		for (int i = 1; i <= users; i++) {
 			for (int j = 1; j <= items; j++) {
 				// Condition for Union
@@ -339,10 +336,9 @@ public class Similarity {
 			// Getting the Union between Searching User's Movies and the Rest
 			unionList = union(currentUserMovies, tempList);
 
-			// Calculating and Storing the Jaccard Coefficient in the
-			// jacSimMatrix
+			// Calculating and Storing the Jaccard Coefficient in the jacSimMatrix
 			jacSimMatrix[i] = (double) intersectionList.size() / unionList.size();
-
+			System.out.println("User " + i + ".\t" + jacSimMatrix[i]);
 			intersectionList.clear();
 			tempList.clear();
 		}
@@ -351,8 +347,8 @@ public class Similarity {
 	}
 
 	// Return the Union(ArrayList) of the two given ArrayLists
-	public static ArrayList<String> union(ArrayList<String> List1, ArrayList<String> List2) {
-		
+	public ArrayList<String> union(ArrayList<String> List1, ArrayList<String> List2) {
+
 		HashSet<String> set = new HashSet<String>();
 		set.addAll(List1);
 		set.addAll(List2);
@@ -362,7 +358,7 @@ public class Similarity {
 
 	// Returns Array with the Chebyshev Similarities between the given User and
 	// the rest of the Users
-	public static double[] chebyshevSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
+	public double[] chebyshevSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
 		double[] chebSimMatrix = new double[users + 1];
 		double sum, distance;
 		double dif = 0;
@@ -388,9 +384,8 @@ public class Similarity {
 		return chebSimMatrix;
 	}
 
-	// Returns Array with the Euclidean Similarities between the given User and
-	// the rest of the Users
-	public static double[] euclideanSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
+	// Returns Array with the Euclidean Similarities between the given User and the rest of the Users
+	public double[] euclideanSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
 		double[] euclSimMatrix = new double[users + 1];
 		double sum, euclideanDistance;
 		double dif = 0;
@@ -413,9 +408,8 @@ public class Similarity {
 		return euclSimMatrix;
 	}
 
-	// Returns Array with the Pearson Similarities between the given User and
-	// the rest of the Users
-	public static double[] pearsonSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
+	// Returns Array with the Pearson Similarities between the given User and the rest of the Users
+	public double[] pearsonSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
 		double[] pearsonSimMatrix = new double[users + 1];
 		double[] userAverages = rowAverages(utilityMatrix);
 		double rxs_rx;
@@ -465,7 +459,7 @@ public class Similarity {
 	}
 
 	// Return Array of Row Averages
-	public static double[] rowAverages(int utilityMatrix[][]) {
+	public double[] rowAverages(int utilityMatrix[][]) {
 		double temp;
 		double[] rowAverages = new double[users + 1];
 		for (int i = 1; i <= users; i++) {
@@ -480,5 +474,5 @@ public class Similarity {
 
 		return rowAverages;
 	}
-	
+
 }
