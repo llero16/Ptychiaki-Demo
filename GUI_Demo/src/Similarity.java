@@ -93,7 +93,8 @@ public class Similarity {
 		return utilityMatrix;
 	}
 
-	// Returns Array consisting the whole Utility Matrix with 1s in place of 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
+	// Returns Array consisting the whole Utility Matrix with 1s in place of
+	// 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
 	public int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException {
 		File file = new File(directoryString);
 
@@ -157,11 +158,13 @@ public class Similarity {
 		return movies;
 	}
 
-	
-	//If we are to include Users with the movies we should change the ArrayList to HashMap
-	//If we are to choose based on Average Rating instead of Similar Users' Rating we should change userRating to averageRating
-	
-	// Returns ArrayList of Movies. The more Similar the User the higher the movie on the list
+	// If we are to include Users with the movies we should change the ArrayList
+	// to HashMap
+	// If we are to choose based on Average Rating instead of Similar Users'
+	// Rating we should change userRating to averageRating
+
+	// Returns ArrayList of Movies. The more Similar the User the higher the
+	// movie on the list
 	public ArrayList<String> recommendedMovies(ArrayList<Integer> similarUsers, ArrayList<String> currentUserMovies,
 			int userRating, int[][] utilityMatrix) throws IOException, ParseException {
 		ArrayList<String> suggestions = new ArrayList<String>();
@@ -190,7 +193,8 @@ public class Similarity {
 		return highlyRatedMovies;
 	}
 
-	// Returns ArrayList with the #similarUsersNo most similar users to the user given as parameter
+	// Returns ArrayList with the #similarUsersNo most similar users to the user
+	// given as parameter
 	@SuppressWarnings("rawtypes")
 	public ArrayList<Integer> similarUsers(int currentUser, int similarUsersNo, double similarityMatrix[]) {
 		// Putting the similarities in a map with respective users as keys
@@ -208,7 +212,6 @@ public class Similarity {
 		// Selecting 5 most similar users and store the in ArratList
 		// similarUsers;
 		ArrayList<Integer> similarUsers = new ArrayList<Integer>();
-
 		int counter = 0;
 		while (iterator.hasNext() && counter < similarUsersNo)
 		// while(counter < similarUsersNo)
@@ -221,7 +224,8 @@ public class Similarity {
 		return similarUsers;
 	}
 
-	// Returns a sorted by values HashMap of Users as keys and the respective Similarities as values
+	// Returns a sorted by values HashMap of Users as keys and the respective
+	// Similarities as values
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private HashMap<Integer, Double> sortByValues(Map<Integer, Double> similarityMap) {
 		List list = new LinkedList(similarityMap.entrySet());
@@ -235,18 +239,18 @@ public class Similarity {
 		// Here I am copying the sorted list in HashMap
 		// using LinkedHashMap to preserve the insertion order
 		HashMap sortedHashMap = new LinkedHashMap();
-		for (Iterator it = list.iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+			Map.Entry entry = (Map.Entry) iterator.next();
 			sortedHashMap.put(entry.getKey(), entry.getValue());
 		}
 		return sortedHashMap;
 	}
 
-	// Returns Array with the Cosine Similarities between the given User and the rest of the Users
+	// Returns Array with the Cosine Similarities between the given User and the
+	// rest of the Users
 	public double[] cosineSimilarityMatrix(int currentUser, int utilityMatrix[][], double rssMatrix[]) {
 		double[] cosSimMatrix = new double[users + 1];
 		double productSum;
-		System.out.println("Similarity to User " + currentUser);
 		for (int j = 1; j <= users; j++) {
 			productSum = 0;
 			for (int k = 1; k <= items; k++) {
@@ -312,16 +316,16 @@ public class Similarity {
 		return rssMatrix;
 	}
 
-	// Returns Array with the Jaccard Similarities between the given User and the rest of the Users
-	public double[] jaccardSimilarityMatrix(int currentUser, int utilityMatrix[][], ArrayList<String> currentUserMovies) {
-		
+	// Returns Array with the Jaccard Similarities between the given User and
+	// the rest of the Users
+	public double[] jaccardSimilarityMatrix(int currentUser, int utilityMatrix[][],
+			ArrayList<String> currentUserMovies) {
+
 		double[] jacSimMatrix = new double[users + 1];
 		ArrayList<String> tempList = new ArrayList<String>();
 		ArrayList<String> intersectionList = new ArrayList<String>();
 		ArrayList<String> unionList = new ArrayList<String>();
 
-		System.out.println("Jaccard Similarity User: " + currentUser);
-		System.out.println("User\tJacSimilarity");
 		for (int i = 1; i <= users; i++) {
 			for (int j = 1; j <= items; j++) {
 				// Condition for Union
@@ -336,9 +340,9 @@ public class Similarity {
 			// Getting the Union between Searching User's Movies and the Rest
 			unionList = union(currentUserMovies, tempList);
 
-			// Calculating and Storing the Jaccard Coefficient in the jacSimMatrix
+			// Calculating and Storing the Jaccard Coefficient in the
+			// jacSimMatrix
 			jacSimMatrix[i] = (double) intersectionList.size() / unionList.size();
-			System.out.println("User " + i + ".\t" + jacSimMatrix[i]);
 			intersectionList.clear();
 			tempList.clear();
 		}
@@ -368,23 +372,27 @@ public class Similarity {
 
 			for (int j = 1; j <= items; j++) {
 				dif = utilityMatrix[currentUser][j] - utilityMatrix[i][j];
+				// System.out.println(dif);
 				difInf = Math.pow(dif, Double.POSITIVE_INFINITY);
+				// System.out.println(difInf);
 				sum += difInf;
 			}
 
 			// Calculating the Euclidean Distance
 			distance = Math.pow(sum, 1 / Double.POSITIVE_INFINITY);
-
+			// System.out.println(distance);
 			// Calculating and Storing the Euclidean Similarity by subtracting
 			// the Euclidean Distance from 1
 			chebSimMatrix[i] = 1 - distance;
+			// System.out.println(chebSimMatrix);
 
 		}
 
 		return chebSimMatrix;
 	}
 
-	// Returns Array with the Euclidean Similarities between the given User and the rest of the Users
+	// Returns Array with the Euclidean Similarities between the given User and
+	// the rest of the Users
 	public double[] euclideanSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
 		double[] euclSimMatrix = new double[users + 1];
 		double sum, euclideanDistance;
@@ -408,7 +416,8 @@ public class Similarity {
 		return euclSimMatrix;
 	}
 
-	// Returns Array with the Pearson Similarities between the given User and the rest of the Users
+	// Returns Array with the Pearson Similarities between the given User and
+	// the rest of the Users
 	public double[] pearsonSimilarityMatrix(int currentUser, int utilityMatrix[][]) {
 		double[] pearsonSimMatrix = new double[users + 1];
 		double[] userAverages = rowAverages(utilityMatrix);
@@ -423,7 +432,6 @@ public class Similarity {
 		double rxSum;
 		double rySum;
 
-		System.out.println("Similarity to User " + currentUser);
 		for (int i = 1; i <= users; i++) {
 			product = 1;
 			productSum = 0;
@@ -464,7 +472,6 @@ public class Similarity {
 		double[] rowAverages = new double[users + 1];
 		for (int i = 1; i <= users; i++) {
 			temp = 0;
-			// System.out.print("User" + i + ". ");
 			for (int j = 1; j <= items; j++) {
 				temp += utilityMatrix[i][j];
 			}
@@ -475,4 +482,79 @@ public class Similarity {
 		return rowAverages;
 	}
 
+	// Given an ArrayList of Similar Users and the respective similarities,
+	// stores and returns Item IDs along with Predicted Ratings
+	public HashMap<String, String> predictionsHash(double[] similarityMatrix, ArrayList<Integer> similarUsers,
+			int[][] utilityMatrix, ArrayList<String> recommendedMovies) {
+		HashMap<String, String> predictionHash = new HashMap<String, String>();
+		double prediction;
+
+		for (String item : recommendedMovies) {
+			prediction = predictedRating(Integer.valueOf(item), similarityMatrix, similarUsers, utilityMatrix);
+			predictionHash.put(item, String.format("%2.1f",prediction));
+		}
+
+		return predictionHash;
+	}
+
+	// Same method with predictionHashRounded above. Takes into account rounded
+	// Utility Matrices
+	// Given an ArrayList of Similar Users and the respective similarities,
+	// stores and returns Item IDs along with Predicted Ratings
+	public HashMap<String, String> predictionsHashRounded(ArrayList<Integer> similarUsers,
+			int[][] utilityMatrix, ArrayList<String> recommendedMovies) {
+		HashMap<String, String> predictionHash = new HashMap<String, String>();
+		double prediction;
+
+		for (String item : recommendedMovies) {
+			prediction = predictedRatingRounded(Integer.valueOf(item), similarUsers, utilityMatrix);
+			predictionHash.put(item, String.format("%2.1f",prediction));
+		}
+
+		return predictionHash;
+	}
+
+	// Given an ArrayList of Similar Users and the respective similarities,
+	// calculates and returns Predicted Rating for a particular Item
+	public double predictedRating(int itemID, double[] similarityMatrix, ArrayList<Integer> similarUsers,
+			int[][] utilityMatrix) {
+		double product, a, b, predictedRating;
+		a = 0;
+		b = 0;
+
+		for (int user : similarUsers) {
+			product = similarityMatrix[user] * utilityMatrix[user][itemID];
+			// We do not take into account Similarity with a User that hasn't
+			// rated the given item
+			// utilityMatrix[user][itemID] = 0 when unrated by the user
+			if (product != 0) {
+				a += product;
+				b += similarityMatrix[user];
+			}
+		}
+
+		predictedRating = a / b;
+		return predictedRating;
+	}
+
+	// Different prediction function used than the predictedRatingRounded above.
+	// Takes into account rounded Utility Matrices
+	// Given an ArrayList of Similar Users, calculates and returns Predicted
+	// Rating for a particular Item
+	public double predictedRatingRounded(int itemID, ArrayList<Integer> similarUsers, int[][] utilityMatrix) {
+		double sum, predictedRating;
+		sum = 0;
+
+		for (int user : similarUsers) {
+
+			// We do not take into account Similarity with a User that hasn't
+			// rated the given item
+			// utilityMatrix[user][itemID] = 0 when unrated by the user
+			sum += utilityMatrix[user][itemID];
+
+		}
+
+		predictedRating = sum / (double) similarUsers.size();
+		return predictedRating;
+	}
 }

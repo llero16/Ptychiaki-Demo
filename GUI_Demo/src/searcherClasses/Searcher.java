@@ -38,7 +38,6 @@ public class Searcher {
 		int usersNo = 0;
 		for (int i = 0; i < indexReader.maxDoc(); i++) {
 			Document document = indexReader.document(i);
-			//System.out.println("Users: " + document.get("UsersNo"));
 			usersNo = Integer.valueOf(document.get("UsersNo"));
 		}
 		indexReader.close();
@@ -54,7 +53,6 @@ public class Searcher {
 		for (int i = 0; i < indexReader.maxDoc(); i++) {
 			Document document = indexReader.document(i);
 			itemsNo = Integer.valueOf(document.get("ItemsNo"));
-			//System.out.println("Items: " + document.get("ItemsNo"));
 		}
 		indexReader.close();
 		return itemsNo;
@@ -153,18 +151,22 @@ public class Searcher {
 		return documentHash;
 	}
 
-	// Matches and returns HashMap with recommended Movie Titles and the respective Movie Documents containing Movie ID, Title, Release Date and Genre
+	// Matches and returns HashMap with recommended Movie Titles and the
+	// respective Movie Documents containing Movie ID, Title, Release Date and
+	// Genre
 	public HashMap<String, Document> recommendedItemDocs(String indexDirectory, ArrayList<String> recommendedMovieIDs)
 			throws IOException, ParseException {
 		// ArrayList to Contain FieldNames
 		ArrayList<String> fields = new ArrayList<String>();
-		// HashMap to Contain Movie Title and the Respective Document it Belongs to
+		// HashMap to Contain Movie Title and the Respective Document it Belongs
+		// to
 		HashMap<String, Document> documentHash = new HashMap<String, Document>();
 
 		// Add wanted field to searched fields
 		fields.add("id");
 
-		// Match every Recommended Movie ID with the Respective Title and Document
+		// Match every Recommended Movie ID with the Respective Title and
+		// Document
 		for (String queryString : recommendedMovieIDs) {
 			// Checks if there is at least one actual written TextField
 			File file = new File(indexDirectory);
@@ -226,7 +228,6 @@ public class Searcher {
 		}
 
 		indexReader.close();
-		// System.out.print(rating);
 		return rating;
 	}
 

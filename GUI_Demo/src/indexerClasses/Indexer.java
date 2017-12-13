@@ -110,7 +110,6 @@ public class Indexer {
 		users++;
 		// MainFrame mainFrame = new MainFrame();
 		// usernameNoSULabel.setText("Your UserID will be: " + (users + 1));
-		System.out.println("Users are now " + users);
 
 		indexUsersItemsNo(users, items);
 	}
@@ -130,7 +129,7 @@ public class Indexer {
 		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
 
 		document.add(new StringField("UsersNo", String.format("%03d", users), Field.Store.YES));
-		System.out.println("Users: " + users);
+		System.out.println("\nUsers: " + users);
 
 		document.add(new StringField("ItemsNo", String.format("%04d", items), Field.Store.YES));
 		System.out.println("Items: " + items);

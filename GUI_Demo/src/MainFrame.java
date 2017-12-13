@@ -71,6 +71,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JLabel genreTextMRLabel;
 	private JLabel genreMRLabel;
 	private JLabel ratedMRLabel;
+	private JLabel predictedRatingMRLabel;
 	private JLabel ratingMRLabel;
 	private JLabel averageRatingMRLabel;
 
@@ -132,8 +133,9 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JPanel movieRatePanel;
 	private JPanel infoRatePanel;
 	private JPanel buttonRatePanel;
+	private JPanel ratedRatePanel;
 	private JPanel ratingsRatePanel;
-	// Recommendations Panel
+	// Recommendations Panels
 	private JPanel recommendationsPanel;
 	private JPanel searchRecsPanel;
 	private JPanel buttonRecsPanel;
@@ -167,6 +169,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static HashMap<String, Document> movieHash;
 	// Recommendations HashMap
 	private static HashMap<String, Document> recommendationHash;
+	// Predictions HashMap
+	private static HashMap<String, String> predictionsHash;
 
 	// Movie List ListModel
 	private DefaultListModel<String> movieListModel;
@@ -273,9 +277,10 @@ public class MainFrame extends JFrame implements ActionListener {
 		imdbMRLabel = new JLabel("IMDB URL");
 		genreTextMRLabel = new JLabel("Genre");
 		genreMRLabel = new JLabel("Genre");
-		ratedMRLabel = new JLabel("Rated/Unrated");
-		ratingMRLabel = new JLabel("  ", SwingConstants.CENTER);
-		averageRatingMRLabel = new JLabel(" ", SwingConstants.CENTER);
+		ratedMRLabel = new JLabel("Un-/Rated");
+		predictedRatingMRLabel = new JLabel("Prediction");
+		ratingMRLabel = new JLabel("User's", SwingConstants.CENTER);
+		averageRatingMRLabel = new JLabel("Average", SwingConstants.CENTER);
 
 		// TextFields
 		// Sign In Panel TextField
@@ -354,6 +359,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		// HashMap
 		movieHash = new HashMap<String, Document>();
 		recommendationHash = new HashMap<String, Document>();
+		predictionsHash = new HashMap<String,String>();
 
 		// MovieSearch: MovieList List Model
 		movieListModel = new DefaultListModel<String>();
@@ -458,6 +464,13 @@ public class MainFrame extends JFrame implements ActionListener {
 		movieSearchPanel.add(movieListScrollPane, BorderLayout.CENTER);
 		movieSearchPanel.add(buttonSearchPanel, BorderLayout.SOUTH);
 
+		// Movie Rate Rated/Unrated Panel: Set Layout, Add Labels
+		ratedRatePanel = new JPanel();
+		ratedRatePanel.setLayout(new GridLayout(1, 2, 20, 10));
+		ratedRatePanel.setBorder(new TitledBorder("Rating Prediction"));
+		ratedRatePanel.add(ratedMRLabel);
+		ratedRatePanel.add(predictedRatingMRLabel);
+		
 		// Movie Rate RatingsRate Panel: Set Layout, Add Labels
 		ratingsRatePanel = new JPanel();
 		ratingsRatePanel.setLayout(new GridLayout(1, 2, 20, 10));
@@ -480,8 +493,9 @@ public class MainFrame extends JFrame implements ActionListener {
 		infoRatePanel.add(imdbMRLabel);
 		infoRatePanel.add(genreTextMRLabel);
 		infoRatePanel.add(genreMRLabel);
-		infoRatePanel.add(ratedMRLabel);
+		//infoRatePanel.add(ratedMRLabel);
 		// infoRatePanel.add(ratingMRLabel);
+		infoRatePanel.add(ratedRatePanel);
 		infoRatePanel.add(ratingsRatePanel);
 
 		// Movie Rate ButtonRate Panel: Set Layout, Add Labels, TextFields &
@@ -677,6 +691,7 @@ public class MainFrame extends JFrame implements ActionListener {
 				for (String title : recommendationHash.keySet()) {
 					if (title.equals(queryString)) {
 						movieRatePanelSetText(recommendationHash.get(title).get("title"), recommendationHash.get(title).get("id"), recommendationHash.get(title).get("releaseDate"), recommendationHash.get(title).get("imdbURL"), recommendationHash.get(title).get("genre"), recommendationHash.get(title).get("averageRating"));
+						predictedRatingMRLabel.setText(predictionsHash.get(recommendationHash.get(title).get("id")));
 						String tempRating;
 						if (user != null) {
 							try {
@@ -686,6 +701,7 @@ public class MainFrame extends JFrame implements ActionListener {
 									ratedMRLabel.setText("Unrated");
 								else
 									ratedMRLabel.setText("Rated");
+								
 							} catch (IOException e) {
 								e.printStackTrace();
 							} catch (ParseException e) {
@@ -871,6 +887,8 @@ public class MainFrame extends JFrame implements ActionListener {
 						try {
 							ArrayList<String> jrm = similarity.recommendedMovies(jsu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, jrm);
+							// Predicted Rating
+							predictionsHash = similarity.predictionsHash(jsm, jsu, um, jrm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -885,6 +903,8 @@ public class MainFrame extends JFrame implements ActionListener {
 						try {
 							ArrayList<String> prm = similarity.recommendedMovies(psu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, prm);
+							// Predicted Rating
+							predictionsHash = similarity.predictionsHash(psm, psu, um, prm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -907,6 +927,8 @@ public class MainFrame extends JFrame implements ActionListener {
 						try {
 							ArrayList<String> crm = similarity.recommendedMovies(csu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, crm);
+							// Predicted Rating
+							predictionsHash = similarity.predictionsHash(csm, csu, um, crm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -921,6 +943,8 @@ public class MainFrame extends JFrame implements ActionListener {
 						try {
 							ArrayList<String> erm = similarity.recommendedMovies(esu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, erm);
+							// Predicted Rating
+							predictionsHash = similarity.predictionsHash(esm, esu, um, erm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
@@ -934,13 +958,17 @@ public class MainFrame extends JFrame implements ActionListener {
 						ArrayList<Integer> chsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo, chsm);
 						try {
 							ArrayList<String> chrm = similarity.recommendedMovies(chsu, cum, userRating, um);
-							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, chrm);	
+							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, chrm);
+							// Predicted Rating
+							predictionsHash = similarity.predictionsHash(chsm, chsu, um, chrm);
 						} catch (IOException e) {
 							e.printStackTrace();
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
 					}
+					
+					
 				}
 			}
 
@@ -966,6 +994,8 @@ public class MainFrame extends JFrame implements ActionListener {
 					try {
 						ArrayList<String> jrrm = similarity.recommendedMovies(jrsu, cum, userRating, um);
 						recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, jrrm);
+						// Predicted Rating
+						predictionsHash = similarity.predictionsHashRounded(jrsu, rum, jrrm);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ParseException e) {
