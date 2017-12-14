@@ -23,8 +23,6 @@ import searcherClasses.Searcher;
 
 public class Indexer {
 
-	private String indexDataDirectory = "indexed\\uDataIndex";
-	// private static String indexItemDirectory = "indexed\\uItemIndex";
 	private String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 
 	private int users;
@@ -33,23 +31,24 @@ public class Indexer {
 	private static Searcher dataSearcher = new Searcher();
 
 	public Indexer() throws IOException {
-		users = dataSearcher.getUsersNo();
-		items = dataSearcher.getItemsNo();
+		users = dataSearcher.getUsersNo(indexUsersItemsNoDirectory);
+		items = dataSearcher.getItemsNo(indexUsersItemsNoDirectory);
 		// user = Indexer.user;
 	}
 
 	// Rates Item using UserID and ItemID
-	public void rateDataItem(String userID, String itemID, String rating) throws IOException, ParseException {
-		if (dataSearcher.searchDataRating(userID, itemID) != null)
-			deleteDataDoc(userID, itemID);
-		addDataDoc(userID, itemID, rating);
+	public void rateDataItem(String indexDirectory, String userID, String itemID, String rating)
+			throws IOException, ParseException {
+		if (dataSearcher.searchDataRating(indexDirectory, userID, itemID) != null)
+			deleteDataDoc(indexDirectory, userID, itemID);
+		addDataDoc(indexDirectory, userID, itemID, rating);
 	}
 
 	// Adds new or updates existing Item Rating
-	public void addDataDoc(String userID, String itemID, String rating) throws IOException {
+	public void addDataDoc(String indexDirectory, String userID, String itemID, String rating) throws IOException {
 
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
+		FSDirectory index = FSDirectory.open(Paths.get(indexDirectory));
 		// Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
@@ -69,9 +68,9 @@ public class Indexer {
 	}
 
 	// Deletes existing Item Rating given UserID and ItemID
-	public void deleteDataDoc(String userID, String itemID) throws IOException {
+	public void deleteDataDoc(String indexDirectory, String userID, String itemID) throws IOException {
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
+		FSDirectory index = FSDirectory.open(Paths.get(indexDirectory));
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);
 		writer.commit();
@@ -88,9 +87,10 @@ public class Indexer {
 	}
 
 	// Add Rating (Index new Document)
-	public void addUserDoc(String id, String age, String gender, String occupation, String zipCode) throws IOException {
+	public void addUserDoc(String indexDirectory, String id, String age, String gender, String occupation,
+			String zipCode) throws IOException {
 		Analyzer analyzer = new StandardAnalyzer();
-		FSDirectory index = FSDirectory.open(Paths.get(indexDataDirectory));
+		FSDirectory index = FSDirectory.open(Paths.get(indexDirectory));
 		// Σε περίπτωση που υπάρχει ήδη το αρχείο κάνει append όχι overwrite
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		IndexWriter writer = new IndexWriter(index, config);

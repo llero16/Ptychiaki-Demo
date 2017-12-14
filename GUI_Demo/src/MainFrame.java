@@ -47,19 +47,20 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JLabel usernameSILabel;
 	// Sign Up Labels
 	private JLabel usernameSULabel;
-	private static JLabel usernameNoSULabel; // Replaced the usernameSUTF TextField
+	private static JLabel usernameNoSULabel; // Replaced the usernameSUTF
+												// TextField
 	private JLabel ageSULabel;
 	private JLabel genderSULabel;
 	private JLabel occupationSULabel;
 	private JLabel zipCodeSULabel;
 	// Movie Search Labels
-	private JLabel usernameMSLabel;
+	// private JLabel usernameMSLabel; // Replaced by usernameMSButton Button
 	private JLabel idMSLabel;
 	private JLabel titleMSLabel;
 	private JLabel releaseMSLabel;
 	private JLabel genreMSLabel;
 	// Movie Rate Labels
-	private JLabel movieMRLabel;
+	// private JLabel usernameMRLabel; // Replaced usernameMRButton Button
 	private JLabel titleTextMRLabel;
 	private JLabel titleMRLabel;
 	private JLabel idTextMRLabel;
@@ -74,6 +75,19 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JLabel predictedRatingMRLabel;
 	private JLabel ratingMRLabel;
 	private JLabel averageRatingMRLabel;
+	// User Profile Labels
+	private JLabel usernameTextUPLabel;
+	private JLabel usernameUPLabel;
+	private JLabel ageTextUPLabel;
+	private JLabel ageUPLabel;
+	private JLabel genderTextUPLabel;
+	private JLabel genderUPLabel;
+	private JLabel occupationTextUPLabel;
+	private JLabel occupationUPLabel;
+	private JLabel zipCodeTextUPLabel;
+	private JLabel zipCodeUPLabel;
+	private JLabel averageRatingTextUPLabel;
+	private JLabel averageRatingUPLabel;
 
 	// TextFields
 	// Home/Sign In TextFields
@@ -99,10 +113,12 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JButton signUpSUpButton;
 	private JButton signInSUpButton;
 	// Movie Search Buttons
+	private JButton usernameMSButton; // Replaced usernameMSLabel Label
 	private JButton searchMSButton;
 	private JButton signInOutMSButton;
 	private JButton recsMSButton;
 	// Movie Rate Buttons
+	private JButton usernameMRButton; // Replace usernameMRLabel Label
 	private JButton rateMRButton;
 	private JButton searchMRButton;
 	private JButton recsMRButton;
@@ -116,6 +132,10 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JButton chebyshevButton;
 	private JButton searchRecButton;
 	private JButton signOutRecButton;
+	// User Profile Button
+	private JButton searchUPButton;
+	private JButton recsUPButton;
+	private JButton signOutUPButton;
 
 	// Panels
 	private JPanel mainPanel;
@@ -139,6 +159,10 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JPanel recommendationsPanel;
 	private JPanel searchRecsPanel;
 	private JPanel buttonRecsPanel;
+	// User Profile Panels
+	private JPanel userProfilePanel;
+	private JPanel infoUPPanel;
+	private JPanel buttonUPPanel;
 
 	// JScroll Panes
 	// MovieSearch JScroll Pane
@@ -155,6 +179,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JMenuItem movieSearchMI;
 	private JMenuItem movieRateMI;
 	private JMenuItem movieRecMI;
+	private JMenuItem userProfileMI;
 	private JMenuItem exitMI;
 
 	// Movie Search JList
@@ -185,13 +210,12 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static User user;
 
 	private static String indexDataDirectory = "indexed\\uDataIndex";
-	// private static String indexItemDirectory = "indexed\\uItemIndex";
+	private static String indexUserDirectory = "indexed\\uUserIndex";
 	private static String indexItemDirectoryUpdated = "indexed\\uItemIndexUpdated";
-	// private static String indexUsersItemsNoDirectory =
-	// "indexed\\Users&Items";
+	private String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 
-	private static int users; // 943
-	private static int items; // 1682
+	private static int users; // initially 943
+	private static int items; // initially 1682
 
 	private static int userRating = 5;
 	private static int similarUsersNo = 5;
@@ -202,19 +226,17 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static Indexer indexer;
 	private static Similarity similarity;
 
-	@SuppressWarnings("unchecked")
 	public MainFrame() throws IOException, ParseException {
 		// Number of Users and Items
 
 		searcher = new Searcher();
 		indexer = new Indexer();
 		similarity = new Similarity();
-		
-		users = searcher.getUsersNo();
-		items = searcher.getItemsNo();
+
+		users = searcher.getUsersNo(indexUsersItemsNoDirectory);
+		items = searcher.getItemsNo(indexUsersItemsNoDirectory);
 		System.out.println("Users: " + users);
 		System.out.println("Items: " + items);
-		
 
 		// Menu Items
 		homeMI = new JMenuItem("Home");
@@ -223,6 +245,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		movieSearchMI = new JMenuItem("Movie Search");
 		movieRateMI = new JMenuItem("Movie Rate");
 		movieRecMI = new JMenuItem("Movie Recommendations");
+		userProfileMI = new JMenuItem("User Profile");
 		exitMI = new JMenuItem("Exit");
 
 		// MenuListener, MenuItems: Add Listener
@@ -233,6 +256,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		movieSearchMI.addActionListener(this);
 		movieRateMI.addActionListener(this);
 		movieRecMI.addActionListener(this);
+		userProfileMI.addActionListener(this);
 		exitMI.addActionListener(this);
 
 		// Main Menu: Add Home, Sign In, Sign Up, Exit MenuItems
@@ -243,6 +267,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		mainMenu.add(movieSearchMI);
 		mainMenu.add(movieRateMI);
 		mainMenu.add(movieRecMI);
+		mainMenu.add(userProfileMI);
 		mainMenu.add(exitMI);
 
 		// Main Menu Bar: Add Main Menu
@@ -254,33 +279,51 @@ public class MainFrame extends JFrame implements ActionListener {
 		usernameSILabel = new JLabel("Username");
 		// Sign Up Panel Labels
 		usernameSULabel = new JLabel("Username/User ID");
-		usernameNoSULabel = new JLabel("Your UserID will be: " + (users + 1)); // Replaced usernameSUTF TextField
+		usernameNoSULabel = new JLabel("Your UserID will be: " + (users + 1)); // Replaced
+																				// usernameSUTF
+																				// TextField
 		ageSULabel = new JLabel("Age");
 		genderSULabel = new JLabel("Gender");
 		occupationSULabel = new JLabel("Occupation");
 		zipCodeSULabel = new JLabel("Zip Code");
 		// Movie Search Labels
-		usernameMSLabel = new JLabel("Anonymous User");
+		// usernameMSLabel = new JLabel("Anonymous User"); //Replace by
+		// usernameMSButton Button
+		// underlineLabel(usernameMSLabel);
 		idMSLabel = new JLabel("Movie ID");
 		titleMSLabel = new JLabel("Title");
 		releaseMSLabel = new JLabel("Release");
 		genreMSLabel = new JLabel("Genre");
 		// Movie Rate Labels
-		movieMRLabel = new JLabel("MOVIE INFO", SwingConstants.CENTER);
+		// usernameMRLabel = new JLabel("MOVIE INFO", SwingConstants.CENTER);
 		titleTextMRLabel = new JLabel("Title");
 		titleMRLabel = new JLabel("Title");
 		idTextMRLabel = new JLabel("Movie ID");
-		idMRLabel = new JLabel("Movie ID");
+		idMRLabel = new JLabel("-");
 		releaseTextMRLabel = new JLabel("Realease Date");
-		releaseMRLabel = new JLabel("Realease Date");
+		releaseMRLabel = new JLabel("-");
 		imdbTextMRLabel = new JLabel("IMDb URL");
-		imdbMRLabel = new JLabel("IMDB URL");
+		imdbMRLabel = new JLabel("-");
 		genreTextMRLabel = new JLabel("Genre");
-		genreMRLabel = new JLabel("Genre");
+		genreMRLabel = new JLabel("-");
 		ratedMRLabel = new JLabel("Un-/Rated");
-		predictedRatingMRLabel = new JLabel("Prediction");
+		predictedRatingMRLabel = new JLabel("-");
+		predictedRatingMRLabel.setVisible(false);
 		ratingMRLabel = new JLabel("User's", SwingConstants.CENTER);
 		averageRatingMRLabel = new JLabel("Average", SwingConstants.CENTER);
+		// User Profile Labels
+		usernameTextUPLabel = new JLabel("User ID");
+		usernameUPLabel = new JLabel("-");
+		ageTextUPLabel = new JLabel("Age");
+		ageUPLabel = new JLabel("-");
+		genderTextUPLabel = new JLabel("Gender");
+		genderUPLabel = new JLabel("-");
+		occupationTextUPLabel = new JLabel("Occupation");
+		occupationUPLabel = new JLabel("-");
+		zipCodeTextUPLabel = new JLabel("Zip Code");
+		zipCodeUPLabel = new JLabel("-");
+		averageRatingTextUPLabel = new JLabel("Average User Rating");
+		averageRatingUPLabel = new JLabel("-");
 
 		// TextFields
 		// Sign In Panel TextField
@@ -301,19 +344,24 @@ public class MainFrame extends JFrame implements ActionListener {
 		// Home/Sign In Panel Button
 		signInSInButton = new JButton("Sign In");
 		signUpSInButton = new JButton("Sign Up");
+		transparentButton(signUpSInButton);
 		// Sign Up Panel Button
 		signUpSUpButton = new JButton("Sign Up");
 		signInSUpButton = new JButton("Sign In");
 		// Movie Search Buttons
+		usernameMSButton = new JButton("Anonymous User");
+		usernameMSButton.setEnabled(false);
+		transparentButton(usernameMSButton);
 		signInOutMSButton = new JButton("Sign In/Out");
 		searchMSButton = new JButton("Search Movie");
 		recsMSButton = new JButton("Recommendations");
 		// Movie Rate Buttons
+		usernameMRButton = new JButton();
+		transparentButton(usernameMRButton);
 		rateMRButton = new JButton("Rate");
 		searchMRButton = new JButton("Search");
 		recsMRButton = new JButton("Recommendations");
 		signInOutMRButton = new JButton("Sign In/Out");
-
 		// Movie Recommendations Buttons
 		searchRecButton = new JButton("Search");
 		signOutRecButton = new JButton("Sign Out");
@@ -323,6 +371,10 @@ public class MainFrame extends JFrame implements ActionListener {
 		cosineButton = new JButton("Cosine Similarity");
 		euclideanButton = new JButton("Euclidean Distance");
 		chebyshevButton = new JButton("Chebyshev");
+		// User Profile Buttons
+		searchUPButton = new JButton("Search");
+		recsUPButton = new JButton("Recommendations");
+		signOutUPButton = new JButton("Sign Out");
 
 		// ListListener
 		ListListener listListener = new ListListener();
@@ -335,10 +387,12 @@ public class MainFrame extends JFrame implements ActionListener {
 		signUpSUpButton.addActionListener(buttonListener);
 		signInSUpButton.addActionListener(buttonListener);
 		// Movie Search Listeners
+		usernameMSButton.addActionListener(buttonListener);
 		signInOutMSButton.addActionListener(buttonListener);
 		searchMSButton.addActionListener(buttonListener);
 		recsMSButton.addActionListener(buttonListener);
 		// Movie Rate Listeners
+		usernameMRButton.addActionListener(buttonListener);
 		rateMRButton.addActionListener(buttonListener);
 		searchMRButton.addActionListener(buttonListener);
 		recsMRButton.addActionListener(buttonListener);
@@ -352,6 +406,10 @@ public class MainFrame extends JFrame implements ActionListener {
 		cosineButton.addActionListener(buttonListener);
 		euclideanButton.addActionListener(buttonListener);
 		chebyshevButton.addActionListener(buttonListener);
+		// User Profile Listeners
+		searchUPButton.addActionListener(buttonListener);
+		recsUPButton.addActionListener(buttonListener);
+		signOutUPButton.addActionListener(buttonListener);
 
 		// ArrayLists
 		movieTitles = new ArrayList<String>();
@@ -359,12 +417,14 @@ public class MainFrame extends JFrame implements ActionListener {
 		// HashMap
 		movieHash = new HashMap<String, Document>();
 		recommendationHash = new HashMap<String, Document>();
-		predictionsHash = new HashMap<String,String>();
+		predictionsHash = new HashMap<String, String>();
 
 		// MovieSearch: MovieList List Model
 		movieListModel = new DefaultListModel<String>();
-		/*if (movieListModel.isEmpty())
-			System.out.println("Search ListModel Empty At Constructor");*/
+		/*
+		 * if (movieListModel.isEmpty())
+		 * System.out.println("Search ListModel Empty At Constructor");
+		 */
 
 		// Hash Implementation
 		for (String title : movieHash.keySet())
@@ -387,15 +447,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		signInPanel.add(usernameSITF);
 		signInPanel.add(signInSInButton);
 		signInPanel.add(signUpSInButton);
-
-		signUpSInButton.setBorderPainted(false);
-		signUpSInButton.setOpaque(false);
-		signUpSInButton.setBackground(Color.WHITE);
-		Font font = signUpSInButton.getFont();
-		@SuppressWarnings("rawtypes")
-		Map attributes = font.getAttributes();
-		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-		signUpSInButton.setFont(font.deriveFont(attributes));
 
 		// Sign Up Info Panel: Set Layout, Add Labels & TextFields
 		infoSignUpPanel = new JPanel();
@@ -430,7 +481,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		infoSearchPanel = new JPanel();
 		infoSearchPanel.setLayout(new GridLayout(5, 2, 20, 10));
 		infoSearchPanel.setBorder(new TitledBorder("Movie Search Info"));
-		infoSearchPanel.add(usernameMSLabel);
+		// infoSearchPanel.add(usernameMSLabel);
+		infoSearchPanel.add(usernameMSButton);
 		infoSearchPanel.add(signInOutMSButton);
 		infoSearchPanel.add(idMSLabel);
 		infoSearchPanel.add(idMSTF);
@@ -470,7 +522,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		ratedRatePanel.setBorder(new TitledBorder("Rating Prediction"));
 		ratedRatePanel.add(ratedMRLabel);
 		ratedRatePanel.add(predictedRatingMRLabel);
-		
+
 		// Movie Rate RatingsRate Panel: Set Layout, Add Labels
 		ratingsRatePanel = new JPanel();
 		ratingsRatePanel.setLayout(new GridLayout(1, 2, 20, 10));
@@ -493,7 +545,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		infoRatePanel.add(imdbMRLabel);
 		infoRatePanel.add(genreTextMRLabel);
 		infoRatePanel.add(genreMRLabel);
-		//infoRatePanel.add(ratedMRLabel);
+		// infoRatePanel.add(ratedMRLabel);
 		// infoRatePanel.add(ratingMRLabel);
 		infoRatePanel.add(ratedRatePanel);
 		infoRatePanel.add(ratingsRatePanel);
@@ -512,7 +564,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		movieRatePanel = new JPanel();
 		// movieRatePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		movieRatePanel.setLayout(new BorderLayout());
-		movieRatePanel.add(movieMRLabel, BorderLayout.NORTH);
+		// movieRatePanel.add(usernameMRLabel, BorderLayout.NORTH);
 		movieRatePanel.add(infoRatePanel, BorderLayout.CENTER);
 		movieRatePanel.add(buttonRatePanel, BorderLayout.SOUTH);
 
@@ -529,8 +581,10 @@ public class MainFrame extends JFrame implements ActionListener {
 
 		// Recommendations RecommendationsList: List Model
 		recommendationListModel = new DefaultListModel<String>();
-		/*if (recommendationListModel.isEmpty())
-			System.out.println("Recommendations ListModel Empty At Constructor");*/
+		/*
+		 * if (recommendationListModel.isEmpty())
+		 * System.out.println("Recommendations ListModel Empty At Constructor");
+		 */
 
 		// HashMap Implementation
 		for (String title : recommendationHash.keySet())
@@ -564,6 +618,37 @@ public class MainFrame extends JFrame implements ActionListener {
 		recommendationsPanel.add(recsListScrollPane, BorderLayout.CENTER);
 		recommendationsPanel.add(buttonRecsPanel, BorderLayout.SOUTH);
 
+		// User Profile InfoPanel: Set Layout, Add Panels
+		infoUPPanel = new JPanel();
+		infoUPPanel.setLayout(new GridLayout(6, 2, 20, 10));
+		infoUPPanel.setBorder(new TitledBorder("User Info"));
+		infoUPPanel.add(usernameTextUPLabel);
+		infoUPPanel.add(usernameUPLabel);
+		infoUPPanel.add(ageTextUPLabel);
+		infoUPPanel.add(ageUPLabel);
+		infoUPPanel.add(genderTextUPLabel);
+		infoUPPanel.add(genderUPLabel);
+		infoUPPanel.add(occupationTextUPLabel);
+		infoUPPanel.add(occupationUPLabel);
+		infoUPPanel.add(zipCodeTextUPLabel);
+		infoUPPanel.add(zipCodeUPLabel);
+		infoUPPanel.add(averageRatingTextUPLabel);
+		infoUPPanel.add(averageRatingUPLabel);
+
+		// User Profile Button Panel: Set Layout, Add Labels
+		buttonUPPanel = new JPanel();
+		buttonUPPanel.setLayout(new GridLayout(1, 3, 20, 10));
+		buttonUPPanel.setBorder(new TitledBorder("Search or Get Recommendations"));
+		buttonUPPanel.add(searchUPButton);
+		buttonUPPanel.add(recsUPButton);
+		buttonUPPanel.add(signOutUPButton);
+
+		// User Profile Panel: Set Layout, Add Buttons
+		userProfilePanel = new JPanel();
+		userProfilePanel.setLayout(new BorderLayout());
+		userProfilePanel.add(infoUPPanel, BorderLayout.CENTER);
+		userProfilePanel.add(buttonUPPanel, BorderLayout.SOUTH);
+
 		// Main Panel: Set Layout, Add SignIn,SignUp Panels
 		mainPanel = new JPanel();
 		cardLayout = new CardLayout();
@@ -575,6 +660,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		mainPanel.add(movieSearchPanel, "3");
 		mainPanel.add(movieRatePanel, "4");
 		mainPanel.add(recommendationsPanel, "5");
+		mainPanel.add(userProfilePanel, "6");
 		cardLayout.show(mainPanel, "1");
 
 		// Frame Staff
@@ -601,6 +687,8 @@ public class MainFrame extends JFrame implements ActionListener {
 			changePage(4);
 		} else if (buttonString.equals("Movie Recommendations")) {
 			changePage(5);
+		} else if (buttonString.equals("User Profile")) {
+			changePage(6);
 		} else if (buttonString.equals("Exit")) {
 			System.exit(0);
 		} else
@@ -630,21 +718,71 @@ public class MainFrame extends JFrame implements ActionListener {
 			setTitle("Movie Recommendations");
 			cardLayout.show(mainPanel, "5");
 			break;
+		case 6:
+			setTitle("User Profile");
+			cardLayout.show(mainPanel, "6");
+			break;
 		default:
 			setTitle("Home/Sign In ");
 			cardLayout.show(mainPanel, "1");
 			break;
 		}
 	}
-	
-	public void movieRatePanelSetText(String titleLabel, String idLabel, String releaseLabel, String imdbLabel, String genreLabel, String averageRatingLabel)
-	{
+
+	public void movieRatePanelSetText(String titleLabel, String idLabel, String releaseLabel, String imdbLabel,
+			String genreLabel, String averageRatingLabel) {
 		titleMRLabel.setText(titleLabel);
 		idMRLabel.setText(idLabel);
 		releaseMRLabel.setText(releaseLabel);
 		imdbMRLabel.setText(imdbLabel);
 		genreMRLabel.setText(genreLabel);
 		averageRatingMRLabel.setText(averageRatingLabel);
+	}
+
+	public void userProfilePanelSetText(String userID, String age, String gender, String occupation, String zipCode) {
+		usernameUPLabel.setText(userID);
+		ageUPLabel.setText(age);
+		genderUPLabel.setText(gender);
+		occupationUPLabel.setText(occupation);
+		zipCodeUPLabel.setText(zipCode);
+		// averageRatingUPLabel.setText(averageRating);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void transparentButton(JButton button) {
+		button.setBorderPainted(false);
+		button.setOpaque(false);
+		button.setBackground(Color.WHITE);
+		Font font = signUpSInButton.getFont();
+		Map attributes = font.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		button.setFont(font.deriveFont(attributes));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void underlineLabel(JLabel label) {
+		Font font = label.getFont();
+		Map attributes = font.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		label.setFont(font.deriveFont(attributes));
+	}
+
+	public void disableUserButtons() {
+		usernameMSButton.setText("Anonymous User");
+		usernameMSButton.setEnabled(false);
+
+		usernameMRButton.setText("Anonymous User");
+		usernameMRButton.setEnabled(false);
+		movieRatePanel.remove(usernameMRButton);
+	}
+
+	public void enableUserButtons() {
+		usernameMSButton.setText("User " + user.getId());
+		usernameMSButton.setEnabled(true);
+
+		usernameMRButton.setText(("User" + user.getId()));
+		usernameMRButton.setEnabled(true);
+		movieRatePanel.add(usernameMRButton, BorderLayout.NORTH);
 	}
 
 	class ListListener implements ListSelectionListener {
@@ -659,11 +797,14 @@ public class MainFrame extends JFrame implements ActionListener {
 				// HashMap Implementation
 				for (String title : movieHash.keySet()) {
 					if (title.equals(queryString)) {
-						movieRatePanelSetText(movieHash.get(title).get("title"), movieHash.get(title).get("id"), movieHash.get(title).get("releaseDate"), movieHash.get(title).get("imdbURL"), movieHash.get(title).get("genre"), movieHash.get(title).get("averageRating"));
+						movieRatePanelSetText(movieHash.get(title).get("title"), movieHash.get(title).get("id"),
+								movieHash.get(title).get("releaseDate"), movieHash.get(title).get("imdbURL"),
+								movieHash.get(title).get("genre"), movieHash.get(title).get("averageRating"));
 						String tempRating;
 						if (user != null) {
 							try {
-								tempRating = searcher.searchDataRating(user.getId(), movieHash.get(title).get("id")); 
+								tempRating = searcher.searchDataRating(indexDataDirectory, user.getId(),
+										movieHash.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
 								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
@@ -690,18 +831,25 @@ public class MainFrame extends JFrame implements ActionListener {
 				// HashMap Implementation
 				for (String title : recommendationHash.keySet()) {
 					if (title.equals(queryString)) {
-						movieRatePanelSetText(recommendationHash.get(title).get("title"), recommendationHash.get(title).get("id"), recommendationHash.get(title).get("releaseDate"), recommendationHash.get(title).get("imdbURL"), recommendationHash.get(title).get("genre"), recommendationHash.get(title).get("averageRating"));
+						movieRatePanelSetText(recommendationHash.get(title).get("title"),
+								recommendationHash.get(title).get("id"),
+								recommendationHash.get(title).get("releaseDate"),
+								recommendationHash.get(title).get("imdbURL"),
+								recommendationHash.get(title).get("genre"),
+								recommendationHash.get(title).get("averageRating"));
 						predictedRatingMRLabel.setText(predictionsHash.get(recommendationHash.get(title).get("id")));
+						predictedRatingMRLabel.setVisible(true);
 						String tempRating;
 						if (user != null) {
 							try {
-								tempRating = searcher.searchDataRating(user.getId(), recommendationHash.get(title).get("id"));
+								tempRating = searcher.searchDataRating(indexDataDirectory, user.getId(),
+										recommendationHash.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
 								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
 								else
 									ratedMRLabel.setText("Rated");
-								
+
 							} catch (IOException e) {
 								e.printStackTrace();
 							} catch (ParseException e) {
@@ -732,25 +880,36 @@ public class MainFrame extends JFrame implements ActionListener {
 				} else {
 					JOptionPane.showMessageDialog(null, "User " + usernameSITF.getText() + " does not exist!");
 				}
-				if (user != null)
-					usernameMSLabel.setText("User " + user.getId());
+				if (user != null) {
+					// usernameMSLabel.setText("User " + user.getId());
+					/*
+					 * usernameMRLabel = new JLabel("USER " + user.getId(),
+					 * SwingConstants.RIGHT); underlineLabel(usernameMRLabel);
+					 * movieRatePanel.add(usernameMRLabel, BorderLayout.NORTH);
+					 */
+					enableUserButtons();
+				}
 			}
 			if (event.getSource() == signUpSInButton) {
 				changePage(2);
 			}
 			// Sign Up Page
 			if (event.getSource() == signUpSUpButton) {
-				user = new NewUser(String.format("%03d", users + 1), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
+				user = new NewUser(String.format("%03d", users + 1), ageSUTF.getText(), genderSUTF.getText(),
+						occupationSUTF.getText(), zipCodeSUTF.getText());
 				try {
-					indexer.addUserDoc(user.getId(), ageSUTF.getText(), genderSUTF.getText(), occupationSUTF.getText(), zipCodeSUTF.getText());
+					indexer.addUserDoc(indexUserDirectory, user.getId(), ageSUTF.getText(), genderSUTF.getText(),
+							occupationSUTF.getText(), zipCodeSUTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 
 				JOptionPane.showMessageDialog(null, "Signed In as User " + user.getId());
 				if (user != null) {
-					usernameMSLabel.setText("User "+ user.getId());
+					// usernameMSLabel.setText("User " + user.getId());
+					enableUserButtons();
 				}
+
 				signInOutMSButton.setText("Sign Out");
 				signInOutMRButton.setText("Sign Out");
 				recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List"));
@@ -760,13 +919,28 @@ public class MainFrame extends JFrame implements ActionListener {
 				changePage(1);
 			}
 			// Movie Search Page
+			if (event.getSource() == usernameMSButton) {
+				Document userDocument;
+				try {
+					userDocument = searcher.searchUserDoc(indexUserDirectory, user.getId());
+					userProfilePanelSetText(userDocument.get("userID"), userDocument.get("userAge"),
+							userDocument.get("userGender"), userDocument.get("userOccupation"),
+							userDocument.get("userZipCode"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				changePage(6);
+			}
 			if (event.getSource() == searchMSButton) {
 
 				// HashMap Implementation
 				try {
 					if (!movieTitles.isEmpty())
 						movieTitles.clear();
-					movieHash = searcher.searchItemDocs(indexItemDirectoryUpdated, idMSTF.getText(),titleMSTF.getText(), releaseMSTF.getText(), genreMSTF.getText());
+					movieHash = searcher.searchItemDocs(indexItemDirectoryUpdated, idMSTF.getText(),
+							titleMSTF.getText(), releaseMSTF.getText(), genreMSTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -784,10 +958,11 @@ public class MainFrame extends JFrame implements ActionListener {
 
 				movieList.setModel(movieListModel);
 
-				/*System.out.println("\nMovies In List After Search");
-				// HashMap Implementation
-				for (String title : movieHash.keySet())
-					System.out.println(title);*/
+				/*
+				 * System.out.println("\nMovies In List After Search"); //
+				 * HashMap Implementation for (String title :
+				 * movieHash.keySet()) System.out.println(title);
+				 */
 
 				movieListScrollPane.revalidate();
 
@@ -799,8 +974,10 @@ public class MainFrame extends JFrame implements ActionListener {
 				if (user != null) {
 					JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 					user = null;
-					usernameMSLabel.setText("Anonymous User");
+					// usernameMSLabel.setText("Anonymous User");
+					disableUserButtons();
 					signInOutMSButton.setText("Sign In");
+
 				} else {
 					changePage(1);
 					signInOutMSButton.setText("Sign Out");
@@ -808,6 +985,20 @@ public class MainFrame extends JFrame implements ActionListener {
 				// changePage(1);
 			}
 			// Movie Rate Page
+			if (event.getSource() == usernameMRButton) {
+				Document userDocument;
+				try {
+					userDocument = searcher.searchUserDoc(indexUserDirectory, user.getId());
+					userProfilePanelSetText(userDocument.get("userID"), userDocument.get("userAge"),
+							userDocument.get("userGender"), userDocument.get("userOccupation"),
+							userDocument.get("userZipCode"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				changePage(6);
+			}
 			if (event.getSource() == rateMRButton) {
 
 				if (user == null) {
@@ -825,7 +1016,8 @@ public class MainFrame extends JFrame implements ActionListener {
 							ratedMRLabel.setText("Rated");
 							ratingMRLabel.setText(stringRating);
 							try {
-								indexer.rateDataItem(user.getId(), idMRLabel.getText(), stringRating);
+								indexer.rateDataItem(indexDataDirectory, user.getId(), idMRLabel.getText(),
+										stringRating);
 							} catch (IOException e) {
 								e.printStackTrace();
 							} catch (ParseException e) {
@@ -849,10 +1041,30 @@ public class MainFrame extends JFrame implements ActionListener {
 					JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 					user = null;
 					signInOutMRButton.setText("Sign In");
+					/*
+					 * usernameMRLabel.setText("Anonymous User",
+					 * SwingConstants.RIGHT);
+					 * movieRatePanel.remove(usernameMRLabel);
+					 */
+
+					disableUserButtons();
 				} else {
 					changePage(1);
 					signInOutMRButton.setText("Sign Out");
 				}
+			}
+			// User Profile Page
+			if (event.getSource() == signOutUPButton) {
+				JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
+				user = null;
+				signInOutMSButton.setText("Sign In");
+				changePage(1);
+			}
+			if (event.getSource() == searchUPButton) {
+				changePage(3);
+			}
+			if (event.getSource() == recsUPButton) {
+				changePage(5);
 			}
 			// Recommendations Page
 			if (event.getSource() == searchRecButton) {
@@ -862,6 +1074,9 @@ public class MainFrame extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 				user = null;
 				signInOutMSButton.setText("Sign In");
+
+				disableUserButtons();
+
 				changePage(1);
 			}
 			if ((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton)
@@ -883,7 +1098,8 @@ public class MainFrame extends JFrame implements ActionListener {
 					// Jaccard Similarity
 					if (event.getSource() == jaccardButton) {
 						double[] jsm = similarity.jaccardSimilarityMatrix(Integer.valueOf(user.getId()), um, cum);
-						ArrayList<Integer> jsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo, jsm);
+						ArrayList<Integer> jsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+								jsm);
 						try {
 							ArrayList<String> jrm = similarity.recommendedMovies(jsu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, jrm);
@@ -899,7 +1115,8 @@ public class MainFrame extends JFrame implements ActionListener {
 					// Pearson Correlation
 					if (event.getSource() == pearsonButton) {
 						double[] psm = similarity.pearsonSimilarityMatrix(Integer.valueOf(user.getId()), um);
-						ArrayList<Integer> psu = similarity.similarUsers(Integer.valueOf(user.getId()),	similarUsersNo, psm);
+						ArrayList<Integer> psu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+								psm);
 						try {
 							ArrayList<String> prm = similarity.recommendedMovies(psu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, prm);
@@ -923,7 +1140,8 @@ public class MainFrame extends JFrame implements ActionListener {
 							e.printStackTrace();
 						}
 						double[] csm = similarity.cosineSimilarityMatrix(Integer.valueOf(user.getId()), um, rssm);
-						ArrayList<Integer> csu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo, csm);
+						ArrayList<Integer> csu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+								csm);
 						try {
 							ArrayList<String> crm = similarity.recommendedMovies(csu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, crm);
@@ -939,7 +1157,8 @@ public class MainFrame extends JFrame implements ActionListener {
 					// Euclidean Distance
 					if (event.getSource() == euclideanButton) {
 						double[] esm = similarity.euclideanSimilarityMatrix(Integer.valueOf(user.getId()), um);
-						ArrayList<Integer> esu = similarity.similarUsers(Integer.valueOf(user.getId()),	similarUsersNo, esm);
+						ArrayList<Integer> esu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+								esm);
 						try {
 							ArrayList<String> erm = similarity.recommendedMovies(esu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, erm);
@@ -955,7 +1174,8 @@ public class MainFrame extends JFrame implements ActionListener {
 					// Chebyshev Similarity
 					if (event.getSource() == chebyshevButton) {
 						double[] chsm = similarity.chebyshevSimilarityMatrix(Integer.valueOf(user.getId()), um);
-						ArrayList<Integer> chsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo, chsm);
+						ArrayList<Integer> chsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+								chsm);
 						try {
 							ArrayList<String> chrm = similarity.recommendedMovies(chsu, cum, userRating, um);
 							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, chrm);
@@ -967,8 +1187,7 @@ public class MainFrame extends JFrame implements ActionListener {
 							e.printStackTrace();
 						}
 					}
-					
-					
+
 				}
 			}
 
@@ -990,12 +1209,13 @@ public class MainFrame extends JFrame implements ActionListener {
 					}
 					ArrayList<String> cum = similarity.currentUserMovies(Integer.valueOf(user.getId()), um);
 					double[] jrsm = similarity.jaccardSimilarityMatrix(Integer.valueOf(user.getId()), rum, cum);
-					ArrayList<Integer> jrsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo, jrsm);
+					ArrayList<Integer> jrsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+							jrsm);
 					try {
 						ArrayList<String> jrrm = similarity.recommendedMovies(jrsu, cum, userRating, um);
 						recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, jrrm);
 						// Predicted Rating
-						predictionsHash = similarity.predictionsHashRounded(jrsu, rum, jrrm);
+						predictionsHash = similarity.predictionsHash(jrsm, jrsu, um, jrrm);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ParseException e) {
@@ -1009,14 +1229,17 @@ public class MainFrame extends JFrame implements ActionListener {
 			// recommendationListModel.removeAllElements();
 			for (String recommendationTitle : recommendationHash.keySet())
 				recommendationListModel.addElement(recommendationTitle);
-			/*if (recommendationListModel.isEmpty())
-				System.out.println("ListModel Empty After Search");*/
+			/*
+			 * if (recommendationListModel.isEmpty())
+			 * System.out.println("ListModel Empty After Search");
+			 */
 			recommendationList.setModel(recommendationListModel);
 
-			/*System.out.println("\nMovies In List After Recommendation");
-			// HashMap Implementation
-			for (String title : recommendationHash.keySet())
-				System.out.println(title);*/
+			/*
+			 * System.out.println("\nMovies In List After Recommendation"); //
+			 * HashMap Implementation for (String title :
+			 * recommendationHash.keySet()) System.out.println(title);
+			 */
 
 			recsListScrollPane.revalidate();
 

@@ -29,10 +29,7 @@ import searcherClasses.Searcher;
 
 public class Similarity {
 
-	// private String indexDataDirectory = "indexed\\uDataIndex";
-	// private String indexItemDirectory = "indexed\\uItemIndex";
-	// private static String indexUsersItemsNoDirectory =
-	// "indexed\\Users&Items";
+	private String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 
 	// private User user;
 	private int users;
@@ -41,8 +38,8 @@ public class Similarity {
 	private static Searcher dataSearcher = new Searcher();
 
 	public Similarity() throws IOException {
-		users = dataSearcher.getUsersNo();
-		items = dataSearcher.getItemsNo();
+		users = dataSearcher.getUsersNo(indexUsersItemsNoDirectory);
+		items = dataSearcher.getItemsNo(indexUsersItemsNoDirectory);
 		// user = Indexer.user;
 	}
 
@@ -491,7 +488,7 @@ public class Similarity {
 
 		for (String item : recommendedMovies) {
 			prediction = predictedRating(Integer.valueOf(item), similarityMatrix, similarUsers, utilityMatrix);
-			predictionHash.put(item, String.format("%2.1f",prediction));
+			predictionHash.put(item, String.format("%2.1f", prediction));
 		}
 
 		return predictionHash;
@@ -501,14 +498,14 @@ public class Similarity {
 	// Utility Matrices
 	// Given an ArrayList of Similar Users and the respective similarities,
 	// stores and returns Item IDs along with Predicted Ratings
-	public HashMap<String, String> predictionsHashRounded(ArrayList<Integer> similarUsers,
-			int[][] utilityMatrix, ArrayList<String> recommendedMovies) {
+	public HashMap<String, String> predictionsHashRounded(ArrayList<Integer> similarUsers, int[][] utilityMatrix,
+			ArrayList<String> recommendedMovies) {
 		HashMap<String, String> predictionHash = new HashMap<String, String>();
 		double prediction;
 
 		for (String item : recommendedMovies) {
 			prediction = predictedRatingRounded(Integer.valueOf(item), similarUsers, utilityMatrix);
-			predictionHash.put(item, String.format("%2.1f",prediction));
+			predictionHash.put(item, String.format("%2.1f", prediction));
 		}
 
 		return predictionHash;

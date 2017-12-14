@@ -11,6 +11,7 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -19,20 +20,10 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 public class Searcher {
-	private String indexDataDirectory = "indexed\\uDataIndex";
-	// private static String indexItemDirectory = "indexed\\uItemIndex";
-	private String indexUsersItemsNoDirectory = "indexed\\Users&Items";
-
-	/*
-	 * private int users; private int items;
-	 * 
-	 * public Searcher(int users, int items) { users = this.users; items =
-	 * this.items; }
-	 */
 
 	// Read Number of Users
-	public int getUsersNo() throws IOException {
-		File file = new File(indexUsersItemsNoDirectory);
+	public int getUsersNo(String indexDirectory) throws IOException {
+		File file = new File(indexDirectory);
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		int usersNo = 0;
@@ -45,8 +36,8 @@ public class Searcher {
 	}
 
 	// Read Number of Items
-	public int getItemsNo() throws IOException {
-		File file = new File(indexUsersItemsNoDirectory);
+	public int getItemsNo(String indexDirectory) throws IOException {
+		File file = new File(indexDirectory);
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		int itemsNo = 0;
@@ -116,7 +107,7 @@ public class Searcher {
 			File file = new File(indexDirectory);
 
 			// Open index
-			Directory directory = FSDirectory.open(file.toPath()); // 3
+			Directory directory = FSDirectory.open(file.toPath());
 			IndexReader indexReader = DirectoryReader.open(directory);
 			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 
@@ -207,10 +198,33 @@ public class Searcher {
 		return documentHash;
 	}
 
-	// Given UserID & ItemID returns the respective Rating if this exists
-	public String searchDataRating(String userQuery, String itemQuery) throws IOException, ParseException {
+	public Document searchUserDoc(String indexDirectory, String userID) throws IOException, ParseException {
+		File file = new File(indexDirectory);
+		// Open index
+		Directory directory = FSDirectory.open(file.toPath());
+		IndexReader reader = DirectoryReader.open(directory);
+		IndexSearcher searcher = new IndexSearcher(reader);
 
-		File file = new File(indexDataDirectory);
+		// Parse query
+		QueryParser parser = new QueryParser("userID", new StandardAnalyzer());
+		Query query = parser.parse(userID);
+
+		TopDocs hits = searcher.search(query, 1);
+		Document document = null;
+
+		for (ScoreDoc scoreDoc : hits.scoreDocs) {
+			// Retrieve matching document
+			document = searcher.doc(scoreDoc.doc);
+		}
+		reader.close();
+
+		return document;
+	}
+
+	// Given UserID & ItemID returns the respective Rating if this exists
+	public String searchDataRating(String indexDirectory, String userQuery, String itemQuery)
+			throws IOException, ParseException {
+		File file = new File(indexDirectory);
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
 		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
