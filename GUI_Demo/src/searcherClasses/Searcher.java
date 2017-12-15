@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -57,9 +58,10 @@ public class Searcher {
 		ArrayList<String> fields = new ArrayList<String>();
 		// HashMap to Contain Movie Title and the Respective Document it Belongs
 		// to
-		HashMap<String, Document> documentHash = new HashMap<String, Document>();
+		HashMap<String, Document> documentMap = new HashMap<String, Document>();
 		String queryString = " ";
 		// Conditions to form final QueryString(AND)
+		// Tried queryBuilder, got tired, dropped it
 		if (!itemIDQuery.equals("")) {
 			queryString = itemIDQuery;
 			fields.add("id");
@@ -85,22 +87,6 @@ public class Searcher {
 				queryString = itemGenreQuery;
 			fields.add("genre");
 		}
-
-		// QueryBuilder does not function correctly with Lucene - (or maybe I
-		// can't make it work)
-		/*
-		 * BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder(); Query
-		 * idQuery = new TermQuery(new Term("id", itemIDQuery)); Query
-		 * titleQuery = new TermQuery(new Term("title", itemTitleQuery)); Query
-		 * releaseQuery = new TermQuery(new Term("releaseDate",
-		 * itemReleaseQuery)); Query genreQuery = new TermQuery(new
-		 * Term("genre", itemGenreQuery));
-		 * 
-		 * queryBuilder.add(idQuery, BooleanClause.Occur.MUST);
-		 * queryBuilder.add(titleQuery, BooleanClause.Occur.MUST);
-		 * queryBuilder.add(releaseQuery, BooleanClause.Occur.MUST);
-		 * queryBuilder.add(genreQuery, BooleanClause.Occur.MUST);
-		 */
 
 		// Checks if there is at least one actual written TextField
 		if (!fields.isEmpty()) {
@@ -134,12 +120,12 @@ public class Searcher {
 				// Retrieve matching document
 				Document document = indexSearcher.doc(scoreDoc.doc);
 				// Put Movie Title and Document to HashMap
-				documentHash.put(document.get("title"), document);
+				documentMap.put(document.get("title"), document);
 			}
 			// Close IndexSearcher
 			indexReader.close();
 		}
-		return documentHash;
+		return documentMap;
 	}
 
 	// Matches and returns HashMap with recommended Movie Titles and the
@@ -151,7 +137,7 @@ public class Searcher {
 		ArrayList<String> fields = new ArrayList<String>();
 		// HashMap to Contain Movie Title and the Respective Document it Belongs
 		// to
-		HashMap<String, Document> documentHash = new HashMap<String, Document>();
+		LinkedHashMap<String, Document> documentMap = new LinkedHashMap<String, Document>();
 
 		// Add wanted field to searched fields
 		fields.add("id");
@@ -176,7 +162,7 @@ public class Searcher {
 			// long start = System.currentTimeMillis();
 
 			// Search index
-			TopDocs hits = indexSearcher.search(query, 25);
+			TopDocs hits = indexSearcher.search(query, 1);
 
 			// long end = System.currentTimeMillis();
 
@@ -184,20 +170,25 @@ public class Searcher {
 			// System.err.println("Found " + hits.totalHits + " topics(s) (in "
 			// + (end - start) + " milliseconds) that matched query '" +
 			// queryString + "':");
+			Document document = null;
 
 			for (ScoreDoc scoreDoc : hits.scoreDocs) {
 				// Retrieve matching document
-				Document document = indexSearcher.doc(scoreDoc.doc);
+				document = indexSearcher.doc(scoreDoc.doc);
 				// Put Movie Title and Document to HashMap
-				documentHash.put(document.get("title"), document);
+				documentMap.put(document.get("title"), document);
+
 			}
 
 			// Close IndexSearcher
 			indexReader.close();
 		}
-		return documentHash;
+
+		return documentMap;
 	}
 
+	// Given UserID returns the respective User Document with ID, Age, Gender,
+	// Occupation, ZipCode
 	public Document searchUserDoc(String indexDirectory, String userID) throws IOException, ParseException {
 		File file = new File(indexDirectory);
 		// Open index
@@ -235,7 +226,7 @@ public class Searcher {
 		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
 		Query query = parser.parse(queryString);
 
-		TopDocs hits = indexSearcher.search(query, 10);
+		TopDocs hits = indexSearcher.search(query, 1);
 		for (ScoreDoc scoreDoc : hits.scoreDocs) {
 			Document document = indexSearcher.doc(scoreDoc.doc);
 			rating = document.get("dataRating");
@@ -245,30 +236,79 @@ public class Searcher {
 		return rating;
 	}
 
-	/*
-	 * // Returns Title(String) of the given Item ID public static String
-	 * searchItemTitle(String itemQueryString, File itemFile) throws
-	 * IOException, ParseException { // Open index String title = ""; Directory
-	 * itemDirectory = FSDirectory.open(itemFile.toPath()); // 3 IndexReader
-	 * itemIndexReader = DirectoryReader.open(itemDirectory); IndexSearcher
-	 * itemIndexSearcher = new IndexSearcher(itemIndexReader);
-	 * 
-	 * // Parse query String[] itemFields = { "id", "genre" };
-	 * MultiFieldQueryParser itemParser = new MultiFieldQueryParser(itemFields,
-	 * new StandardAnalyzer()); Query itemQuery =
-	 * itemParser.parse(itemQueryString);
-	 * 
-	 * // Search index TopDocs itemHits = itemIndexSearcher.search(itemQuery,
-	 * 30); for (ScoreDoc itemScoreDoc : itemHits.scoreDocs) { // Retrieve
-	 * matching document Document itemDocument =
-	 * itemIndexSearcher.doc(itemScoreDoc.doc);
-	 * 
-	 * title = itemDocument.get("title"); }
-	 * 
-	 * // Close Index Reader itemIndexReader.close();
-	 * 
-	 * return title; }
-	 */
+	// Given UserID it calculates and returns his/hers Average Rating
+	public HashMap<String, String> getAverageUserRating(String indexDirectory, String userQuery)
+			throws IOException, ParseException {
+
+		File file = new File(indexDirectory);
+		Directory directory = FSDirectory.open(file.toPath());
+		IndexReader indexReader = DirectoryReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+		String queryString = userQuery;
+		String[] fields = { "dataUserID" };
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
+		Query query = parser.parse(queryString);
+		TopDocs hits = indexSearcher.search(query, 1682);
+
+		HashMap<String, String> averageRatingMap = new HashMap<String, String>();
+		double averageRating, sum;
+		String stringSum;
+		int count;
+		sum = 0;
+		count = 0;
+		for (ScoreDoc scoreDoc : hits.scoreDocs) {
+			Document document = indexSearcher.doc(scoreDoc.doc);
+			stringSum = document.get("dataRating");
+			sum += Double.valueOf(stringSum);
+			count++;
+		}
+
+		averageRating = sum / count;
+		averageRatingMap.put("averageRating", String.format("%2.1f", averageRating));
+		averageRatingMap.put("itemsRated", Integer.toString(count));
+
+		indexReader.close();
+		return averageRatingMap;
+	}
+
+	// Matches Item IDs with Titles and returns HashMap IDs as keys and Titles
+	// as values
+	public HashMap<String, String> matchingIDsTitlesMap(String indexDirectory, ArrayList<String> highlyRatedMovies)
+			throws IOException, ParseException {
+		String titleTemp;
+		HashMap<String, String> titlesList = new HashMap<String, String>();
+		for (String suggestion : highlyRatedMovies) {
+			String itemQueryString = suggestion;
+			titleTemp = searchItemTitle(indexDirectory, itemQueryString);
+			titlesList.put(suggestion, titleTemp);
+		}
+
+		return titlesList;
+	}
+
+	// Given ItemID returns the respective Title if this exists
+	public String searchItemTitle(String indexDirectory, String itemIDQuery) throws IOException, ParseException {
+		File file = new File(indexDirectory);
+		Directory directory = FSDirectory.open(file.toPath());
+		IndexReader indexReader = DirectoryReader.open(directory);
+		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+
+		String queryString = itemIDQuery;
+		String title = " - ";
+		String[] fields = { "id" };
+		MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
+		Query query = parser.parse(queryString);
+
+		TopDocs hits = indexSearcher.search(query, 1);
+		for (ScoreDoc scoreDoc : hits.scoreDocs) {
+			Document document = indexSearcher.doc(scoreDoc.doc);
+			title = document.get("title");
+		}
+
+		indexReader.close();
+		return title;
+	}
 
 	/*
 	 * // Given the Item ID it returns the respective Average Rating public

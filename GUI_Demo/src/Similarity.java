@@ -31,21 +31,19 @@ public class Similarity {
 
 	private String indexUsersItemsNoDirectory = "indexed\\Users&Items";
 
-	// private User user;
 	private int users;
 	private int items;
 
-	private static Searcher dataSearcher = new Searcher();
+	private static Searcher searcher = new Searcher();
 
 	public Similarity() throws IOException {
-		users = dataSearcher.getUsersNo(indexUsersItemsNoDirectory);
-		items = dataSearcher.getItemsNo(indexUsersItemsNoDirectory);
-		// user = Indexer.user;
+		users = searcher.getUsersNo(indexUsersItemsNoDirectory);
+		items = searcher.getItemsNo(indexUsersItemsNoDirectory);
 	}
 
 	// Returns Array consisting the whole Utility Matrix
-	public int[][] utilityMatrixPopulator(String directoryString) throws IOException, ParseException {
-		File file = new File(directoryString);
+	public int[][] utilityMatrixPopulator(String indexDirectory) throws IOException, ParseException {
+		File file = new File(indexDirectory);
 
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
@@ -92,8 +90,8 @@ public class Similarity {
 
 	// Returns Array consisting the whole Utility Matrix with 1s in place of
 	// 3s,4s and 5s, and 0s in place of no rating, 1s and 2s
-	public int[][] utilityMatrixPopulatorRounded(String directoryString) throws IOException, ParseException {
-		File file = new File(directoryString);
+	public int[][] utilityMatrixPopulatorRounded(String indexDirectory) throws IOException, ParseException {
+		File file = new File(indexDirectory);
 
 		Directory directory = FSDirectory.open(file.toPath());
 		IndexReader indexReader = DirectoryReader.open(directory);
@@ -129,12 +127,14 @@ public class Similarity {
 				ratingTemp = Integer.valueOf(ratingString);
 
 				// Redundant Condition - Utility Matrix element already equals 0
+				// from initialization
 				/*
 				 * if(ratingTemp <= 2) utilityMatrix[i][itemTemp] = 0;
 				 */
-				if (ratingTemp > 3)
+				if (ratingTemp > 2)
 					utilityMatrix[i][itemTemp] = 1;
 			}
+
 		}
 
 		indexReader.close();
@@ -155,11 +155,6 @@ public class Similarity {
 		return movies;
 	}
 
-	// If we are to include Users with the movies we should change the ArrayList
-	// to HashMap
-	// If we are to choose based on Average Rating instead of Similar Users'
-	// Rating we should change userRating to averageRating
-
 	// Returns ArrayList of Movies. The more Similar the User the higher the
 	// movie on the list
 	public ArrayList<String> recommendedMovies(ArrayList<Integer> similarUsers, ArrayList<String> currentUserMovies,
@@ -167,7 +162,7 @@ public class Similarity {
 		ArrayList<String> suggestions = new ArrayList<String>();
 		String itemID;
 		for (int user : similarUsers) {
-			for (int j = 1; j <= users; j++) {
+			for (int j = 1; j <= items; j++) {
 				itemID = String.format("%04d", j);
 				if (utilityMatrix[user][j] >= userRating && !suggestions.contains(itemID))
 					suggestions.add(itemID);
@@ -190,6 +185,41 @@ public class Similarity {
 		return highlyRatedMovies;
 	}
 
+	// Given the predictionsMap(Item IDs as keys and respective Predicted
+	// Ratings as values) it produces and returns an ArrayList of Sorted
+	// by Predicted Rating Recommended Movies
+	public ArrayList<String> sortedRecommendedMovies(HashMap<String, Double> predictionsMap) {
+		ArrayList<String> recommendedMovies = new ArrayList<String>();
+		HashMap<String, Double> sortedPredictionsMap = sortByPredictedRating(predictionsMap);
+		for (String key : sortedPredictionsMap.keySet()) {
+			recommendedMovies.add(key);
+		}
+
+		return recommendedMovies;
+	}
+
+	// Returns a sorted by values HashMap of Item IDs as keys and the respective
+	// Predicted Ratings as values
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private HashMap<String, Double> sortByPredictedRating(Map<String, Double> similarityMap) {
+		List list = new LinkedList(similarityMap.entrySet());
+		// Defined Custom Comparator here
+		Collections.sort(list, new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
+			}
+		}.reversed());
+
+		// Here I am copying the sorted list in HashMap
+		// using LinkedHashMap to preserve the insertion order
+		HashMap sortedHashMap = new LinkedHashMap();
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+			Map.Entry entry = (Map.Entry) iterator.next();
+			sortedHashMap.put(entry.getKey(), entry.getValue());
+		}
+		return sortedHashMap;
+	}
+
 	// Returns ArrayList with the #similarUsersNo most similar users to the user
 	// given as parameter
 	@SuppressWarnings("rawtypes")
@@ -210,12 +240,16 @@ public class Similarity {
 		// similarUsers;
 		ArrayList<Integer> similarUsers = new ArrayList<Integer>();
 		int counter = 0;
+
+		System.out.println("\n5 Most Similar Users to User " + currentUser);
 		while (iterator.hasNext() && counter < similarUsersNo)
 		// while(counter < similarUsersNo)
 		{
 			Map.Entry entry = (Map.Entry) iterator.next();
 			similarUsers.add((Integer) entry.getKey());
 			counter++;
+
+			System.out.println(entry.getKey());
 		}
 
 		return similarUsers;
@@ -445,7 +479,6 @@ public class Similarity {
 
 				// Sum of Products of Differences
 				productSum += product;
-				// productSum += rxs_rx * rys_ry;
 
 				// Sum of Squares of Differences
 				rxs_rx2 = Math.pow(rxs_rx, 2);
@@ -463,17 +496,20 @@ public class Similarity {
 		return pearsonSimMatrix;
 	}
 
-	// Return Array of Row Averages
+	// Returns Array of Row/User Averages
 	public double[] rowAverages(int utilityMatrix[][]) {
-		double temp;
+		double temp, count;
 		double[] rowAverages = new double[users + 1];
 		for (int i = 1; i <= users; i++) {
 			temp = 0;
+			count = 0;
 			for (int j = 1; j <= items; j++) {
-				temp += utilityMatrix[i][j];
+				if (utilityMatrix[i][j] != 0) {
+					temp += utilityMatrix[i][j];
+					count++;
+				}
 			}
-			rowAverages[i] = temp / items;
-
+			rowAverages[i] = temp / count;
 		}
 
 		return rowAverages;
@@ -481,31 +517,15 @@ public class Similarity {
 
 	// Given an ArrayList of Similar Users and the respective similarities,
 	// stores and returns Item IDs along with Predicted Ratings
-	public HashMap<String, String> predictionsHash(double[] similarityMatrix, ArrayList<Integer> similarUsers,
+	public HashMap<String, Double> predictionsMap(double[] similarityMatrix, ArrayList<Integer> similarUsers,
 			int[][] utilityMatrix, ArrayList<String> recommendedMovies) {
-		HashMap<String, String> predictionHash = new HashMap<String, String>();
+		HashMap<String, Double> predictionHash = new HashMap<String, Double>();
 		double prediction;
 
-		for (String item : recommendedMovies) {
-			prediction = predictedRating(Integer.valueOf(item), similarityMatrix, similarUsers, utilityMatrix);
-			predictionHash.put(item, String.format("%2.1f", prediction));
-		}
-
-		return predictionHash;
-	}
-
-	// Same method with predictionHashRounded above. Takes into account rounded
-	// Utility Matrices
-	// Given an ArrayList of Similar Users and the respective similarities,
-	// stores and returns Item IDs along with Predicted Ratings
-	public HashMap<String, String> predictionsHashRounded(ArrayList<Integer> similarUsers, int[][] utilityMatrix,
-			ArrayList<String> recommendedMovies) {
-		HashMap<String, String> predictionHash = new HashMap<String, String>();
-		double prediction;
-
-		for (String item : recommendedMovies) {
-			prediction = predictedRatingRounded(Integer.valueOf(item), similarUsers, utilityMatrix);
-			predictionHash.put(item, String.format("%2.1f", prediction));
+		for (String itemID : recommendedMovies) {
+			prediction = predictedRating(Integer.valueOf(itemID), similarityMatrix, similarUsers, utilityMatrix);
+			// predictionHash.put(itemID, String.format("%2.1f", prediction));
+			predictionHash.put(itemID, prediction);
 		}
 
 		return predictionHash;
@@ -534,24 +554,29 @@ public class Similarity {
 		return predictedRating;
 	}
 
-	// Different prediction function used than the predictedRatingRounded above.
-	// Takes into account rounded Utility Matrices
-	// Given an ArrayList of Similar Users, calculates and returns Predicted
-	// Rating for a particular Item
-	public double predictedRatingRounded(int itemID, ArrayList<Integer> similarUsers, int[][] utilityMatrix) {
-		double sum, predictedRating;
-		sum = 0;
-
+	// Given Similar Users, Recommended Movies and Utility Matrix, returns Hashmap of Item Titles as keys and the Users that suggested them as Values 
+	public HashMap<String, String> recommendationsUsersMap(String indexDirectory, ArrayList<Integer> similarUsers,
+			ArrayList<String> recommendedMovies, int[][] utilityMatrix) throws IOException, ParseException {
+		ArrayList<String> suggestions = recommendedMovies;
+		HashMap<String, String> userRecommendationsMap = new HashMap<String, String>();
+		HashMap<String, String> idsTitlesMap = searcher.matchingIDsTitlesMap(indexDirectory, recommendedMovies);
+		String itemID;
+		String itemTitle;
+		long start = System.currentTimeMillis();
 		for (int user : similarUsers) {
-
-			// We do not take into account Similarity with a User that hasn't
-			// rated the given item
-			// utilityMatrix[user][itemID] = 0 when unrated by the user
-			sum += utilityMatrix[user][itemID];
-
+			for (int j = 1; j <= items; j++) {
+				itemID = String.format("%04d", j);
+				if (utilityMatrix[user][j] > 0 && suggestions.contains(itemID)) {
+					itemTitle = idsTitlesMap.get(itemID);
+					if (!userRecommendationsMap.containsKey(idsTitlesMap.get(itemID)))
+						userRecommendationsMap.put(itemTitle, String.format("%03d", user));
+				}
+			}
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("Millisecs: " + (end-start) );
 
-		predictedRating = sum / (double) similarUsers.size();
-		return predictedRating;
+		return userRecommendationsMap;
 	}
+
 }

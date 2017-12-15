@@ -88,6 +88,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JLabel zipCodeUPLabel;
 	private JLabel averageRatingTextUPLabel;
 	private JLabel averageRatingUPLabel;
+	private JLabel itemsRatedTextUPLabel;
+	private JLabel itemsRatedUPLabel;
 
 	// TextFields
 	// Home/Sign In TextFields
@@ -183,7 +185,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JMenuItem exitMI;
 
 	// Movie Search JList
-	private JList<String> movieList;
+	private JList<String> searchList;
 	// Recommendations JList
 	private JList<String> recommendationList;
 
@@ -191,23 +193,22 @@ public class MainFrame extends JFrame implements ActionListener {
 	private ArrayList<String> movieTitles;
 
 	// Movie Search HashMap
-	private static HashMap<String, Document> movieHash;
+	private static HashMap<String, Document> movieMap;
 	// Recommendations HashMap
-	private static HashMap<String, Document> recommendationHash;
+	private static HashMap<String, Document> recommendationMap;
+	private static HashMap<String, String> recsUsersMap;
 	// Predictions HashMap
-	private static HashMap<String, String> predictionsHash;
+	private static HashMap<String, Double> predictionMap;
 
-	// Movie List ListModel
-	private DefaultListModel<String> movieListModel;
+	// Search List ListModel
+	private DefaultListModel<String> searchListModel;
 	// Recommendation List ListModel
 	private DefaultListModel<String> recommendationListModel;
 
 	// CardLayout
 	CardLayout cardLayout;
+	private String[] listSelection;
 	private String queryString;
-
-	// Test String
-	private static User user;
 
 	private static String indexDataDirectory = "indexed\\uDataIndex";
 	private static String indexUserDirectory = "indexed\\uUserIndex";
@@ -217,22 +218,23 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static int users; // initially 943
 	private static int items; // initially 1682
 
-	private static int userRating = 5;
+	private static int userRating = 1;
 	private static int similarUsersNo = 5;
 	private static int maxRating = 5;
 	private static int minRating = 1;
 
+	private static User user;
 	private static Searcher searcher;
 	private static Indexer indexer;
 	private static Similarity similarity;
 
 	public MainFrame() throws IOException, ParseException {
-		// Number of Users and Items
 
 		searcher = new Searcher();
 		indexer = new Indexer();
 		similarity = new Similarity();
 
+		// Number of Users and Items
 		users = searcher.getUsersNo(indexUsersItemsNoDirectory);
 		items = searcher.getItemsNo(indexUsersItemsNoDirectory);
 		System.out.println("Users: " + users);
@@ -324,6 +326,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		zipCodeUPLabel = new JLabel("-");
 		averageRatingTextUPLabel = new JLabel("Average User Rating");
 		averageRatingUPLabel = new JLabel("-");
+		itemsRatedTextUPLabel = new JLabel("Items Rated");
+		itemsRatedUPLabel = new JLabel("-");
 
 		// TextFields
 		// Sign In Panel TextField
@@ -414,28 +418,25 @@ public class MainFrame extends JFrame implements ActionListener {
 		// ArrayLists
 		movieTitles = new ArrayList<String>();
 
-		// HashMap
-		movieHash = new HashMap<String, Document>();
-		recommendationHash = new HashMap<String, Document>();
-		predictionsHash = new HashMap<String, String>();
+		// HashMaps
+		movieMap = new HashMap<String, Document>();
+		recommendationMap = new HashMap<String, Document>();
+		recsUsersMap = new HashMap<String, String>();
+		predictionMap = new HashMap<String, Double>();
 
-		// MovieSearch: MovieList List Model
-		movieListModel = new DefaultListModel<String>();
-		/*
-		 * if (movieListModel.isEmpty())
-		 * System.out.println("Search ListModel Empty At Constructor");
-		 */
+		// MovieSearch: SearchList List Model
+		searchListModel = new DefaultListModel<String>();
 
-		// Hash Implementation
-		for (String title : movieHash.keySet())
-			movieListModel.addElement(title);
+		// Filling the Search ListModel
+		for (String title : movieMap.keySet())
+			searchListModel.addElement(title);
 
 		// MovieSearch JList
-		movieList = new JList<String>(movieListModel);
-		movieList.setVisibleRowCount(4);
-		movieList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		searchList = new JList<String>(searchListModel);
+		searchList.setVisibleRowCount(4);
+		searchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// MovieList Selection Listener
-		movieList.addListSelectionListener(listListener);
+		searchList.addListSelectionListener(listListener);
 
 		// Sign In Panel: Set Layout, Add Labels, TextFields & Buttons
 		signInPanel = new JPanel();
@@ -504,7 +505,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		// buttonSearchPanel.add(movieList);
 
 		// Movie Search JScroll Pane: Set Size, Border
-		movieListScrollPane = new JScrollPane(movieList);
+		movieListScrollPane = new JScrollPane(searchList);
 		movieListScrollPane.setPreferredSize(new Dimension(200, 200));
 		movieListScrollPane.setBorder(new TitledBorder("Movie List"));
 
@@ -526,7 +527,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		// Movie Rate RatingsRate Panel: Set Layout, Add Labels
 		ratingsRatePanel = new JPanel();
 		ratingsRatePanel.setLayout(new GridLayout(1, 2, 20, 10));
-		ratingsRatePanel.setBorder(new TitledBorder("Ratings"));
+		ratingsRatePanel.setBorder(new TitledBorder("Average & User Rating"));
 		ratingsRatePanel.add(averageRatingMRLabel);
 		ratingsRatePanel.add(ratingMRLabel);
 
@@ -581,14 +582,10 @@ public class MainFrame extends JFrame implements ActionListener {
 
 		// Recommendations RecommendationsList: List Model
 		recommendationListModel = new DefaultListModel<String>();
-		/*
-		 * if (recommendationListModel.isEmpty())
-		 * System.out.println("Recommendations ListModel Empty At Constructor");
-		 */
 
-		// HashMap Implementation
-		for (String title : recommendationHash.keySet())
-			recommendationListModel.addElement(title);
+		// Filling the Recommendations ListModel
+		for (String title : recommendationMap.keySet())
+			recommendationListModel.addElement(recsUsersMap.get(title) + ". -> \t" + title);
 
 		// Recommendation JList
 		recommendationList = new JList<String>(recommendationListModel);
@@ -620,7 +617,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
 		// User Profile InfoPanel: Set Layout, Add Panels
 		infoUPPanel = new JPanel();
-		infoUPPanel.setLayout(new GridLayout(6, 2, 20, 10));
+		infoUPPanel.setLayout(new GridLayout(7, 2, 20, 10));
 		infoUPPanel.setBorder(new TitledBorder("User Info"));
 		infoUPPanel.add(usernameTextUPLabel);
 		infoUPPanel.add(usernameUPLabel);
@@ -634,7 +631,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		infoUPPanel.add(zipCodeUPLabel);
 		infoUPPanel.add(averageRatingTextUPLabel);
 		infoUPPanel.add(averageRatingUPLabel);
-
+		infoUPPanel.add(itemsRatedTextUPLabel);
+		infoUPPanel.add(itemsRatedUPLabel);
 		// User Profile Button Panel: Set Layout, Add Labels
 		buttonUPPanel = new JPanel();
 		buttonUPPanel.setLayout(new GridLayout(1, 3, 20, 10));
@@ -739,13 +737,15 @@ public class MainFrame extends JFrame implements ActionListener {
 		averageRatingMRLabel.setText(averageRatingLabel);
 	}
 
-	public void userProfilePanelSetText(String userID, String age, String gender, String occupation, String zipCode) {
+	public void userProfilePanelSetText(String userID, String age, String gender, String occupation, String zipCode,
+			String averageRating, String itemsRated) {
 		usernameUPLabel.setText(userID);
 		ageUPLabel.setText(age);
 		genderUPLabel.setText(gender);
 		occupationUPLabel.setText(occupation);
 		zipCodeUPLabel.setText(zipCode);
-		// averageRatingUPLabel.setText(averageRating);
+		averageRatingUPLabel.setText(averageRating);
+		itemsRatedUPLabel.setText(itemsRated);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -785,26 +785,89 @@ public class MainFrame extends JFrame implements ActionListener {
 		movieRatePanel.add(usernameMRButton, BorderLayout.NORTH);
 	}
 
+	public void similarityStuff(String similarityType, int[][] utilityMatrix, int[][] utilityMatrixRounded,
+			ArrayList<String> currentUserMovies) {
+		double[] similarityMatrix = null;
+
+		// Calculate Similarity Matrix
+		switch (similarityType) {
+		case "jaccardSimilarity":
+			similarityMatrix = similarity.jaccardSimilarityMatrix(Integer.valueOf(user.getId()), utilityMatrix,
+					currentUserMovies);
+			break;
+		case "pearsonCorrelation":
+			similarityMatrix = similarity.pearsonSimilarityMatrix(Integer.valueOf(user.getId()), utilityMatrix);
+			break;
+		case "cosineSimilarity":
+			double[] rootSumSquaresMatrix = null;
+			try {
+				rootSumSquaresMatrix = similarity.rootSumSquaresMatrix(indexDataDirectory);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			similarityMatrix = similarity.cosineSimilarityMatrix(Integer.valueOf(user.getId()), utilityMatrix,
+					rootSumSquaresMatrix);
+			break;
+		case "euclideanDistance":
+			similarityMatrix = similarity.euclideanSimilarityMatrix(Integer.valueOf(user.getId()), utilityMatrix);
+			break;
+		case "chebyshevSimilarity":
+			similarityMatrix = similarity.chebyshevSimilarityMatrix(Integer.valueOf(user.getId()), utilityMatrix);
+			break;
+		case "jaccardRoundedSimilarity":
+			similarityMatrix = similarity.jaccardSimilarityMatrix(Integer.valueOf(user.getId()), utilityMatrixRounded,
+					currentUserMovies);
+			break;
+		default:
+			System.out.println("Error Occured In Similarity Matrix Calculations!!!");
+			break;
+		}
+
+		// Retrieve Similar Users
+		ArrayList<Integer> similarUsers = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
+				similarityMatrix);
+		try {
+			// Retrieve Recommended Movies
+			ArrayList<String> recommendedMovies = similarity.recommendedMovies(similarUsers, currentUserMovies,
+					userRating, utilityMatrix);
+			// Predicted Rating
+			predictionMap = similarity.predictionsMap(similarityMatrix, similarUsers, utilityMatrix, recommendedMovies);
+			// Sorted by Predicted Rating
+			ArrayList<String> recommendedMoviesSorted = similarity.sortedRecommendedMovies(predictionMap);
+			// Recommendation Map Created
+			recommendationMap = searcher.recommendedItemDocs(indexItemDirectoryUpdated, recommendedMoviesSorted);
+			// Add User in JList alongside Suggested Item Title
+			recsUsersMap = similarity.recommendationsUsersMap(indexItemDirectoryUpdated, similarUsers,
+					recommendedMovies, utilityMatrix);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
 	class ListListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent event) {
-			if (event.getSource() == movieList) {
+			if (event.getSource() == searchList) {
 
-				if (movieList.getSelectedValue() == null)
+				if (searchList.getSelectedValue() == null)
 					return;
 
-				queryString = movieList.getSelectedValue().toString();
+				queryString = searchList.getSelectedValue().toString();
 
-				// HashMap Implementation
-				for (String title : movieHash.keySet()) {
+				// "Transfering" info from movieMap to movieRatePanel
+				for (String title : movieMap.keySet()) {
 					if (title.equals(queryString)) {
-						movieRatePanelSetText(movieHash.get(title).get("title"), movieHash.get(title).get("id"),
-								movieHash.get(title).get("releaseDate"), movieHash.get(title).get("imdbURL"),
-								movieHash.get(title).get("genre"), movieHash.get(title).get("averageRating"));
+						movieRatePanelSetText(movieMap.get(title).get("title"), movieMap.get(title).get("id"),
+								movieMap.get(title).get("releaseDate"), movieMap.get(title).get("imdbURL"),
+								movieMap.get(title).get("genre"), movieMap.get(title).get("averageRating"));
 						String tempRating;
 						if (user != null) {
 							try {
 								tempRating = searcher.searchDataRating(indexDataDirectory, user.getId(),
-										movieHash.get(title).get("id"));
+										movieMap.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
 								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
@@ -826,24 +889,25 @@ public class MainFrame extends JFrame implements ActionListener {
 
 				if (recommendationList.getSelectedValue() == null)
 					return;
-				queryString = recommendationList.getSelectedValue().toString();
+				listSelection = recommendationList.getSelectedValue().toString().split("[\t]");
+				queryString = listSelection[1];
 
-				// HashMap Implementation
-				for (String title : recommendationHash.keySet()) {
+				// "Transfering" info from recommendationMap and predictionMap
+				// to movieRatePanel
+				for (String title : recommendationMap.keySet()) {
 					if (title.equals(queryString)) {
-						movieRatePanelSetText(recommendationHash.get(title).get("title"),
-								recommendationHash.get(title).get("id"),
-								recommendationHash.get(title).get("releaseDate"),
-								recommendationHash.get(title).get("imdbURL"),
-								recommendationHash.get(title).get("genre"),
-								recommendationHash.get(title).get("averageRating"));
-						predictedRatingMRLabel.setText(predictionsHash.get(recommendationHash.get(title).get("id")));
+						movieRatePanelSetText(recommendationMap.get(title).get("title"),
+								recommendationMap.get(title).get("id"), recommendationMap.get(title).get("releaseDate"),
+								recommendationMap.get(title).get("imdbURL"), recommendationMap.get(title).get("genre"),
+								recommendationMap.get(title).get("averageRating"));
+						predictedRatingMRLabel.setText(
+								String.format("%2.1f", predictionMap.get(recommendationMap.get(title).get("id"))));
 						predictedRatingMRLabel.setVisible(true);
 						String tempRating;
 						if (user != null) {
 							try {
 								tempRating = searcher.searchDataRating(indexDataDirectory, user.getId(),
-										recommendationHash.get(title).get("id"));
+										recommendationMap.get(title).get("id"));
 								ratingMRLabel.setText(tempRating);
 								if (tempRating.equals(" - "))
 									ratedMRLabel.setText("Unrated");
@@ -880,15 +944,8 @@ public class MainFrame extends JFrame implements ActionListener {
 				} else {
 					JOptionPane.showMessageDialog(null, "User " + usernameSITF.getText() + " does not exist!");
 				}
-				if (user != null) {
-					// usernameMSLabel.setText("User " + user.getId());
-					/*
-					 * usernameMRLabel = new JLabel("USER " + user.getId(),
-					 * SwingConstants.RIGHT); underlineLabel(usernameMRLabel);
-					 * movieRatePanel.add(usernameMRLabel, BorderLayout.NORTH);
-					 */
+				if (user != null)
 					enableUserButtons();
-				}
 			}
 			if (event.getSource() == signUpSInButton) {
 				changePage(2);
@@ -905,10 +962,8 @@ public class MainFrame extends JFrame implements ActionListener {
 				}
 
 				JOptionPane.showMessageDialog(null, "Signed In as User " + user.getId());
-				if (user != null) {
-					// usernameMSLabel.setText("User " + user.getId());
+				if (user != null)
 					enableUserButtons();
-				}
 
 				signInOutMSButton.setText("Sign Out");
 				signInOutMRButton.setText("Sign Out");
@@ -921,11 +976,14 @@ public class MainFrame extends JFrame implements ActionListener {
 			// Movie Search Page
 			if (event.getSource() == usernameMSButton) {
 				Document userDocument;
+				HashMap<String, String> averageRatingMap;
 				try {
 					userDocument = searcher.searchUserDoc(indexUserDirectory, user.getId());
+					averageRatingMap = searcher.getAverageUserRating(indexDataDirectory, user.getId());
 					userProfilePanelSetText(userDocument.get("userID"), userDocument.get("userAge"),
 							userDocument.get("userGender"), userDocument.get("userOccupation"),
-							userDocument.get("userZipCode"));
+							userDocument.get("userZipCode"), averageRatingMap.get("averageRating"),
+							averageRatingMap.get("itemsRated"));
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -935,35 +993,26 @@ public class MainFrame extends JFrame implements ActionListener {
 			}
 			if (event.getSource() == searchMSButton) {
 
-				// HashMap Implementation
 				try {
 					if (!movieTitles.isEmpty())
 						movieTitles.clear();
-					movieHash = searcher.searchItemDocs(indexItemDirectoryUpdated, idMSTF.getText(),
-							titleMSTF.getText(), releaseMSTF.getText(), genreMSTF.getText());
+					movieMap = searcher.searchItemDocs(indexItemDirectoryUpdated, idMSTF.getText(), titleMSTF.getText(),
+							releaseMSTF.getText(), genreMSTF.getText());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
 
-				// HashMap Implementation
-				movieListModel = new DefaultListModel<String>();
-				// movieListModel.removeAllElements();
-				for (String movieTitle : movieHash.keySet())
-					movieListModel.addElement(movieTitle);
-				if (movieListModel.isEmpty()) {
+				// Filling the Search ListModel
+				searchListModel = new DefaultListModel<String>();
+				for (String movieTitle : movieMap.keySet())
+					searchListModel.addElement(movieTitle);
+				if (searchListModel.isEmpty()) {
 					JOptionPane.showMessageDialog(null, "No results found.");
 				}
 
-				movieList.setModel(movieListModel);
-
-				/*
-				 * System.out.println("\nMovies In List After Search"); //
-				 * HashMap Implementation for (String title :
-				 * movieHash.keySet()) System.out.println(title);
-				 */
-
+				searchList.setModel(searchListModel);
 				movieListScrollPane.revalidate();
 
 			}
@@ -974,7 +1023,6 @@ public class MainFrame extends JFrame implements ActionListener {
 				if (user != null) {
 					JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 					user = null;
-					// usernameMSLabel.setText("Anonymous User");
 					disableUserButtons();
 					signInOutMSButton.setText("Sign In");
 
@@ -987,11 +1035,14 @@ public class MainFrame extends JFrame implements ActionListener {
 			// Movie Rate Page
 			if (event.getSource() == usernameMRButton) {
 				Document userDocument;
+				HashMap<String, String> averageRatingMap;
 				try {
 					userDocument = searcher.searchUserDoc(indexUserDirectory, user.getId());
+					averageRatingMap = searcher.getAverageUserRating(indexDataDirectory, user.getId());
 					userProfilePanelSetText(userDocument.get("userID"), userDocument.get("userAge"),
 							userDocument.get("userGender"), userDocument.get("userOccupation"),
-							userDocument.get("userZipCode"));
+							userDocument.get("userZipCode"), averageRatingMap.get("averageRating"),
+							averageRatingMap.get("itemsRated"));
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -1012,7 +1063,7 @@ public class MainFrame extends JFrame implements ActionListener {
 						if (intRating > maxRating || intRating < minRating) {
 							JOptionPane.showMessageDialog(null, "Your rating must be between 1 and 5.");
 						} else {
-							JOptionPane.showMessageDialog(null, "The number you chose is " + intRating + ".");
+							JOptionPane.showMessageDialog(null, "You rated this " + intRating + ".");
 							ratedMRLabel.setText("Rated");
 							ratingMRLabel.setText(stringRating);
 							try {
@@ -1026,7 +1077,7 @@ public class MainFrame extends JFrame implements ActionListener {
 							return;
 						}
 					} catch (NumberFormatException e) {
-						JOptionPane.showMessageDialog(null, "The text you typed is not an integer.");
+						JOptionPane.showMessageDialog(null, "You need to type an integer.");
 					}
 				}
 			}
@@ -1041,11 +1092,6 @@ public class MainFrame extends JFrame implements ActionListener {
 					JOptionPane.showMessageDialog(null, "Signed Out User " + user.getId());
 					user = null;
 					signInOutMRButton.setText("Sign In");
-					/*
-					 * usernameMRLabel.setText("Anonymous User",
-					 * SwingConstants.RIGHT);
-					 * movieRatePanel.remove(usernameMRLabel);
-					 */
 
 					disableUserButtons();
 				} else {
@@ -1076,7 +1122,6 @@ public class MainFrame extends JFrame implements ActionListener {
 				signInOutMSButton.setText("Sign In");
 
 				disableUserButtons();
-
 				changePage(1);
 			}
 			if ((event.getSource() == jaccardButton) || (event.getSource() == pearsonButton)
@@ -1086,106 +1131,40 @@ public class MainFrame extends JFrame implements ActionListener {
 					changePage(1);
 					JOptionPane.showMessageDialog(null, "You need to Sign In or Sing Up first...");
 				} else {
-					int[][] um = null;
+					int[][] utilityMatrix = null;
 					try {
-						um = similarity.utilityMatrixPopulator(indexDataDirectory);
+						utilityMatrix = similarity.utilityMatrixPopulator(indexDataDirectory);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					ArrayList<String> cum = similarity.currentUserMovies(Integer.valueOf(user.getId()), um);
+					ArrayList<String> currentUserMovies = similarity.currentUserMovies(Integer.valueOf(user.getId()),
+							utilityMatrix);
+
 					// Jaccard Similarity
 					if (event.getSource() == jaccardButton) {
-						double[] jsm = similarity.jaccardSimilarityMatrix(Integer.valueOf(user.getId()), um, cum);
-						ArrayList<Integer> jsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
-								jsm);
-						try {
-							ArrayList<String> jrm = similarity.recommendedMovies(jsu, cum, userRating, um);
-							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, jrm);
-							// Predicted Rating
-							predictionsHash = similarity.predictionsHash(jsm, jsu, um, jrm);
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+						similarityStuff("jaccardSimilarity", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Pearson Correlation
 					if (event.getSource() == pearsonButton) {
-						double[] psm = similarity.pearsonSimilarityMatrix(Integer.valueOf(user.getId()), um);
-						ArrayList<Integer> psu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
-								psm);
-						try {
-							ArrayList<String> prm = similarity.recommendedMovies(psu, cum, userRating, um);
-							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, prm);
-							// Predicted Rating
-							predictionsHash = similarity.predictionsHash(psm, psu, um, prm);
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+						similarityStuff("pearsonCorrelation", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Cosine Similarity
 					if (event.getSource() == cosineButton) {
-						double[] rssm = null;
-						try {
-							rssm = similarity.rootSumSquaresMatrix(indexDataDirectory);
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
-						double[] csm = similarity.cosineSimilarityMatrix(Integer.valueOf(user.getId()), um, rssm);
-						ArrayList<Integer> csu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
-								csm);
-						try {
-							ArrayList<String> crm = similarity.recommendedMovies(csu, cum, userRating, um);
-							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, crm);
-							// Predicted Rating
-							predictionsHash = similarity.predictionsHash(csm, csu, um, crm);
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+						similarityStuff("cosineSimilarity", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Euclidean Distance
 					if (event.getSource() == euclideanButton) {
-						double[] esm = similarity.euclideanSimilarityMatrix(Integer.valueOf(user.getId()), um);
-						ArrayList<Integer> esu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
-								esm);
-						try {
-							ArrayList<String> erm = similarity.recommendedMovies(esu, cum, userRating, um);
-							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, erm);
-							// Predicted Rating
-							predictionsHash = similarity.predictionsHash(esm, esu, um, erm);
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+						similarityStuff("euclideanDistance", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Chebyshev Similarity
 					if (event.getSource() == chebyshevButton) {
-						double[] chsm = similarity.chebyshevSimilarityMatrix(Integer.valueOf(user.getId()), um);
-						ArrayList<Integer> chsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
-								chsm);
-						try {
-							ArrayList<String> chrm = similarity.recommendedMovies(chsu, cum, userRating, um);
-							recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, chrm);
-							// Predicted Rating
-							predictionsHash = similarity.predictionsHash(chsm, chsu, um, chrm);
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+						similarityStuff("chebyshevSimilarity", utilityMatrix, null, currentUserMovies);
 					}
 
 				}
@@ -1197,49 +1176,31 @@ public class MainFrame extends JFrame implements ActionListener {
 					changePage(1);
 					JOptionPane.showMessageDialog(null, "You need to Sign In or Sing Up first...");
 				} else {
-					int[][] um = null;
-					int[][] rum = null;
+					int[][] utilityMatrix = null;
+					int[][] utilityMatrixRounded = null;
 					try {
-						um = similarity.utilityMatrixPopulator(indexDataDirectory);
-						rum = similarity.utilityMatrixPopulatorRounded(indexDataDirectory);
+						utilityMatrix = similarity.utilityMatrixPopulator(indexDataDirectory);
+						utilityMatrixRounded = similarity.utilityMatrixPopulatorRounded(indexDataDirectory);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					ArrayList<String> cum = similarity.currentUserMovies(Integer.valueOf(user.getId()), um);
-					double[] jrsm = similarity.jaccardSimilarityMatrix(Integer.valueOf(user.getId()), rum, cum);
-					ArrayList<Integer> jrsu = similarity.similarUsers(Integer.valueOf(user.getId()), similarUsersNo,
-							jrsm);
-					try {
-						ArrayList<String> jrrm = similarity.recommendedMovies(jrsu, cum, userRating, um);
-						recommendationHash = searcher.recommendedItemDocs(indexItemDirectoryUpdated, jrrm);
-						// Predicted Rating
-						predictionsHash = similarity.predictionsHash(jrsm, jrsu, um, jrrm);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
+					ArrayList<String> currentUserMovies = similarity.currentUserMovies(Integer.valueOf(user.getId()),
+							utilityMatrix);
+
+					similarityStuff("jaccardRoundedSimilarity", utilityMatrix, utilityMatrixRounded, currentUserMovies);
 				}
 			}
 
-			// HashMap Implementation
+			// Filling the Recommendations ListModel
 			recommendationListModel = new DefaultListModel<String>();
-			// recommendationListModel.removeAllElements();
-			for (String recommendationTitle : recommendationHash.keySet())
-				recommendationListModel.addElement(recommendationTitle);
-			/*
-			 * if (recommendationListModel.isEmpty())
-			 * System.out.println("ListModel Empty After Search");
-			 */
-			recommendationList.setModel(recommendationListModel);
+			for (String recommendationTitle : recommendationMap.keySet()) {
+				recommendationListModel
+						.addElement(recsUsersMap.get(recommendationTitle) + ". -> \t" + recommendationTitle);
+			}
 
-			/*
-			 * System.out.println("\nMovies In List After Recommendation"); //
-			 * HashMap Implementation for (String title :
-			 * recommendationHash.keySet()) System.out.println(title);
-			 */
+			recommendationList.setModel(recommendationListModel);
 
 			recsListScrollPane.revalidate();
 

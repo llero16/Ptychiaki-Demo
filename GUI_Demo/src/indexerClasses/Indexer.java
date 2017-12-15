@@ -27,13 +27,11 @@ public class Indexer {
 
 	private int users;
 	private int items;
-	// private static User user;
 	private static Searcher dataSearcher = new Searcher();
 
 	public Indexer() throws IOException {
 		users = dataSearcher.getUsersNo(indexUsersItemsNoDirectory);
 		items = dataSearcher.getItemsNo(indexUsersItemsNoDirectory);
-		// user = Indexer.user;
 	}
 
 	// Rates Item using UserID and ItemID
@@ -44,7 +42,7 @@ public class Indexer {
 		addDataDoc(indexDirectory, userID, itemID, rating);
 	}
 
-	// Adds new or updates existing Item Rating
+	// Adds new or Updates existing Item Rating
 	public void addDataDoc(String indexDirectory, String userID, String itemID, String rating) throws IOException {
 
 		Analyzer analyzer = new StandardAnalyzer();
@@ -86,7 +84,7 @@ public class Indexer {
 		writer.close();
 	}
 
-	// Add Rating (Index new Document)
+	// Adds Rating (Index new Document)
 	public void addUserDoc(String indexDirectory, String id, String age, String gender, String occupation,
 			String zipCode) throws IOException {
 		Analyzer analyzer = new StandardAnalyzer();
