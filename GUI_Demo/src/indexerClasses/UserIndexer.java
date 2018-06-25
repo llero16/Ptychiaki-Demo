@@ -50,16 +50,6 @@ public class UserIndexer
 			userOccupation = user[3];
 			userZipCode = user[4];
 			
-			
-			//Εκτύπωση ευρετηριοποιημένω στοιχείων
-			System.out.println("id: " + userID);
-			System.out.println("age: " + userAge);
-			System.out.println("gender: " + userGender);
-			System.out.println("occupation: " + userOccupation);
-			System.out.println("zipcode: " + userZipCode);
-		
-			System.out.println();
-			
 			//Προσθήκη στο ευρετήριο
 			addDoc(writer,userID, userAge, userGender, userOccupation, userZipCode);
 			System.out.println("Ευρετηριοποιείται το αρχείο: " + userID);

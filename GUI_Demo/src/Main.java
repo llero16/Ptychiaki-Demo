@@ -2,6 +2,8 @@ import java.io.IOException;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 
+import guiClasses.MainFrame;
+
 public class Main {
 
 	@SuppressWarnings("unused")

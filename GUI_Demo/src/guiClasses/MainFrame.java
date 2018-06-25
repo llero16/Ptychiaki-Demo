@@ -1,3 +1,4 @@
+package guiClasses;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -36,6 +37,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 
 import indexerClasses.Indexer;
 import searcherClasses.Searcher;
+import similarityClasses.Similarity;
 import userClasses.NewUser;
 import userClasses.OldUser;
 import userClasses.User;
@@ -784,6 +786,34 @@ public class MainFrame extends JFrame implements ActionListener {
 		usernameMRButton.setEnabled(true);
 		movieRatePanel.add(usernameMRButton, BorderLayout.NORTH);
 	}
+	
+	public void changeRecListTitle(int similarityMeasure)
+	{
+		switch (similarityMeasure) {
+		case 1:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List - jacSim"));
+			break;
+		case 2:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List - jacSimRound"));
+			break;
+		case 3:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List - pearCor"));
+			break;
+		case 4:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List - cosSim"));
+			break;
+		case 5:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List - eucDist"));
+			break;
+		case 6:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List - chebSim"));
+			break;
+		default:
+			recsListScrollPane.setBorder(new TitledBorder("User " + user.getId() + " - Recommendations List"));
+			break;
+		}
+		
+	}
 
 	public void similarityStuff(String similarityType, int[][] utilityMatrix, int[][] utilityMatrixRounded,
 			ArrayList<String> currentUserMovies) {
@@ -1144,26 +1174,31 @@ public class MainFrame extends JFrame implements ActionListener {
 
 					// Jaccard Similarity
 					if (event.getSource() == jaccardButton) {
+						changeRecListTitle(1);
 						similarityStuff("jaccardSimilarity", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Pearson Correlation
 					if (event.getSource() == pearsonButton) {
+						changeRecListTitle(3);
 						similarityStuff("pearsonCorrelation", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Cosine Similarity
 					if (event.getSource() == cosineButton) {
+						changeRecListTitle(4);
 						similarityStuff("cosineSimilarity", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Euclidean Distance
 					if (event.getSource() == euclideanButton) {
+						changeRecListTitle(5);
 						similarityStuff("euclideanDistance", utilityMatrix, null, currentUserMovies);
 					}
 
 					// Chebyshev Similarity
 					if (event.getSource() == chebyshevButton) {
+						changeRecListTitle(6);
 						similarityStuff("chebyshevSimilarity", utilityMatrix, null, currentUserMovies);
 					}
 
@@ -1188,7 +1223,7 @@ public class MainFrame extends JFrame implements ActionListener {
 					}
 					ArrayList<String> currentUserMovies = similarity.currentUserMovies(Integer.valueOf(user.getId()),
 							utilityMatrix);
-
+					changeRecListTitle(2);
 					similarityStuff("jaccardRoundedSimilarity", utilityMatrix, utilityMatrixRounded, currentUserMovies);
 				}
 			}

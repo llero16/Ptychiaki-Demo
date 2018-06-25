@@ -22,25 +22,25 @@ public class UserSearcher
 		//Parse provided index directory
 		String indexDir = "indexed\\uUserIndex";					
 		//Parse provided query string
-		String q = "946";
+		String queryString = "946";
 
-		search(indexDir, q);
+		search(indexDir, queryString);
 	}
 	
 	public static void search(String indexDir, String q)
 		    throws IOException, ParseException {
-		    File ff=new File(indexDir);
+		    File file=new File(indexDir);
 		    //#3 Open index
-		    Directory dir = FSDirectory.open(ff.toPath()); //3
-		    IndexReader reader = DirectoryReader.open(dir);
-		    IndexSearcher is = new IndexSearcher(reader);
+		    Directory index = FSDirectory.open(file.toPath()); //3
+		    IndexReader reader = DirectoryReader.open(index);
+		    IndexSearcher searcher = new IndexSearcher(reader);
 		    
 		    //Parse query
 		    QueryParser parser = new QueryParser( "userID", new StandardAnalyzer());
 		     Query query = parser.parse(q);               
 		    long start = System.currentTimeMillis();
 		    //Search index
-		    TopDocs hits = is.search(query, 30);		
+		    TopDocs hits = searcher.search(query, 30);		
 		    long end = System.currentTimeMillis();
 
 
@@ -49,13 +49,13 @@ public class UserSearcher
 		    
 		    for(ScoreDoc scoreDoc : hits.scoreDocs) {
 		    	//Retrieve matching document
-		      Document doc = is.doc(scoreDoc.doc);                    
+		      Document document = searcher.doc(scoreDoc.doc);                    
 		      //#8 Display filename
-		      System.out.print(doc.get("userID") + " ");
-		      System.out.print(doc.get("userAge") + " ");
-		      System.out.print(doc.get("userGender") + " ");
-		      System.out.print(doc.get("userOccupation") + " ");
-		      System.out.print(doc.get("userZipCode") + " ");
+		      System.out.print(document.get("userID") + " ");
+		      System.out.print(document.get("userAge") + " ");
+		      System.out.print(document.get("userGender") + " ");
+		      System.out.print(document.get("userOccupation") + " ");
+		      System.out.print(document.get("userZipCode") + " ");
 		    }
 		    //Close IndexSearcher
 		   reader.close();                        
